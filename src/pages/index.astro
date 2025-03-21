@@ -2,3 +2,64 @@
 
 ---
 
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Cafe Life Itself</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+    </head>
+    <body>
+        <p>Here it is. You've arrived.</p>
+        <p>
+            The door is yellow and the trim is red. The wide storefront glass is
+            fogged. You hear the clinks of mugs and silverware, and smell steam
+            and fresh-baked bread.
+        </p>
+        <p>
+            It's been a long journey, but here you are. <b>Cafe Halcyon.</b>
+            Time to see what all the fuss is about.
+        </p>
+        <ol>
+            <li>1. Go inside.</li>
+            <li>2. Peer through the glass.</li>
+            <li>3. Go around the back.</li>
+            <li>4. Leave.</li>
+        </ol>
+    </body>
+</html>
+
+<style>
+    html {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        font-family: serif;
+    }
+
+    body {
+        margin: 10rem auto;
+        max-width: 65ch;
+        padding: 0 1rem;
+    }
+
+    ol {
+        position: sticky;
+        background-color: white;
+        bottom: 0;
+        padding: 0 0 2rem;
+        margin: 10rem 0;
+        list-style: none;
+
+        li {
+            padding: 0.5em 0.5em;
+            border-top: 1px dotted black;
+
+            &:hover {
+                color: white;
+                background-color: black;
+                cursor: pointer;
+            }
+        }
+    }
+</style>
