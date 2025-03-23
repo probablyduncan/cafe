@@ -1,65 +1,28 @@
 ---
-
+import "../style.css";
+import { Content } from "../content/generated/i/start-morning-outside.mdx";
+import LiChoices from "../components/li-choices.astro";
+import OlChoices from "../components/ol-choices.astro";
+import UlChoices from "../components/ul-choices.astro";
 ---
 
 <!doctype html>
 <html lang="en">
     <head>
-        <title>Cafe Life Itself</title>
+        <title>Cafe Halcyon</title>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width" />
+        <script src="../lib/client"/>
     </head>
     <body>
-        <p>Here it is. You've arrived.</p>
-        <p>
-            The door is yellow and the trim is red. The wide storefront glass is
-            fogged. You hear the clinks of mugs and silverware, and smell steam
-            and fresh-baked bread.
-        </p>
-        <p>
-            It's been a long journey, but here you are. <b>Cafe Halcyon.</b>
-            Time to see what all the fuss is about.
-        </p>
-        <ol>
-            <li>1. Go inside.</li>
-            <li>2. Peer through the glass.</li>
-            <li>3. Go around the back.</li>
-            <li>4. Leave.</li>
-        </ol>
+        <nav>
+            <a href="/info" title="about this cafe">info</a>
+            <!-- <span><span data-time></span> at the Cafe Halcyon</span> -->
+            <!-- <span>Cafe Halcyon</span> -->
+            <a href="/ctrl" title="settings & save files">ctrl</a>
+        </nav>
+        <div data-content>
+            <Content components={{li: LiChoices, ol: OlChoices, ul: UlChoices}} />
+        </div>
     </body>
 </html>
-
-<style>
-    html {
-        margin: 0;
-        width: 100%;
-        height: 100%;
-        font-family: serif;
-    }
-
-    body {
-        margin: 10rem auto;
-        max-width: 65ch;
-        padding: 0 1rem;
-    }
-
-    ol {
-        position: sticky;
-        background-color: white;
-        bottom: 0;
-        padding: 0 0 2rem;
-        margin: 10rem 0;
-        list-style: none;
-
-        li {
-            padding: 0.5em 0.5em;
-            border-top: 1px dotted black;
-
-            &:hover {
-                color: white;
-                background-color: black;
-                cursor: pointer;
-            }
-        }
-    }
-</style>

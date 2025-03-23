@@ -1,0 +1,18 @@
+---
+import type { GetStaticPaths } from "astro";
+import { getStaticPathsImpl } from "../lib/server";
+import { render } from "astro:content";
+import LiChoices from "../components/li-choices.astro";
+import UlChoices from "../components/ul-choices.astro";
+import OlChoices from "../components/ol-choices.astro";
+
+export const partial = true;
+
+export const getStaticPaths = (async () => {
+    return await getStaticPathsImpl();
+}) satisfies GetStaticPaths;
+const { data } = Astro.props;
+const { Content } = await render(data);
+---
+
+<Content components={{ li: LiChoices, ul: UlChoices, ol: OlChoices }} />
