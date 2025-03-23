@@ -38,9 +38,13 @@ function init() {
     function setupNewCard() {
         document.querySelectorAll("[data-choice]").forEach(_e => {
             const button = _e as HTMLElement;
-            const choiceId = button.dataset.choice;
+            const url = button.dataset.choice;
+            if (!url) {
+                return;
+            }
+
             _e.addEventListener("click", async () => {
-                const respose = await fetch("/" + choiceId);
+                const respose = await fetch(url);
                 contentContainer.innerHTML = await respose.text();
                 setupNewCard();
             })

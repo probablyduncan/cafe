@@ -1,11 +1,12 @@
 ---
+import path from "path";
 let raw = await Astro.slots.render("default");
 
 let choiceId;
 const openIndex = raw.indexOf("[[");
 const closeIndex = raw.indexOf("]]");
 if (openIndex !== -1 && closeIndex !== -1) {
-    choiceId = raw.substring(openIndex + 2, closeIndex);
+    choiceId = path.join(import.meta.env.BASE_URL, raw.substring(openIndex + 2, closeIndex));
     raw = raw.substring(0, openIndex) + raw.substring(closeIndex + 2);
 }
 ---
