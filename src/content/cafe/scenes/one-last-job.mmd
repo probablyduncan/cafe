@@ -1,0 +1,53 @@
+flowchart TD
+    ia(1\. So, will you help?) --> ii[
+        Such a goddamn cliche. One last job, my ass.
+        *He takes a long drink.*
+        I'm old. You do it.
+    ]
+
+    ii --o ii-i(1\. What? Me?) 
+    --> ii-i-i[Yeah, you.] --> iii
+    
+    ii --o ii-ii(2\. No!)
+    --> ii-ii-i[Well, I'm not doing it.]
+    --> ii-ii-ii[*He grunts.*] --> iii
+    
+    ii --o ii-iii(3\. I'll think about it.)
+    --> ii-iii-i[Yeah, do that.] --> iii
+
+    iii[If you rely on old men for everything the world'll go to hell.] --> iiib[*He coughs.*] --> iiic[Old men are the reason we got so close to hell in the first place, right?]
+
+    iii --> ticks[
+        If you rely on old men for everything the world'll go to hell. 
+        *He coughs.*
+        Old men are the reason we got so close to hell in the first place, right?
+    ]
+
+    iiic --o iii-i(1\. *Protest.*) --> iv
+    iiic --o iii-ii(2\. *Say nothing.*) --> iv
+
+    iv[
+        Do it yourself. You might learn something. 
+        *He turns away.* 
+        One last job, my ass, *he mutters, shaking his head.*
+    ]
+
+    iv --o iv-i(1\. *Leave.*) ==> return
+
+    iv --o iv-ii(2\. *Flick the back of his head.*) 
+    --> iv-ii-i[*The old detective jolts forward, then slowly raises his hand to his head.*] 
+    --> iv-ii-ii[*You can't see his face, but you can tell he's in disbelief.*] 
+    --> iv-ii-iii[*He gingerly touches the spot, then slowly turns around.*]
+
+    iv-ii-iii --o iv-ii-iii-i(1\. *Apologize hurriedly.*) --> iv-ii-iv
+    iv-ii-iii --o iv-ii-iii-ii(2\. *Say nothing.*) --> iv-ii-iv
+
+    iv-ii-iv[
+        What'd you do that for?
+        Got some balls on you, I'll give you that.
+        *He looks at you for a second.*
+        You know what? I'll help you out.
+        But just this once.
+        One last job.
+    ]
+    -- beanHelp --o iv-ii-v(1\. Walk away.) ==> return

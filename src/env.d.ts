@@ -1,8 +1,14 @@
 type Time = "morning" | "afternoon" | "evening" | "closed";
-type SaveData = {
+declare var getTime: () => Time;
 
+declare var state: {
+    get: () => SaveData,
+    setVariable: (key: string, value: boolean) => void,
+    setCurrentNode: (node: string, scene?: string) => void,
 }
 
-declare var getSave: () => SaveData;
-declare var updateSave: (data: SaveData) => SaveData;
-declare var getTime: () => Time;
+type SaveData = {
+    currentScene: string;
+    currentNode: string;
+    state: Record<string, boolean>;
+}

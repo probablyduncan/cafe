@@ -1,0 +1,14 @@
+flowchart TD
+    begin --> i[Saying something]
+    --> ii[This is your first chance.]
+    --> iii[This is your second chance.]
+    --> iv[Ok nothing new here.]
+    --> v[This is your final chance!]
+    --> vi[Ok. Enough rambling.]
+    --x vii[You took no action.] --> return
+
+    ii --o c1[Make your choice.] --> choice-result
+    iii --o c2[Another choice!] --> choice-result
+    v --o c3[Last chance!] --> choice-result
+
+    choice-result[You take action!] --> return

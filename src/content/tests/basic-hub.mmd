@@ -1,0 +1,13 @@
+flowchart TD
+
+%% this is an example exploring how a hub might work?
+
+start --> i[*There's a cowbody sitting next to you.*] --> ii[Howdy, pardner, *he says.*] --> m.hub
+
+%% you say this one, but it doesn't change 
+m.hub --x c1[Howdy.] --> c1-i[Howdy.] --> m.hub
+m.hub --x c2[What's the weather like?] --> c2-i[Cloudy with a chance of meatballs, based on the twitch of my knee.] --> m.hub
+m.hub --x c3[Come here often?] --> c3-i[No.] --> c3-ii[Well...] --> c3-iii[Sometimes.] --> m.hub
+m.hub --o c4[Well, be seeing ya.]
+
+c4 --> return

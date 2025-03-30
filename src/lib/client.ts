@@ -1,11 +1,3 @@
-let _save: SaveData = {};
-window.getSave = () => {
-
-    return {
-
-    }
-}
-
 let _time: Time;
 window.getTime = () => {
 

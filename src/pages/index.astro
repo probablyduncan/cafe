@@ -1,9 +1,18 @@
 ---
 import "../style.css";
-import { Content } from "../content/generated/i/start-morning-outside.mdx";
 import LiChoices from "../components/li-choices.astro";
 import OlChoices from "../components/ol-choices.astro";
 import UlChoices from "../components/ul-choices.astro";
+import { getCollection } from "astro:content";
+import { marked } from "marked";
+
+const nodes = (await getCollection("dialogueNodes")).map((i) => ({
+    id: i.data.id,
+    text: i.data.text,
+    next: i.data.children,
+}));
+
+console.log(nodes)
 ---
 
 <!doctype html>
@@ -12,7 +21,7 @@ import UlChoices from "../components/ul-choices.astro";
         <title>Cafe Halcyon</title>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width" />
-        <script src="../lib/client"/>
+        <script src="../lib/client"></script>
     </head>
     <body>
         <nav>
@@ -22,7 +31,7 @@ import UlChoices from "../components/ul-choices.astro";
             <a href="/ctrl" title="settings & save files">ctrl</a>
         </nav>
         <div data-content>
-            <Content components={{li: LiChoices, ol: OlChoices, ul: UlChoices}} />
+            <!-- <Content components={{li: LiChoices, ol: OlChoices, ul: UlChoices}} /> -->
         </div>
     </body>
 </html>

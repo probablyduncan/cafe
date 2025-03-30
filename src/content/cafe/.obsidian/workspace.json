@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "i/start-morning-back-trash-iiii.md",
+                "file": "i/start-morning-outside.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "start-morning-back-trash-iiii"
+              "title": "start-morning-outside"
             }
           }
         ]
@@ -78,7 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 384.5
+    "width": 263.5
   },
   "right": {
     "id": "7e49b89148244d51",
@@ -94,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "notes/operating info.md",
+                "file": "i/start-morning-back-trash-iiii.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for operating info"
+              "title": "Backlinks for start-morning-back-trash-iiii"
             }
           },
           {
@@ -149,11 +149,12 @@
               "title": "Outline"
             }
           }
-        ]
+        ],
+        "currentTab": 3
       }
     ],
     "direction": "horizontal",
-    "width": 300,
+    "width": 257.5,
     "collapsed": true
   },
   "left-ribbon": {
@@ -168,41 +169,41 @@
   },
   "active": "776017b9f6a4bc91",
   "lastOpenFiles": [
+    "scenes/morning-ordering.mmd",
+    "scenes/one-last-job.mmd",
+    "scenes/morning-start-outside.mmd",
+    "scenes/_one-last-job.mmd",
+    "scenes/_morning-start-outside.mmd",
+    "scenes/basic.mmd",
+    "start-morning-hours.md",
+    "start-morning-ordering-i.md",
+    "i/start-morning-back-trash-iiii.md",
+    "i/start-morning-back-trash-iii.md",
+    "i/start-morning-back-trash-ii-ii.md",
+    "i/start-morning-back-trash-i.md",
+    "i/start-morning-back-trash-ii-i.md",
+    "i/start-morning-back-knock.md",
+    "i/start-morning-back-lantern.md",
     "i/start-morning-back.md",
     "i/start-morning-outside.md",
+    "i/start-morning-outside-window.md",
+    "i/start-morning-leave.md",
+    "notes/tech.md",
+    "scenes",
+    "notes/operating info.md",
     "start-morning-ordering-ii-v.md",
     "start-morning-ordering-ii-iv.md",
     "start-morning-ordering-ii-ii.md",
     "start-morning-ordering-ii-i.md",
-    "start-morning-ordering-i.md",
-    "i/start-morning-outside-window.md",
-    "i/start-morning-leave.md",
-    "i/start-morning-back-trash-iiii.md",
-    "i/start-morning-back-trash-iii.md",
-    "i/start-morning-back-trash-ii-ii.md",
-    "i/start-morning-back-trash-ii-i.md",
-    "i/start-morning-back-trash-i.md",
-    "i/start-morning-back-lantern.md",
-    "i/start-morning-back-knock.md",
-    "notes/tech.md",
     "start-morning-ordering-ii-iii.md",
     "i/start-morning--outside.mdx",
     "i/start-morning--outside--window.mdx",
     "start-morning--back.md",
     "start-morning-ordering-i.mdx",
     "i/start-morning--back--trash-i.mdx",
-    "i/start-morning--back--knock.mdx",
-    "i/start-morning--back.mdx",
-    "start-morning-ordering-ii-v.mdx",
-    "start-morning-ordering-ii-iv.mdx",
-    "start-morning-ordering-ii-iii.mdx",
-    "start-morning-ordering-ii-ii.mdx",
-    "notes/operating info.md",
     "start-morning--ordering-ii-i.md",
     "start-morning--ordering-i.md",
     "start-morning--ordering-ii-v.md",
-    "start-morning--ordering-ii-iv.md",
-    "start-morning--ordering-ii-iii.md",
-    "start-morning--ordering-ii-ii.md"
+    "start-morning--ordering-ii-iv.md"
   ]
 }
