@@ -136,13 +136,20 @@ ok what are the rules
 
 ## Basic flow
 
-a text node is denoted like `id[Text]`
+a text node is denoted like `id[First Line] --> id2[Second Line]`
 a choice node is denoted like `id[Take Action]`
+
+## Arrows
+
+a `-->` arrow means something is automatically said
+a `--o` means a choice
+a `--x` also means a choice, but it won't render if you've already chosen it
 
 ## Id keywords
 
 the id in a node can be a special macro, reference an internal scene, or be one of the other reserved keywords
 
-`start` - entry point for scene
+`begin` - entry point for scene
 `return` - exit the current scene
+`reset` - clear save and 'log out'
 

@@ -1,50 +1,48 @@
-let _time: Time;
-window.getTime = () => {
+// import type { TimeSlot } from "./contentSchemaTypes";
 
-    if (!_time) {
-        const hour = new Date().getHours();
+// let _time: TimeSlot;
+// window.getTime = () => {
 
-        // open 8am - 11pm
-        if (hour < 8 || hour > 22) {
-            _time = "closed";
-        }
-        else if (hour <= 11) {
-            _time = "morning";
-        }
-        else if (hour <= 16) {
-            _time = "afternoon";
-        }
-        else {
-            _time = "evening";
-        }
-    }
+//     if (!_time) {
+//         const hour = new Date().getHours();
 
-    return _time;
-}
+//         // open 8am - 11pm
+//         if (hour < 8 || hour > 22) {
+//             _time = "closed";
+//         }
+//         else if (hour <= 11) {
+//             _time = "morning";
+//         }
+//         else if (hour <= 16) {
+//             _time = "afternoon";
+//         }
+//         else {
+//             _time = "evening";
+//         }
+//     }
 
-function init() {
-    // document.querySelectorAll("[data-time]").forEach(_e => { _e.innerHTML = window.getTime(); });
+//     return _time;
+// }
 
+// function init() {
+//     const contentContainer = document.querySelector("[data-content]") as HTMLElement;
+//     function setupNewCard() {
+//         document.querySelectorAll("[data-choice]").forEach(_e => {
+//             const button = _e as HTMLElement;
+//             const url = button.dataset.choice;
+//             if (!url) {
+//                 return;
+//             }
 
-    const contentContainer = document.querySelector("[data-content]") as HTMLElement;
-    function setupNewCard() {
-        document.querySelectorAll("[data-choice]").forEach(_e => {
-            const button = _e as HTMLElement;
-            const url = button.dataset.choice;
-            if (!url) {
-                return;
-            }
-
-            _e.addEventListener("click", async () => {
-                const respose = await fetch(url);
-                contentContainer.innerHTML = await respose.text();
-                setupNewCard();
-            })
-        });
-    }
-    setupNewCard();
-    
-}
+//             _e.addEventListener("click", async () => {
+//                 const respose = await fetch(url);
+//                 contentContainer.innerHTML = await respose.text();
+//                 setupNewCard();
+//             })
+//         });
+//     }
+//     setupNewCard();
+// }
 
 
-document.addEventListener("DOMContentLoaded", init);
+// document.addEventListener("DOMContentLoaded", init);

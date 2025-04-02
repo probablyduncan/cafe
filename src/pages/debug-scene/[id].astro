@@ -1,0 +1,149 @@
+---
+import "../../style.css";
+import { getStaticPathsImpl } from "../../lib/server";
+import type { GetStaticPaths } from "astro";
+
+export const getStaticPaths = (async () => {
+    return await getStaticPathsImpl();
+}) satisfies GetStaticPaths;
+
+const {
+    data: { id, data: scene },
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Cafe Halcyon</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <script src="../../lib/client"></script>
+    </head>
+    <body>
+        <nav>
+            <a href="/info" title="about this cafe">info</a>
+            <!-- <span><span data-time></span> at the Cafe Halcyon</span> -->
+            <span style="font-family: monospace;">~ debugging {id}.mmd ~</span>
+            <a href="/ctrl" title="settings & save files">ctrl</a>
+        </nav>
+        <div data-content={JSON.stringify(scene)}></div>
+        <div data-choices></div>
+    </body>
+</html>
+<script>
+    import type {
+        DialogueNode,
+        DialogueScene,
+    } from "../../lib/contentSchemaTypes";
+
+    function init() {
+        const dialogueContainer = document.querySelector(
+            "[data-content]",
+        ) as HTMLElement;
+        const choicesContainer = document.querySelector(
+            "[data-choices]",
+        ) as HTMLElement;
+
+        if (
+            !dialogueContainer ||
+            !dialogueContainer.dataset.content ||
+            !choicesContainer
+        ) {
+            return;
+        }
+
+        const stateDict: Record<string, boolean> = {};
+
+        const scene = JSON.parse(
+            dialogueContainer.dataset.content,
+        ) as DialogueScene;
+        console.log(scene);
+
+        async function renderChildren(parent: DialogueNode) {
+            await Promise.all(
+                parent.children.map(async (c) => {
+                    renderNode(scene.nodes[c]);
+                }),
+            );
+        }
+
+        async function renderNode(node: DialogueNode) {
+            // this is a sort of passthrough
+            if (node.html === undefined) {
+                renderChildren(node);
+                return;
+            }
+
+            // check state dict - if any requirements are missing, return
+            for (var i = 0; i < node.requiredStateKeys.length; i++) {
+                const { key, negated } = node.requiredStateKeys[i];
+
+                // state vars default to false
+                const isCurrentlyTrue = key in stateDict && stateDict[key];
+
+                // if current state value is true, negated needs to be false to render node,
+                // and if current value is false, negated needs to be true to render node
+                if (isCurrentlyTrue === (negated ?? false)) {
+                    return;
+                }
+            }
+
+            switch (node.type) {
+                case "choice":
+                    await renderChoice(node);
+                    break;
+                case "text":
+                default:
+                    await renderText(node);
+                    break;
+            }
+        }
+
+        async function renderText(node: DialogueNode) {
+            const splits = node.html?.split("\n") ?? [];
+            for (var i = 0; i < splits.length; i++) {
+                const e = document.createElement("p");
+                e.innerHTML = splits[i];
+                e.style.transition = "opacity .5s, transform .5s";
+                e.style.opacity = "0";
+                e.style.transform = "translateY(10px)";
+                dialogueContainer.appendChild(e);
+
+                await new Promise((resolve) =>
+                    setTimeout(() => {
+                        e.style.opacity = "1";
+                        e.style.transform = "translateY(0px)";
+                        setTimeout(resolve, 500 + 500 * node.delay);
+                    }, 1),
+                );
+            }
+
+            renderChildren(node);
+        }
+
+        async function renderChoice(node: DialogueNode) {
+            const e = document.createElement("button");
+            e.innerHTML = node.html ?? "";
+            e.onclick = () => {
+                // clear text
+                dialogueContainer.innerHTML = "";
+                choicesContainer.innerHTML = "";
+
+                // update state dict
+                node.stateKeysToSetOnChoose.forEach((stateVar) => {
+                    stateDict[stateVar.key] = !(stateVar.negated ?? false);
+                });
+
+                console.log(stateDict);
+
+                renderChildren(node);
+            };
+            choicesContainer.appendChild(e);
+        }
+
+        renderNode(scene.nodes[scene.entryNode]);
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
+</script>

@@ -6,13 +6,11 @@ import UlChoices from "../components/ul-choices.astro";
 import { getCollection } from "astro:content";
 import { marked } from "marked";
 
-const nodes = (await getCollection("dialogueNodes")).map((i) => ({
-    id: i.data.id,
-    text: i.data.text,
-    next: i.data.children,
-}));
-
-console.log(nodes)
+// const nodes = (await getCollection("scenes")).map((i) => ({
+//     id: i.data.id,
+//     text: i.data.text,
+//     next: i.data.children,
+// }));
 ---
 
 <!doctype html>

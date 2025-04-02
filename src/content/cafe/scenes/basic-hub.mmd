@@ -1,0 +1,23 @@
+flowchart TD
+
+%% this is an example exploring how a hub might work?
+
+start --> i[
+    There's a cowbody sitting next to you.
+    He's funny looking. His nose is big and his hat is too small.
+    His face is dusty, but not like he's been riding hard. Like he's been left too long on a shelf in your grandma's house.
+] --> ii[*Howdy, pardner,* he says.] --> hub
+
+hub -- suave --x c3(*Come here often?*) --> c3-i[*No.*] ---> c3-ii[*Well...*] ----> c3-iii[*Sometimes, I guess.*] ---> hub
+
+hub --o c1(*Howdy.*) --cowboy--> c1-i[*Howdy.*] --> hub
+hub -- cowboy --o c5[Ask him about rodeos.] --> c5-i[*When was your last rodeo?* you ask.] --> c5-ii[*Yesterday*, he says with a grimace.] --o c5-iii[*You look like you took quite a fall.*] --> c5-iv[*Yup.*] --> hub
+
+hub --o c2(*What's the weather like?*) --> c2-i[*Cloudy with a chance of meatballs, based on the twitch of my knee.*] 
+
+c2-i --o c2-c1[*Interesting.*] --> hub
+c2-i --o c2-c2[*I like the twitch of your knee, mister.*] -- suave --> c2-c2-i[*Why thank you, mister,* he says. He smiles.] --> hub
+
+hub --o c4(*Well, be seeing ya.*)
+
+c4 --> return

@@ -7,14 +7,12 @@ import type {
 } from "astro";
 
 export const getStaticPathsImpl = (async () => {
-    const cafe = (await getCollection("dialogueNodes"));
+    const cafe = (await getCollection("scenes"));
     const all = cafe
         .map(data => ({
             params: { id: data.id },
             props: { data },
         }));
-
-    console.log(all)
 
     return all;
 }) satisfies GetStaticPaths;

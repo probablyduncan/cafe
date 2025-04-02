@@ -5,10 +5,14 @@ flowchart TD
     --> iv[Ok nothing new here.]
     --> v[This is your final chance!]
     --> vi[Ok. Enough rambling.]
-    --x vii[You took no action.] --> return
+    --> vii[You took no action.] --x return
 
-    ii --o c1[Make your choice.] --> choice-result
-    iii --o c2[Another choice!] --> choice-result
-    v --o c3[Last chance!] --> choice-result
+    ii -- courageous--o c1(Make your choice.) --> choice-result
+    iii --o c2(Another choice!) --courageous--> choice-result
+    v --o c3(Last chance!) --> choice-result
 
-    choice-result[You take action!] --> return
+    choice-result[You take action!] --x return
+
+
+    a[Going to the mall] --> b[At the mall] -- requieredformall--o c[Bold action at the mall]
+

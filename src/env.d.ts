@@ -1,5 +1,6 @@
-type Time = "morning" | "afternoon" | "evening" | "closed";
-declare var getTime: () => Time;
+import type { z } from "astro/zod";
+
+declare var getTime: () => TimeSlot;
 
 declare var state: {
     get: () => SaveData,
@@ -8,7 +9,12 @@ declare var state: {
 }
 
 type SaveData = {
-    currentScene: string;
-    currentNode: string;
+    // like "structure/morning-start-outside/around-back/ii"
+    currentPath: string[];
+    // all keys in state (how do I want to handle choices??) in a Set<string> or something??
     state: Record<string, boolean>;
+
+    // maybe this way? will this get way too big in the future?
+    // stored in the format visited:{scene}:{node}
+    // chosen: Set<string>;
 }
