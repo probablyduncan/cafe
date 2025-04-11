@@ -5,181 +5,291 @@ import fs from "fs";
 import mermaid from 'mermaid';
 import { type FlowEdge, type FlowVertex } from "../node_modules/mermaid/dist/diagrams/flowchart/types.d"
 import { marked } from 'marked';
-import { dialogueScene, getVisitedStateVariableKey, type DialogueNode, type DialogueScene, type DialogueStateVar } from './lib/contentSchemaTypes';
+import { flowchart, getVisitedStateVariableKey, type Flowchart, type FlowchartEdge, type Scene, sceneSchema, nodeSchema, type SceneNode, childNodeSchema, type StateCondition, type SceneChild } from './lib/contentSchemaTypes';
+
+type FilePath = {
+    file: string;   // "test.mmd"
+    name: string;   // "test"
+    ext: string;    // ".mmd"
+    relativePath: string;    // "src/.../scenes/test.mmd"
+    absolutePath: string;   // "C:/.../scenes/test.mmd"
+}
+
+function parsePath(filePath: string) {
+    const { ext, base: file, name, root } = path.parse(filePath);
+    
+    let relativePath: string;
+    let absolutePath: string;
+
+    const { root: cwdRoot } = path.parse(process.cwd());
+    switch (root) {
+        case "":
+            relativePath = path.normalize(filePath);
+            absolutePath = path.resolve(process.cwd(), filePath);
+            break;
+        case cwdRoot:
+            relativePath = path.relative(process.cwd(), filePath);
+            absolutePath = filePath;
+            break;
+        default:
+            relativePath = path.relative("/", filePath);
+            absolutePath = path.join(process.cwd(), filePath);
+            break;
+    }    
+    
+    return { ext, file, name, 
+        relativePath, 
+        absolutePath, };
+}
 
 // migrate this stuff to another file eventually??
 // https://github.com/withastro/astro/issues/13253
 
 const scenes = defineCollection({
-    loader: dialogueLoader(),
+    loader: sceneLoader(),
 });
 
 export const collections = { scenes };
 
-function dialogueLoader(): Loader {
+const assets: Map<string, SceneNode["type"]> = new Map();
+
+function sceneLoader(): Loader {
     return {
-        name: "dialogueLoader",
+        name: "sceneLoader",
 
         // Called when updating the collection.
         load: async (context: LoaderContext): Promise<void> => {
 
-            const files = import.meta.glob("/src/content/cafe/scenes/**/*.{md,mmd}");
-            const filePaths = Object.keys(files).map(filePath => path.join(process.cwd(), filePath));
-
             const loadAll = async () => {
+
                 context.store.clear();
-                // await parseFile(filePaths[0], context);
-                await Promise.all(filePaths.map(filePath => { parseFile(filePath, context) }));
+                assets.clear();
+
+                fs.readdirSync(path.join(process.cwd(), "/src/assets/images/")).forEach((val) => {
+                    assets.set(val, "image");
+                })
+    
+                const scenes = import.meta.glob("/src/assets/scenes/**/*.{md,mmd}");
+                await Promise.all(Object.keys(scenes).map(async filePath => {
+                    const parsedPath = parsePath(filePath);
+                    await updateAsset("add", parsedPath);
+                }));
             };
+
             await loadAll();
 
             // context.watcher?.add("./dialogueLoader.ts");
-            context.watcher?.on("change", (path) => {
-                if (filePaths.includes(path)) {
-                    parseFile(path, context);
-                }
-                // else if (import.meta?.filename === path) {
-                //     context.store.clear();
-                //     loadAll();
-                // }
+
+            context.watcher?.on("all", (event, absolutePath) => {
+                const parsedPath = parsePath(absolutePath);
+                updateAsset(event as typeof updateAsset["arguments"][0], parsedPath);
             });
+
+            async function updateAsset(event: "add" | "change" | "unlink", parsedPath: FilePath) {
+                if (path.matchesGlob(parsedPath.relativePath, "src/assets/scenes/**/*.{md,mmd}")) {
+                    console.log(event, "scene:", parsedPath.file);
+
+                    switch (event) {
+                        case "add":
+                            assets.set(parsedPath.file, "scene");
+                            await parseFile(parsedPath, context);
+                            break;
+                        case "change":
+                            await parseFile(parsedPath, context);
+                            break;
+                        case "unlink":
+                            assets.delete(parsedPath.file);
+                            context.store.delete(parsedPath.name);
+                            break;
+                    }
+                }
+
+                else if (path.matchesGlob(parsedPath.relativePath, "src/assets/images/**/*.{svg,webp,jpg}")) {
+                    console.log(event, "image:", parsedPath.file);
+
+                    switch (event) {
+                        case "add":
+                            assets.set(parsedPath.file, "image");
+                            break;
+                        case "unlink":
+                            assets.delete(parsedPath.file);
+                            break;
+                    }
+                }
+            }
         },
 
         // schema of DataStore.
-        schema: async () => dialogueScene
+        schema: async () => sceneSchema
     };
 }
 
-async function parseFile(filePath: string, context: LoaderContext) {
+async function parseFile(filePath: FilePath, context: LoaderContext) {
 
-    const file = fs.readFileSync(filePath);
+    const file = fs.readFileSync(filePath.absolutePath);
     const content = file.toString();
 
-    const relativePath = path.relative(process.cwd(), filePath);
-    const { name, ext } = path.parse(relativePath);
-
-    switch (ext) {
+    switch (filePath.ext) {
         case ".mmd":
-            await parseMMD(name, relativePath, content, context);
+            await parseMMD(filePath, content, context);
         case ".md":
-            await parseMD(name, relativePath, content, context);
+            await parseMD(filePath, content, context);
         default:
             return;
     }
 }
 
-async function parseMMD(name: string, filePath: string, content: string, context: LoaderContext) {
+async function parseMMD(filePath: FilePath, content: string, context: LoaderContext) {
 
     mermaid.mermaidAPI.initialize({ startOnLoad: false });
-    const { db: diagramDB } = await mermaid.mermaidAPI.getDiagramFromText(content, { title: name });
+    const { db: diagramDB } = await mermaid.mermaidAPI.getDiagramFromText(content, { title: filePath.name });
 
-    const vertices = diagramDB["vertices"] as Map<string, FlowVertex>;
+    const vertices = Object.fromEntries(diagramDB["vertices"] as Map<string, FlowVertex>);
     const edges = diagramDB["edges"] as FlowEdge[];
 
-    const nodes: Record<string, Partial<DialogueNode>> = {};
-    async function getNode(key: string): Promise<Partial<DialogueNode>> {
-        if (key in nodes) {
-            return nodes[key];
-        }
-
-        const node: Partial<DialogueNode> = {}
-        node.children = [];
-        node.requiredStateKeys = [];
-        node.stateKeysToSetOnChoose = [];
-
-        const vert = vertices.get(key);
-        if (vert) {
-            if (vert.type === undefined) {
-                // this means it's a macro or some other kind of utility
-            }
-            else {
-                node.style = vert.type;
-                if (vert.text) {
-                    node.html = await marked.parseInline(vert.text);
-                    // node.html = node.html.replaceAll("\n", "<br><br>");
-                }
-            }
-        }
-
-        nodes[key] = node;
-        return node;
+    if (!edges?.length) {
+        return;
     }
 
-    const varsUsed = new Set<string>();
-
-    for (let i = 0; i < edges.length; i++) {
-        const edge = edges[i];
-        const startNode = await getNode(edge.start);
-
-        const endKey = edge.end;
-        const endNode = await getNode(endKey);
-        startNode.children?.push(endKey);
-
-        switch (edge.type) {
-            case "arrow_circle":
-            case "arrow_cross":
-                endNode.type = "choice";
-
-                // a cross is a choice you can't choose again
-                // so this creates a variable which will be set to true on choosing,
-                // and which will be required to be unset for future visits,
-                // thus preventing future visits
-
-                const key = getVisitedStateVariableKey(endKey);
-                varsUsed.add(key);
-                endNode.stateKeysToSetOnChoose?.push({ key });
-                if (edge.type === "arrow_cross") {
-                    endNode.requiredStateKeys?.push({ key, negated: true });
-                }
-
-                break;
-            case "arrow_point":
-            default:
-                endNode.type = "text";
-                break;
-        }
-
-        // state variables
-        if (edge.text) {
-            const stateVar: DialogueStateVar = {
-                key: edge.text,
-            };
-
-            // resolve negated
-            if (edge.text.startsWith("!")) {
-                stateVar.key = stateVar.key.substring(1);
-                stateVar.negated = true;
-            }
-
-            if (startNode.type === "choice") {
-                // if coming from a choice, the variable is meant to be set
-                startNode.stateKeysToSetOnChoose?.push(stateVar);
-            }
-            else {
-                // otherwise, the variable is required to reach the next node
-                endNode.requiredStateKeys?.push(stateVar);
-            }
-
-            varsUsed.add(stateVar.key);
-        }
-
-        // arrow length
-        startNode.delay = edge.length;
-    }
-
-    const data: DialogueScene = {
-        entryNode: edges[0]?.start,
-        nodes: nodes as Record<string, DialogueNode>,
-        varsUsed: Array.from(varsUsed),
-    }
+    const chart = await flowchart.parseAsync({ vertices, edges }) as Flowchart;
+    const scene = await flowChartToScene(chart, context);
 
     context.store.set({
-        id: name,
-        filePath: filePath,
-        data,
+        id: filePath.name,
+        filePath: filePath.relativePath,
+        data: scene,
     });
 }
 
-async function parseMD(name: string, filePath: string, content: string, context: LoaderContext) {
+async function parseMD(filePath: FilePath, content: string, context: LoaderContext) {
     // console.log(content)
+}
+
+async function flowChartToScene(chart: Flowchart, context: LoaderContext): Promise<Scene> {
+
+    if (!chart?.edges?.length) {
+        return sceneSchema.parse({});
+    }
+
+    const nodes: Record<string, SceneNode> = {};
+    const varsUsed = new Set<string>();
+
+    for (var i = 0; i < chart.edges.length; i++) {
+        const edge = chart.edges[i];
+
+        const startNode = await getOrCreateNode(edge, "start");
+        const endNode = await getOrCreateNode(edge, "end");
+
+        const child = await getChild(startNode, endNode, edge);
+        startNode.children.push(child);
+    }
+
+    const scene = sceneSchema.parse({
+        nodes: nodes,
+        varsUsed: Array.from(varsUsed),
+        entryNode: chart.edges[0].start,
+    });
+
+    return scene;
+
+    async function getOrCreateNode(edge: FlowchartEdge, side: "start" | "end"): Promise<SceneNode> {
+
+        const key = edge[side];
+        const vert = chart.vertices[key];
+
+        let node: SceneNode;
+
+        if (key in nodes) {
+            node = nodes[key];
+        }
+        else {
+            node = await initNode();
+            nodes[key] = node;
+        }
+
+        return node;
+
+        /**
+         * called once, most likely as an end node
+         */
+        async function initNode(): Promise<SceneNode> {
+            const node: any = { key };
+
+            if (side === "end" && edge.type === "arrow_circle") {
+                node.type = "choice";
+                node.html = marked.parseInline(vert.text!);
+                // node.style =
+            }
+            else if (assets.has(vert.text!)) {
+                node.type = assets.get(vert.text!);
+                switch (node.type as SceneNode["type"]) {
+                    case "scene":
+                        node.key = path.parse(vert.text!).name;
+                        break;
+                    case "component":
+                        node.key = vert.text;
+                        break;
+                    case "image":
+                        // TODO how do I pass in alt
+                        // node.src = 
+                        // node.alt = 
+                        // node.style = 
+                        break;
+                }
+            }
+            else if (vert.type !== undefined) {
+                node.type = "text";
+                node.html = await marked.parseInline(vert.text!);
+                // node.style =
+            }
+            else {
+                node.type = "passthrough";
+            }
+
+            return nodeSchema.parse(node);
+        }
+    }
+
+    async function getChild(startNode: SceneNode, endNode: SceneNode, edge: FlowchartEdge): Promise<SceneChild> {
+
+        const child = childNodeSchema.parse({
+            key: edge.end,
+            delay: {
+                cycles: edge.length - 1,
+                // style: TODO haven't added options yet
+            },
+            clearPrevious: edge.type === "arrow_cross",
+        });
+
+        // stateVariables
+        if (edge.text !== undefined && edge.text !== "") {
+
+            let key: string;
+
+            if (edge.text === "!") {
+                // special case, only allow this node once
+                key = getVisitedStateVariableKey(edge.end);
+
+                child.requiredState = { key, negated: true };
+                endNode.setState = { key, negated: false };
+            }
+            else {
+                const negated = edge.text.startsWith("!");
+                key = negated ? edge.text.substring(1) : edge.text;
+
+                if (startNode.type === "choice") {
+                    // need to set this state on choosing the choice
+                    startNode.setState = { key, negated };
+                }
+                else {
+                    // otherwise, state is required for this path
+                    child.requiredState = { key, negated };
+                }
+            }
+
+            varsUsed.add(key);
+        }
+
+        return child;
+    }
 }

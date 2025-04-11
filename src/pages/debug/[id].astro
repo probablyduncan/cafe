@@ -1,0 +1,213 @@
+---
+import "../../style.css";
+import { getStaticPathsImpl, type StaticPathProps } from "../../lib/server";
+import type { GetStaticPaths } from "astro";
+
+export const getStaticPaths = (async () => {
+    return await getStaticPathsImpl();
+}) satisfies GetStaticPaths;
+
+const { id, data } = Astro.props as StaticPathProps;
+---
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Cafe Halcyon</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <script src="../../lib/client"></script>
+    </head>
+    <body>
+        <nav>
+            <a href="/info" title="about this cafe">info</a>
+            <!-- <span><span data-time></span> at the Cafe Halcyon</span> -->
+            <span style="font-family: monospace;">~ debugging {id}.mmd ~</span>
+            <a href="/ctrl" title="settings & save files">ctrl</a>
+        </nav>
+        <div data-content={JSON.stringify(data)} data-scene-id={id}></div>
+        <div data-choices></div>
+    </body>
+</html>
+<script>
+    import type {
+        Scene,
+        SceneChild,
+        SceneNode,
+    } from "../../lib/contentSchemaTypes";
+    import type { StateCondition } from "../../lib/contentSchemaTypes";
+
+    const ms = async (ms: number) => new Promise((res) => setTimeout(res, ms));
+
+    async function again() {
+        const dialogueContainer = document.querySelector(
+            "[data-content]",
+        ) as HTMLElement;
+        const choicesContainer = document.querySelector(
+            "[data-choices]",
+        ) as HTMLElement;
+
+        if (
+            !dialogueContainer ||
+            !dialogueContainer.dataset.content ||
+            !choicesContainer
+        ) {
+            return;
+        }
+
+        const activeStateKeys = new Set<string>();
+        const choicesVisited = new Set<string>();
+        const sceneMap = new Map<string, Scene>();
+
+        const startScene = JSON.parse(dialogueContainer.dataset.content) as Scene;
+        sceneMap.set(dialogueContainer.dataset.sceneId!, startScene);
+        let currentScene: Scene = startScene;
+        
+        console.log(startScene);
+
+        async function getOrFetchScene(key: string): Promise<Scene> {
+            if (sceneMap.has(key)) {
+                return sceneMap.get(key)!;
+            }
+
+            const response = await fetch(`/api/scenes/${key}.json`);
+            const scene = (await response.json()) as Scene;
+            console.log(scene);
+            sceneMap.set(key, scene);
+            return scene;
+        }
+
+        async function renderNode(node: SceneNode) {
+            switch (node.type) {
+                case "text":
+                    await renderTextNode(node);
+                    await renderChildren(node.children);
+                    break;
+                case "choice":
+                    await renderChoiceNode(node);
+                    break;
+                case "scene":
+                    const scene = await getOrFetchScene(node.key);
+                    currentScene = scene;
+                    if (scene.entryNode) {
+                        renderNode(currentScene.nodes[scene.entryNode]);
+                    }
+                    break;
+                case "passthrough":
+                default:
+                    await renderChildren(node.children);
+                    break;
+            }
+        }
+
+        async function renderTextNode(node: Extract<SceneNode, { type: "text" }>) {
+            const el = document.createElement("p");
+            el.innerHTML = node.html;
+
+            el.style.transition = "opacity 1s, transform 1s";
+            el.style.opacity = "0";
+            el.style.transform = "translateY(10px)";
+            dialogueContainer.appendChild(el);
+
+            await ms(1);
+
+            el.style.opacity = "1";
+            el.style.transform = "translateY(0px)";
+
+            await ms(1000);
+
+            if (node.setState) {
+                setStateCondition(node.setState);
+            }
+        }
+
+        async function renderChoiceNode(node: Extract<SceneNode, { type: "choice" }>) {
+            const el = document.createElement("button");
+            el.innerHTML = node.html;
+
+            if (choicesVisited.has(node.key)) {
+                el.style.opacity = "0.5";
+            }
+
+            el.onclick = () => {
+                
+                dialogueContainer.innerHTML = "";
+                choicesContainer.innerHTML = "";
+
+                if (node.setState) {
+                    setStateCondition(node.setState);
+                }
+                choicesVisited.add(node.key);
+
+                console.log(activeStateKeys);
+                console.log(choicesVisited);
+
+                renderChildren(node.children);
+            };
+            choicesContainer.appendChild(el);
+        }
+
+        async function renderNodeDelay(delay: SceneChild["delay"]) {
+            if (delay === undefined) {
+                return;
+            }
+
+            for (let i = 0; i < delay.cycles; i++) {
+                await ms(100);
+            }
+        }
+
+        async function renderChild(child: SceneChild) {
+            if (!isRequiredConditionMet(child.requiredState)) {
+                return;
+            }
+
+            if (child.clearPrevious) {
+                dialogueContainer.innerHTML = "";
+            }
+
+            if (child.delay !== undefined) {
+                await renderNodeDelay(child.delay);
+            }
+
+            const node = currentScene.nodes[child.key];
+            renderNode(node);
+        }
+
+        async function renderChildren(children: SceneChild[]) {
+            children.forEach(renderChild);
+        }
+
+        function isRequiredConditionMet(
+            requiredCondition: StateCondition | undefined,
+        ) {
+            if (requiredCondition === undefined) {
+                return true;
+            }
+
+            const { key, negated } = requiredCondition;
+
+            // if not negated, condition is met when key in state
+            // if negated, condition is met when key NOT in state
+            return activeStateKeys.has(key) !== negated;
+        }
+
+        function setStateCondition(stateCondition: StateCondition | undefined) {
+            if (stateCondition === undefined) {
+                return;
+            }
+
+            if (stateCondition.negated) {
+                activeStateKeys.delete(stateCondition.key);
+            } else {
+                activeStateKeys.add(stateCondition.key);
+            }
+        }
+
+        if (currentScene.entryNode) {
+            renderNode(currentScene.nodes[currentScene.entryNode]);
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", again);
+</script>

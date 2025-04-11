@@ -1,21 +1,24 @@
 import { getCollection } from "astro:content";
-import path from "path";
 import type {
     InferGetStaticParamsType,
     InferGetStaticPropsType,
     GetStaticPaths,
 } from "astro";
+import { sceneSchema, type Flowchart, type Scene } from "./contentSchemaTypes";
 
 export const getStaticPathsImpl = (async () => {
-    const cafe = (await getCollection("scenes"));
-    const all = cafe
-        .map(data => ({
-            params: { id: data.id },
-            props: { data },
-        }));
+    const scenes = (await getCollection("scenes"));
+    const all = scenes
+        .map(entry => {
+            
+            return {
+                params: { id: entry.id },
+                props: entry,
+            }
+        });
 
     return all;
 }) satisfies GetStaticPaths;
 
-export type WikiParams = InferGetStaticParamsType<typeof getStaticPathsImpl>;
-export type WikiProps = InferGetStaticPropsType<typeof getStaticPathsImpl>;
+export type StaticPathParams = InferGetStaticParamsType<typeof getStaticPathsImpl>;
+export type StaticPathProps = InferGetStaticPropsType<typeof getStaticPathsImpl>;

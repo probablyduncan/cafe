@@ -1,0 +1,40 @@
+flowchart TD
+
+start
+--> q[You approach the table.]
+--> w[There are six of them. They're dressed in troubador rags, shades of brown. They smell like incense and mothballs.]
+--> e[They each have a pint of something, and there's a half-empty bag of Wiseowls in the middle of the table.]
+--> hub1
+
+
+
+hub1 --o t[Introduce yourself.] -- introduced--> once-over
+
+hub1 --o r[Ask them what they're drinking.] --> s[You ask the group what they're drinking.]
+s -- !introduced--> y[“Bugbear,” says the guy with the moustache.] --> hub1
+s -- introduced--> u[“Bugbear,” says Tumboley.] --> hub1
+
+once-over 
+--> o1[They give you a once over.] 
+--> o2[What's your name, kid? asks the one with the moustache.]
+--> o3[You tell him your name.]
+--> o4[He rubs his eye.]
+--> o5[Okay. Nice name, I guess. I'm Tumboley.]
+--> o6[Tomboley plays the drums, says the woman next to him.]
+--> o7[Tomboley pops a Wiseown into his mouth.]
+--> o8[He chews it.]
+--> o9[The world is so slow, here at the troubador table.]
+--> hub1
+
+hub1 --o i[Spit in their drinks.] --> o[You spit in their drinks, I guess.] --> p[Why did you do that?]
+
+p --o f[*You just want to feel alive.*] --> g[*You're trying to live a little, right?*] --> h[*Nothing wrong with that.*] --o hh[*Explain yourself.*] --> l[*You explain this to the troubadors.*] --> v[*You're trying to be more spontaneous. Less guarded. You want to act more, and overthink less.*] --> b[So you spit in our drinks? *one of them asks.* One after the other? Like giving out snacks, or dealing cards?] --> n[Ptew, ptew, ptew, ptew. *He makes a noise like spitting.*]
+p --o k[You were aiming at something else.]
+p --o j[You always choose the worst option.] --> m[You do, it's true.]
+
+m --> |around-back:isTrashed| mq[Remember when you dug through that pile of trash, out back?] --> mr
+m --> |!around-back:isTrashed| mr
+mr[It's not realistic, is it, spitting in someone's drink.] --> mt[Real people don't do that.]
+
+z -- introduced--> x[Tumboley cocks his head like a puzzled dog.]
+z -- !introduced--> c[The ]

@@ -1,0 +1,37 @@
+flowchart TD
+%% i[Hey] --edge text--> ii[Hi] --> |ooh| iii[Ho]
+
+%% i --> |Take a bite.| iv[You take a bite.]
+%% i --> return
+
+%% c1(The first choice.)
+%% c2((The second choice.))
+%% c3(((The third choice.)))
+%% c4([The fourth choice.])
+
+%% c[It looks pretty tasty.] -- hasTeeth --> c5[[Take a bite.]] --!hasTeeth--> c6[You take a bite.]
+
+oog[He says hello.] --> ooga[Time for troubadors...] --> booga[first-meet-troubadors.mmd] --> tohub
+
+
+tohub --> hub
+
+hub -- ! --o b([Ask about his children.]) --> ba[You ask him about his children.] --> be[I have 15 of them, he says.] --> hub
+
+hub -- v:b --o bb([Fifteen??]) --> bc[You betcha.] 
+--> bd[One alone,] 
+--> bi[one pair of twins,] 
+--> bf[one trio of triplets,]
+--> bg[one round of quadruplets,]
+--> bh[and one little squadron of qintuplets.] --> hub
+
+hub --> z[basic.mmd]
+
+hub --o u([Ask about the weather.]) --> ua[It is cloudy.] --> hub
+hub --o d(Ask him out.) --> da[Sorry, I'll pass.] --> hub
+hub --o e([There was something else.]) --> e3[Yeah, what's that?] --> hub2
+hub --o a(Leave.) --> leave
+
+hub2 --o b2([Come here often?]) --> b2a[No.] --> cat2[cat2.png] --> hub2
+hub2 --o d2([What's your mother's maiden name?]) --> d2a(Tim) --> hub2
+hub2 --o a2(Actually, nevermind.) --> e2[Okay, then.] --> hub

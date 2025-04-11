@@ -1,0 +1,38 @@
+flowchart TD
+
+    %% square[square]
+    %% --> round(round)
+    %% ==> diamond{diamond}
+    %% -.-> subroutine[[subroutine]]
+    %% --x lx
+    %% --o lo
+    %% ==x ex
+    %% ==o eo
+    %% -.-x dx
+    %% -.-o do
+    %% ~~~ circle((circle))
+    %% --- hexagon{{hexagon}}
+    %% === stadium([stadium])
+    %% -.- cylinder[(cylinder)]
+
+    %% begin
+    %% --> i[First line.]
+    %% ---> ii[Second line.]
+    %% ----> iii[Third line.]
+    %% %% --> p[
+    %% %%     Paragraph
+    %% %%     Another Multiline
+    %% %% ]
+    %% --> hub
+    %% --o leave[Leave.] & stay[Go away.]
+    %% --> iv[You've made your choice.]
+    %% --x return
+
+
+    start --> a[What do you want to do?] --> choice
+
+    choice --o c1[You don't know.]--> c1-a[You stand there, deep in thought.] --> c1-b[You have to make a decision at some point.] --> choice
+
+    choice --o c2[You have *no* idea.]--> c2-a[Not a glimmer of a thought.] --> c2-b[Something knocks on your skull, but there's nobody home.] --> c2-c[After a moment, you realize it was *you*. You feel your skull against your knuckles.] --> c2-d[Better try harder.] --> choice
+
+    choice --o c3[Come up with something, fast!] --> c3-a[You come up with something, fast.] --> c3-b[That's it! You'll take a bite.] --> return

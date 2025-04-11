@@ -23,7 +23,7 @@ Finally, you can maybe specify them in the frontmatter? Not implemented yet
 
 ### Conditional things
 
-==[variable] Highlighting== an item with a target at the front of it makes it conditionally render if that variable is set. ==[!variable] Exclamiation marks== negate the variable.
+==[variable] Highlighting== an item with a target at the front of it makes it conditionally render if that variable is set. ==[!variable] Exclamation marks== negate the variable.
 
 
 
@@ -139,11 +139,18 @@ ok what are the rules
 a text node is denoted like `id[First Line] --> id2[Second Line]`
 a choice node is denoted like `id[Take Action]`
 
-## Arrows
+## Arrow points
 
 a `-->` arrow means something is automatically said
 a `--o` means a choice
 a `--x` also means a choice, but it won't render if you've already chosen it
+
+## Arrow bodies/lengths
+
+`--` is the standard length
+any longer, and the dialogue will 'think' before it speaks
+`==` is another style
+`-.-` is another another style? Maybe this is the style of waiting?
 
 ## Id keywords
 
@@ -153,3 +160,104 @@ the id in a node can be a special macro, reference an internal scene, or be one 
 `return` - exit the current scene
 `reset` - clear save and 'log out'
 
+## Edges
+- text content
+- line length (>= 1)
+- type
+    - `-->, ==>, -.->` arrow_point
+    - `--o, ==o, -.-o` arrow_circle
+    - `--x, ==x, -.-x` arrow_cross
+    - `---, ===, -.-, ~~~` arrow_open
+- stroke
+    - `-->, --o, --x, ---` normal
+    - `==>, ==o, ==x, ===` thick
+    - `-.->, -.-o, -.-x, -.-` dotted
+    - `~~~` invisible
+
+## Vertices
+- text content or none
+- shape
+    - `[]` square
+    - `()` round
+    - `{}` diamond
+    - `[[]]` subroutine
+    - `(())` circle
+    - `{{}}` hexagon
+    - `[()]` cylinder
+    - `([])` stadium
+    - `((()))` doublecircle
+    - no label: undefined
+
+# Things I need to control
+
+- text node: `-->`
+    - text content
+    - style/type?
+        - node type?
+    - delay length
+        - edge length
+    - delay type? (..., or something else?)
+        - edge stroke?
+    - required state
+        - in edge before node
+- choice node: `--o`
+    - text content
+    - style/type?
+        - shape of node
+    - required state
+        - in edge before choice. For example, `text -- orderedSandwich --o choice`
+    - state setter
+        - state key after choice sets variable
+    - whether you can only do it once 
+        - maybe this can be an extension of required state?
+        - we'll need to track all choices made, I think, to know what to grey out
+        - so this can just be like `-- ! --o` or `-->|!|` or something, to denote it should check the choice's state var
+- macro/utility node: `--x`
+    - could be nested scene, component or script? maybe other types? But we'll just use the text
+    - so if it's something that'll only be used once, like `return`, could just do `--x return`
+    - some things might be used twice in one diagram, so could do `--x id1[loading]` and `--x id2[loading]`
+    - what about images/doodles? is that a macro? probably
+- state
+    - checked in arrow, like `-->|stateKey|` or `--stateKey-->`
+    - check negative with `!`, like `-- !stateKey-->`
+    - combine several with `&` or `|` - future enhancement
+
+## Controls
+
+Utility node (macro, return, etc.) is denoted by a node with an undefined type
+for example `a[You leave.] --> return`
+
+Node shape controls type of node
+- normal text is []
+- emphasized? is [[]]
+- a choice is ()
+- a choice that's not very important is ([])
+
+Transition animation type is controlled by the arrow stroke
+Transition duration is controlled by edge length
+
+Arrow head controls variables
+options: no change no issue
+- `>` means it'll always be the same
+- `o` means it will be greyed out if you've already asked it
+- `x` means it can only show up once
+
+## Animation timeline
+
+When a node is called to be rendered:
+1. If there's a delay longer than the default, the relevant 'thinking' animation is played
+2. Once this extra delay is over, the node enter animation is played (depending on node shape)
+3. 
+2. This enter animation might contain 
+2. It then pauses before rendering children.
+
+When a choice is chosen, content is cleared, wait for default delay, then render children
+
+
+
+WHAT ABOUT big titles? 
+\- Act I -
+etc.
+
+
+maybe --x should clear the dialogue feed?
