@@ -36,7 +36,6 @@ export function parsePath(filePath: string) {
 }
 
 export function testParsePath() {
-    console.log(process.platform)
     const paths = {
         win32: [
             "C:\\Code\\cafe\\src\\assets\\scenes\\basic.mmd",
@@ -50,8 +49,24 @@ export function testParsePath() {
         ],
     };
 
-    paths[process.platform]?.forEach((fp: string) => {
-        const parsed = parsePath(fp);
-        console.log(parsed);
-    });
+    const parsed: FilePath[] = paths[process.platform]?.map(parsePath);
+    let error = false;
+    if (parsed.length) {
+        Object.keys(parsed[0]).forEach((key: string) => {
+            const vals: string[] = parsed.map((p: FilePath) => p[key]);
+            const same = vals.every((val: string) => val === vals[0]);
+            if (!same) {
+                error = true;
+            }
+        });
+    }
+
+    if (error) {
+        console.log("[parsePath]", "error - mismatch");
+        parsed.forEach(p => console.log(p));
+        console.log("[parsePath]", "end");
+    }
+    else {
+        console.log("[parsePath]", "no errors found");
+    }
 }
