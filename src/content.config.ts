@@ -31,7 +31,7 @@ function sceneLoader(): Loader {
                 context.store.clear();
                 assets.clear();
 
-                fs.readdirSync(path.join(process.cwd(), "/src/assets/images/")).forEach((val) => {
+                fs.readdirSync(path.join(process.cwd(), "/public/assets/images/")).forEach((val) => {
                     assets.set(val, "image");
                 })
     
@@ -70,7 +70,7 @@ function sceneLoader(): Loader {
                     }
                 }
 
-                else if (path.matchesGlob(parsedPath.relativePath, "src/assets/images/**/*.{svg,webp,jpg}")) {
+                else if (path.matchesGlob(parsedPath.relativePath, "public/assets/images/**/*.{svg,webp,jpg}")) {
                     console.log(event, "image:", parsedPath.file);
 
                     switch (event) {
@@ -118,7 +118,7 @@ async function parseMMD(filePath: FilePath, content: string, context: LoaderCont
     }
 
     const chart = await flowchart.parseAsync({ vertices, edges }) as Flowchart;
-    const scene = await flowChartToScene(chart, context);
+    const scene = await flowChartToScene(chart);
 
     context.store.set({
         id: filePath.name,
@@ -131,7 +131,7 @@ async function parseMD(filePath: FilePath, content: string, context: LoaderConte
     // console.log(content)
 }
 
-async function flowChartToScene(chart: Flowchart, context: LoaderContext): Promise<Scene> {
+async function flowChartToScene(chart: Flowchart): Promise<Scene> {
 
     if (!chart?.edges?.length) {
         return sceneSchema.parse({});
@@ -197,7 +197,7 @@ async function flowChartToScene(chart: Flowchart, context: LoaderContext): Promi
                         break;
                     case "image":
                         // TODO how do I pass in alt
-                        // node.src = 
+                        node.src = vert.text!;
                         // node.alt = 
                         // node.style = 
                         break;

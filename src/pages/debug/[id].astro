@@ -93,6 +93,10 @@ const { id, data } = Astro.props as StaticPathProps;
                         renderNode(currentScene.nodes[scene.entryNode]);
                     }
                     break;
+                case "image":
+                    await renderImageNode(node);
+                    await renderChildren(node.children);
+                    break;
                 case "passthrough":
                 default:
                     await renderChildren(node.children);
@@ -145,6 +149,21 @@ const { id, data } = Astro.props as StaticPathProps;
                 renderChildren(node.children);
             };
             choicesContainer.appendChild(el);
+        }
+
+        async function renderImageNode(node: Extract<SceneNode, { type: "image" }>) {
+            const img = document.createElement("img");
+            img.src = "/cafe/assets/images/" + node.src;
+            img.alt = node.alt;
+            img.style.width = "100%";
+
+            dialogueContainer.appendChild(img);
+
+            await ms(1000);
+
+            if (node.setState) {
+                setStateCondition(node.setState);
+            }
         }
 
         async function renderNodeDelay(delay: SceneChild["delay"]) {
