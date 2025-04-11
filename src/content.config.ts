@@ -6,41 +6,7 @@ import mermaid from 'mermaid';
 import { type FlowEdge, type FlowVertex } from "../node_modules/mermaid/dist/diagrams/flowchart/types.d"
 import { marked } from 'marked';
 import { flowchart, getVisitedStateVariableKey, type Flowchart, type FlowchartEdge, type Scene, sceneSchema, nodeSchema, type SceneNode, childNodeSchema, type StateCondition, type SceneChild } from './lib/contentSchemaTypes';
-
-type FilePath = {
-    file: string;   // "test.mmd"
-    name: string;   // "test"
-    ext: string;    // ".mmd"
-    relativePath: string;    // "src/.../scenes/test.mmd"
-    absolutePath: string;   // "C:/.../scenes/test.mmd"
-}
-
-function parsePath(filePath: string) {
-    const { ext, base: file, name, root } = path.parse(filePath);
-    
-    let relativePath: string;
-    let absolutePath: string;
-
-    const { root: cwdRoot } = path.parse(process.cwd());
-    switch (root) {
-        case "":
-            relativePath = path.normalize(filePath);
-            absolutePath = path.resolve(process.cwd(), filePath);
-            break;
-        case cwdRoot:
-            relativePath = path.relative(process.cwd(), filePath);
-            absolutePath = filePath;
-            break;
-        default:
-            relativePath = path.relative("/", filePath);
-            absolutePath = path.join(process.cwd(), filePath);
-            break;
-    }    
-    
-    return { ext, file, name, 
-        relativePath, 
-        absolutePath, };
-}
+import { type FilePath, parsePath } from './lib/parsePath';
 
 // migrate this stuff to another file eventually??
 // https://github.com/withastro/astro/issues/13253
