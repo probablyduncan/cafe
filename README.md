@@ -261,3 +261,5 @@ etc.
 
 
 maybe --x should clear the dialogue feed?
+
+multiple lines in one node should all be displayed inline but should animate staggered
