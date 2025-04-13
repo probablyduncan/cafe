@@ -55,25 +55,34 @@ const { id, data } = Astro.props as StaticPathProps;
             return;
         }
 
-        const activeStateKeys = new Set<string>();
-        const choicesVisited = new Set<string>();
-        const sceneMap = new Map<string, Scene>();
-
         const startScene = JSON.parse(dialogueContainer.dataset.content) as Scene;
-        sceneMap.set(dialogueContainer.dataset.sceneId!, startScene);
-        let currentScene: Scene = startScene;
+        const startPos = [dialogueContainer.dataset.sceneId!, startScene.entryNode!];
         
-        console.log(startScene);
+        const state = {
+            keys: new Set<string>(),
+            choicesMade: new Map<string, Set<string>>(),
+            scenePath: [startPos],
+        }
+        const _sceneCache = new Map<string, Scene>();
+
+        const getCurrentSceneId = (): string => state.scenePath.at(-1)![0]!;
+        const getCurrentScene = async (): Promise<Scene> => await getOrFetchScene(getCurrentSceneId())!;
+        
+        _sceneCache.set(getCurrentSceneId(), startScene);
+        state.choicesMade.set(getCurrentSceneId(), new Set<string>());
+        
+        console.log(await getCurrentScene());
+        
+        renderNode(startScene.nodes[startScene.entryNode!]);
 
         async function getOrFetchScene(key: string): Promise<Scene> {
-            if (sceneMap.has(key)) {
-                return sceneMap.get(key)!;
+            if (_sceneCache.has(key)) {
+                return _sceneCache.get(key)!;
             }
 
             const response = await fetch(`/api/scenes/${key}.json`);
             const scene = (await response.json()) as Scene;
-            console.log(scene);
-            sceneMap.set(key, scene);
+            _sceneCache.set(key, scene);
             return scene;
         }
 
@@ -87,10 +96,10 @@ const { id, data } = Astro.props as StaticPathProps;
                     await renderChoiceNode(node);
                     break;
                 case "scene":
-                    const scene = await getOrFetchScene(node.key);
-                    currentScene = scene;
+                    const scene = await getOrFetchScene(node.sceneId);
+                    state.scenePath.push([node.sceneId, node.nodeId]);
                     if (scene.entryNode) {
-                        renderNode(currentScene.nodes[scene.entryNode]);
+                        renderNode(scene.nodes[scene.entryNode]);
                     }
                     break;
                 case "image":
@@ -106,6 +115,7 @@ const { id, data } = Astro.props as StaticPathProps;
 
         async function renderTextNode(node: Extract<SceneNode, { type: "text" }>) {
             const el = document.createElement("p");
+            el.classList.add(node.type);
             el.innerHTML = node.html;
 
             el.style.transition = "opacity 1s, transform 1s";
@@ -127,10 +137,11 @@ const { id, data } = Astro.props as StaticPathProps;
 
         async function renderChoiceNode(node: Extract<SceneNode, { type: "choice" }>) {
             const el = document.createElement("button");
+            el.classList.add("choice");
             el.innerHTML = node.html;
 
-            if (choicesVisited.has(node.key)) {
-                el.style.opacity = "0.5";
+            if (state.choicesMade.get(getCurrentSceneId())?.has(node.nodeId)) {
+                el.classList.add("visited");
             }
 
             el.onclick = () => {
@@ -141,10 +152,10 @@ const { id, data } = Astro.props as StaticPathProps;
                 if (node.setState) {
                     setStateCondition(node.setState);
                 }
-                choicesVisited.add(node.key);
+                state.choicesMade.get(getCurrentSceneId())?.add(node.nodeId);
 
-                console.log(activeStateKeys);
-                console.log(choicesVisited);
+                console.log(state.keys);
+                console.log(state.choicesMade);
 
                 renderChildren(node.children);
             };
@@ -189,12 +200,22 @@ const { id, data } = Astro.props as StaticPathProps;
                 await renderNodeDelay(child.delay);
             }
 
-            const node = currentScene.nodes[child.key];
+            const node = (await getCurrentScene()).nodes[child.nodeId];
             renderNode(node);
         }
 
         async function renderChildren(children: SceneChild[]) {
-            children.forEach(renderChild);
+            if (children.length) {
+                children.forEach(renderChild);
+            }
+            else if (state.scenePath.length > 1) {
+                // otherwise, get parent scene and render children of scene node
+                state.scenePath.pop();
+                const newScene = await getCurrentScene();
+                const [_, startNodeId] = state.scenePath.at(-1)!;
+                const startNode = newScene.nodes[startNodeId]!;
+                renderChildren(startNode.children);
+            }
         }
 
         function isRequiredConditionMet(
@@ -204,11 +225,11 @@ const { id, data } = Astro.props as StaticPathProps;
                 return true;
             }
 
-            const { key, negated } = requiredCondition;
+            const { name, negated } = requiredCondition;
 
             // if not negated, condition is met when key in state
             // if negated, condition is met when key NOT in state
-            return activeStateKeys.has(key) !== negated;
+            return state.keys.has(name) !== negated;
         }
 
         function setStateCondition(stateCondition: StateCondition | undefined) {
@@ -217,14 +238,10 @@ const { id, data } = Astro.props as StaticPathProps;
             }
 
             if (stateCondition.negated) {
-                activeStateKeys.delete(stateCondition.key);
+                state.keys.delete(stateCondition.name);
             } else {
-                activeStateKeys.add(stateCondition.key);
+                state.keys.add(stateCondition.name);
             }
-        }
-
-        if (currentScene.entryNode) {
-            renderNode(currentScene.nodes[currentScene.entryNode]);
         }
     }
 

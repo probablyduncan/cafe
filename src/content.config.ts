@@ -5,7 +5,7 @@ import fs from "fs";
 import mermaid from 'mermaid';
 import { type FlowEdge, type FlowVertex } from "../node_modules/mermaid/dist/diagrams/flowchart/types.d"
 import { marked } from 'marked';
-import { flowchart, getVisitedStateVariableKey, type Flowchart, type FlowchartEdge, type Scene, sceneSchema, nodeSchema, type SceneNode, childNodeSchema, type StateCondition, type SceneChild } from './lib/contentSchemaTypes';
+import { flowchart, getVisitedStateVariable, type Flowchart, type FlowchartEdge, type Scene, sceneSchema, nodeSchema, type SceneNode, childNodeSchema, type StateCondition, type SceneChild } from './lib/contentSchemaTypes';
 import { type FilePath, parsePath } from './lib/parsePath';
 
 // migrate this stuff to another file eventually??
@@ -179,7 +179,7 @@ async function flowChartToScene(chart: Flowchart): Promise<Scene> {
          * called once, most likely as an end node
          */
         async function initNode(): Promise<SceneNode> {
-            const node: any = { key };
+            const node: any = { nodeId: key };
 
             if (side === "end" && edge.type === "arrow_circle") {
                 node.type = "choice";
@@ -190,10 +190,10 @@ async function flowChartToScene(chart: Flowchart): Promise<Scene> {
                 node.type = assets.get(vert.text!);
                 switch (node.type as SceneNode["type"]) {
                     case "scene":
-                        node.key = path.parse(vert.text!).name;
+                        node.sceneId = path.parse(vert.text!).name;
                         break;
                     case "component":
-                        node.key = vert.text;
+                        node.componentId = vert.text;
                         break;
                     case "image":
                         // TODO how do I pass in alt
@@ -219,7 +219,7 @@ async function flowChartToScene(chart: Flowchart): Promise<Scene> {
     async function getChild(startNode: SceneNode, endNode: SceneNode, edge: FlowchartEdge): Promise<SceneChild> {
 
         const child = childNodeSchema.parse({
-            key: edge.end,
+            nodeId: edge.end,
             delay: {
                 cycles: edge.length - 1,
                 // style: TODO haven't added options yet
@@ -230,30 +230,30 @@ async function flowChartToScene(chart: Flowchart): Promise<Scene> {
         // stateVariables
         if (edge.text !== undefined && edge.text !== "") {
 
-            let key: string;
+            let name: string;
 
             if (edge.text === "!") {
                 // special case, only allow this node once
-                key = getVisitedStateVariableKey(edge.end);
+                name = getVisitedStateVariable(edge.end);
 
-                child.requiredState = { key, negated: true };
-                endNode.setState = { key, negated: false };
+                child.requiredState = { name, negated: true };
+                endNode.setState = { name, negated: false };
             }
             else {
                 const negated = edge.text.startsWith("!");
-                key = negated ? edge.text.substring(1) : edge.text;
+                name = negated ? edge.text.substring(1) : edge.text;
 
                 if (startNode.type === "choice") {
                     // need to set this state on choosing the choice
-                    startNode.setState = { key, negated };
+                    startNode.setState = { name, negated };
                 }
                 else {
                     // otherwise, state is required for this path
-                    child.requiredState = { key, negated };
+                    child.requiredState = { name, negated };
                 }
             }
 
-            varsUsed.add(key);
+            varsUsed.add(name);
         }
 
         return child;

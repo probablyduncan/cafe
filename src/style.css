@@ -16,21 +16,30 @@ html {
     height: 100%;
     color: var(--text-color);
     background-color: var(--bg-color);
+    font-family: serif;
 }
 
 body {
+    position: relative;
     margin: 0 auto;
     max-width: 65ch;
     padding: 0 1rem;
-    min-height: 100svh;
+    height: 100svh;
+    
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    
+    box-sizing: border-box;
 }
 
 nav {
-    position: sticky;
-    top: 0;
-    padding: 1rem 0 8rem;
     display: flex;
     justify-content: space-between;
+
+    position: absolute;
+    padding: 1rem;
+    width: 100%;
+    box-sizing: border-box;
 
     a {
         color: unset;
@@ -43,7 +52,7 @@ nav {
     }
 }
 
-ul, ol {
+/* ul, ol {
     position: sticky;
     background-color: var(--bg-color);
     bottom: 0;
@@ -68,5 +77,58 @@ li {
         background-color: var(--text-color);
         cursor: pointer;
     }
+} */
+
+[data-content] {
+
+    display: flex;
+    flex-flow: column;
+    justify-content: flex-end;
+
+    overflow-y: scroll;
+    margin-bottom: 2em;
+
+    p.text {
+
+    }
+
+
 }
 
+[data-choices] {
+
+    overflow-y: scroll;
+    
+    button.choice {
+
+        font-family: inherit;
+
+        display: block;
+        text-align: left;
+
+        border-radius: unset;
+        border: unset;
+        border-top: 2px solid var(--text-color);
+        color: var(--text-color);
+        background-color: var(--bg-color);
+
+        font-size: unset;
+        box-shadow: unset;
+
+        box-sizing: border-box;
+        width: 100%;
+        padding: 0.5rem;
+        margin-bottom: 4px;
+
+        cursor: pointer;
+
+        &:hover:not(:active) {
+            color: var(--bg-color);
+            background-color: var(--text-color);
+        }
+
+        &.visited {
+            opacity: 0.5;
+        }
+    }
+}

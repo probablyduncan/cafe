@@ -7,7 +7,7 @@ flowchart TD
     %% hub
     base-choices --o go-inside(Go inside.) ==> inside
     base-choices --o check-hours(Check the hours.)
-    base-choices --x peer-through-glass(Peer through the glass.)
+    base-choices -- ! --o peer-through-glass(Peer through the glass.)
     base-choices --o go-around-back(Go around back.)
     base-choices --o leave(Leave.)
 
@@ -33,7 +33,7 @@ flowchart TD
     %% peer through glass
     %% 
 
-    peer-through-glass --> peer-through-glass-i[You approach the window beside the door and peer through it, brushing aside the fronds of a rosemary plant. The window is web from dew and last night's rain.]
+    peer-through-glass --> peer-through-glass-i[You approach the window beside the door and peer through it, brushing aside the fronds of a rosemary plant. The window is wet from dew and last night's rain.]
     --> peer-through-glass-ii[You get closer, but you can't see inside.]
 
     %% don't wipe glass
@@ -61,60 +61,7 @@ flowchart TD
     %% go around back
     %% 
 
-    go-around-back
-    --> go-around-back-i[Good thinking.]
-    --> go-around-back-ii[Only loosers use the front door.]
-    --> go-around-back-iii[Maybe there's another way in.]
-    --> go-around-back-iv["You walk down the street until you come to a narrow alley, sloping down off the street between a tailor and a travel agent (both closed)."]
-    --> go-around-back-v[You glance back along the street and, seeing nobody, descend into the alley.]
-    --> go-around-back-vi[Soon you reach a dead end. You're below street level now, and the ground floor of the Cafe Halcyon hangs above you.]
-    --> go-around-back-vii[There's a little iron door with a wire mesh screen that you can't quite see through, and a window the size of your hand. A lantern burns beside it. In the corner is an ill-contained pile of cafe detritus: cardboard boxes, empty tins, milk crates. The smell of fresh bread down hear is strong.] --> back-choices
-
-    back-choices --o go-around-back-vii-i(1\. Knock on the door.)
-    --> go-around-back-vii-i-i[You knock on the metal door. It makes a tinny, hollow sound.] 
-    --> go-around-back-vii-i-ii[For a second, you're terrified. What if someone actually answers? What would you say? Why are you down here?]
-    --> go-around-back-vii-i-iii[Luckily, nobody comes to the door.]
-    --> back-choices
-    
-    back-choices -- !isLanternOut --o go-around-back-vii-ii(2\. Put out the lantern.) -- isLanternOut --> go-around-back-vii-ii-i[You flick the knob on the bottom of the lantern and the flame goes out. A little oil drips to the ground.] --> go-around-back-vii-ii-ii[Look at you. You're so mischievous] --> back-choices
-
-    back-choices 
-    -- !isTrashed --o 
-    go-around-back-vii-iii(3\. Dig through the pile of trash.) 
-    -- isTrashed --> 
-    go-around-back-vii-iii-i[You pick up one of the boxes in the pile of trash. *JALEPEÑOS & ANCHOS — TINNED — EXTRA LARGE * it says. The J in *jalepeño* is a wiry little cartoon pepper, with big eyes and a wide grid.]
-    --> go-around-back-vii-iii-ii[You brush aside more boxes, cans, egg cartons. There's half a stack of flour, gone moldy.]
-    --o go-around-back-vii-iii-ii-i(1\. Kick it over.)
-    --> go-around-back-vii-iii-ii-i-i[Underneath, you find a box of toothpicks, unopened. Score! You put them in your pocket.]
-    --> go-around-back-vii-iii-ii-i-ii[What other treasures can you find in this garden of leftovers?]
-
-    %% kick cans
-    go-around-back-vii-iii-ii-i-ii --o go-around-back-vii-iii-ii-i-ii-i(1\. Kick the pile of cans.) --> go-around-back-vii-iii-ii-i-ii-i-i[There's a tempting heap of cans like billiard balls beside the door.] --> go-around-back-vii-iii-ii-i-ii-i-ii[You step back, gauge the angle, and run at them. As you swing your leg to kick, you step on a patch of grease and tumble forward into the heap of boxes.] --> go-around-back-vii-iii-ii-i-ii-i-iii[When the mold spores settle, you're laying on a bed of cardboard and banana peels. It's surprisingly warm.] --> go-around-back-vii-iii-ii-i-ii-i-iv[*You could lie here all day,* says a part of you that you wish would shut up.] --> go-around-back-vii-iii-ii-i-iii
-
-    %% climb in box
-    go-around-back-vii-iii-ii-i-ii --o go-around-back-vii-iii-ii-i-ii-ii(2\. Climb into the biggest box.) --> go-around-back-vii-iii-ii-i-ii-ii-i[At the bottom of the pile is the mother of all boxes. It's wide. It's long. It's spotted like a dog from mildew and rain. It's calling to you.] --> go-around-back-vii-iii-ii-i-ii-ii-ii[You sweep the majority of the tins from the box and climb inside. It's long enough for you to stretch out, and you lower yourself until you're entirely under the lip of the box.] --> go-around-back-vii-iii-ii-i-ii-ii-iii[It's surprisingly warm. If you only had water, you could draw a lovely bath.] --> go-around-back-vii-iii-ii-i-iii
-    
-    go-around-back-vii-iii-ii-i-iii[Suddenly, you feel something move beneath you]
-    
-    %% exclaimations against wriggling
-    go-around-back-vii-iii-ii-i-iii --o go-around-back-iii-ii-i-iii-i(1\. Aaugh!) --> go-around-back-iii-ii-i-iv
-    go-around-back-vii-iii-ii-i-iii --o go-around-back-iii-ii-i-iii-ii(2\. Yee-ow!) --> go-around-back-iii-ii-i-iv
-    go-around-back-vii-iii-ii-i-iii --o go-around-back-iii-ii-i-iii-iii(2\. Ahooga!) --> go-around-back-iii-ii-i-iv
-    
-    %% croissant reveal
-    go-around-back-iii-ii-i-iv[You twist, reach down. Something wriggles against your arm.] --> go-around-back-iii-ii-i-v[You see a tail disappear under a box. There's a scraping sound, something shifts.] --> go-around-back-iii-ii-i-vi[And then a mouse emerges a few feet away. It's found half a croissant, somewhere in the pile, and it's dragging it towards the storm drain.] --o go-around-back-iii-ii-i-vii(1\. Grab it!) --> go-around-back-iii-ii-i-viii[Like a raccoon, desperate and hungry, you leap up and snatch the croissant from the feeble grasp of the little mouse.] --> go-around-back-iii-ii-i-ix[Rainwater drips out the end of the croissant as you raise it to your lips. It's fluffy, flaky, sumptuous. Sure, it's a little flat, and a little cold, but you've never wanted anything so much in your life.] --> go-around-back-iii-ii-i-x[The mouse stares up at you. There is wonder in its eyes. You are its god, tall and terrible.] --> go-around-back-iii-ii-i-xi[It sits, motionless, waiting.] --> go-around-back-iii-ii-i-xi-b[You're only staring at the beautiful croissant looks delicious.]
-    
-    %% illusion of choice
-    go-around-back-iii-ii-i-xi-b --o go-around-back-iii-ii-i-viii-i(1\. Take a bite.) --> go-around-back-iii-ii-i-xii
-    go-around-back-iii-ii-i-xi-b --o go-around-back-iii-ii-i-viii-ii(2\. Resist the croissant.) --> go-around-back-iii-ii-i-viii-iii[You try to resist, but it looks so tasty.] --> go-around-back-iii-ii-i-xii
-
-    go-around-back-iii-ii-i-xii[You take a bite, chew. There's a pain in your chest.] --> go-around-back-iii-ii-i-xiii[It's disgusting, of course. You spit it out. The mouse breaks from its stupor and darts down the drain.] --> go-around-back-iii-ii-i-xiv[What's gotten into you? You drop the croissant and try your best to kick the mess of garbage back into a pile. Hopefully nobody will notice.] --> back-choices
-    
-    %% no toothpicks for you
-    go-around-back-vii-iii-ii --o go-around-back-vii-iii-ii-ii(2\. Leave it.) --> back-choices
-
-    %% leave alley
-    back-choices --o go-around-back-vii-iv(4\. Leave the alley.) --> go-around-back-vii-iv-i[Why'd you come down here, anyway?] --> go-around-back-vii-iv-ii[You leave the alley and return to the front of the cafe.] --> base-choices
+    go-around-back --> around-back[around-back.mmd] --> base-choices
     
     %% 
     %% leave
