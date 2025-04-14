@@ -275,3 +275,17 @@ and then we can control how far back you can see
 
 ^ the problem with this is that you also have to store state at that point? i.e. keys, whether the choice had been made before, etc. So maybe can just store an array of serialized json strings of state that we can load from
 each choice would shift the history array and push another state string, and then going back would just load the previous state
+
+
+
+## Settings I need to make customizable
+
+autoplay vs click to progress dialogue
+
+dark/light/system
+maybe different color schemes would be cool
+
+font size? font family?
+different readability settings would be nice
+
+how to make this work for screen readers?
