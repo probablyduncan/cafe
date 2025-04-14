@@ -287,5 +287,6 @@ maybe different color schemes would be cool
 
 font size? font family?
 different readability settings would be nice
+reduced motion/effects
 
 how to make this work for screen readers?
