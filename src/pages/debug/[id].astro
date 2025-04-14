@@ -25,7 +25,7 @@ const { id, data } = Astro.props as StaticPathProps;
             <span style="font-family: monospace;">~ debugging {id}.mmd ~</span>
             <a href="/ctrl" title="settings & save files">ctrl</a>
         </nav>
-        <div data-content={JSON.stringify(data)} data-scene-id={id}></div>
+        <div data-content={JSON.stringify(data)}></div>
         <div data-choices></div>
     </body>
 </html>
@@ -56,7 +56,7 @@ const { id, data } = Astro.props as StaticPathProps;
         }
 
         const startScene = JSON.parse(dialogueContainer.dataset.content) as Scene;
-        const startPos = [dialogueContainer.dataset.sceneId!, startScene.entryNode!];
+        const startPos = [startScene.sceneId, startScene.entryNodeId!];
         
         const state = {
             keys: new Set<string>(),
@@ -73,7 +73,7 @@ const { id, data } = Astro.props as StaticPathProps;
         
         console.log(await getCurrentScene());
         
-        renderNode(startScene.nodes[startScene.entryNode!]);
+        renderNode(startScene.nodes[startScene.entryNodeId]);
 
         async function getOrFetchScene(key: string): Promise<Scene> {
             if (_sceneCache.has(key)) {
@@ -98,9 +98,7 @@ const { id, data } = Astro.props as StaticPathProps;
                 case "scene":
                     const scene = await getOrFetchScene(node.sceneId);
                     state.scenePath.push([node.sceneId, node.nodeId]);
-                    if (scene.entryNode) {
-                        renderNode(scene.nodes[scene.entryNode]);
-                    }
+                    renderNode(scene.nodes[scene.entryNodeId]);
                     break;
                 case "image":
                     await renderImageNode(node);

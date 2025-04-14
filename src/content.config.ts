@@ -118,7 +118,11 @@ async function parseMMD(filePath: FilePath, content: string, context: LoaderCont
     }
 
     const chart = await flowchart.parseAsync({ vertices, edges }) as Flowchart;
-    const scene = await flowChartToScene(chart);
+    const scene = await flowchartToScene(filePath.name, chart);
+
+    if (scene === undefined) {
+        return;
+    }
 
     context.store.set({
         id: filePath.name,
@@ -131,10 +135,10 @@ async function parseMD(filePath: FilePath, content: string, context: LoaderConte
     // console.log(content)
 }
 
-async function flowChartToScene(chart: Flowchart): Promise<Scene> {
+async function flowchartToScene(sceneId: string, chart: Flowchart): Promise<Scene | undefined> {
 
     if (!chart?.edges?.length) {
-        return sceneSchema.parse({});
+        return undefined;
     }
 
     const nodes: Record<string, SceneNode> = {};
@@ -151,9 +155,10 @@ async function flowChartToScene(chart: Flowchart): Promise<Scene> {
     }
 
     const scene = sceneSchema.parse({
+        sceneId,
         nodes: nodes,
         varsUsed: Array.from(varsUsed),
-        entryNode: chart.edges[0].start,
+        entryNodeId: chart.edges[0].start,
     });
 
     return scene;

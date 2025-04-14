@@ -106,8 +106,9 @@ export type SceneNode = z.infer<typeof nodeSchema>;
 export type SceneChild = z.infer<typeof childNodeSchema>;
 
 export const sceneSchema = z.object({
+    sceneId: z.string(),
     nodes: z.record(z.string(), nodeSchema).default({}),
-    entryNode: z.string().optional(),
+    entryNodeId: z.string(),
     varsUsed: z.array(z.string()).default([]),
     timeSlot: timeSlot.optional(),
 })

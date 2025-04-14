@@ -263,3 +263,15 @@ etc.
 maybe --x should clear the dialogue feed?
 
 multiple lines in one node should all be displayed inline but should animate staggered
+
+
+
+
+saving should be based on last choice
+so `lastChoice: "sceneId:nodeId"`
+and then we can have a history of choices
+so `history: ["sceneId:nodeId","sceneId:nodeId", ...]` etc
+and then we can control how far back you can see
+
+^ the problem with this is that you also have to store state at that point? i.e. keys, whether the choice had been made before, etc. So maybe can just store an array of serialized json strings of state that we can load from
+each choice would shift the history array and push another state string, and then going back would just load the previous state
