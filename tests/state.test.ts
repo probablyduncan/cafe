@@ -1,22 +1,28 @@
 import { expect, test } from 'vitest'
-import { State, type SaveDb, type SceneDb, type StateOptions, type StateSave } from '../src/lib/state'
+import { State, type SaveDb, type SceneDb, type StateOptions, type SaveContainer } from '../src/lib/state'
 import { sceneSchema, type Scene } from '../src/lib/contentSchemaTypes';
 
 class MockSaveDb implements SaveDb {
+    
     private saveString: string;
+    
+    get data() {
+        
+        if (this.saveString) {
+            return JSON.parse(this.saveString) as SaveContainer;
+        }
+
+        return {};
+    }
+
+    set data(val: SaveContainer) {
+        this.saveString = JSON.stringify(val);
+    }
 
     constructor(json?: string) {
         if (json !== undefined) {
             this.saveString = json;
         }
-    }
-
-    get() {
-        return this.saveString;
-    }
-
-    set(val: string) {
-        this.saveString = val;
     }
 }
 
@@ -34,7 +40,7 @@ class MockSceneDb implements SceneDb {
     }
 }
 
-function createMockState(data?: StateSave, opts?: Partial<StateOptions>) {
+function createMockState(data?: SaveContainer, opts?: Partial<StateOptions>) {
     const sceneDb = new MockSceneDb();
     const saveDb = new MockSaveDb(JSON.stringify(data));
     const state = new State({ sceneDb, saveDb }, opts);
@@ -96,7 +102,7 @@ test("serialize/deserialize are symmetrical", () => {
     expect(state["_currentSceneId"]).toBe("scene3");
 
     // now see if it's deterministic
-    const { state: state2 } = createMockState(JSON.parse(saveDb.get()));
+    const { state: state2 } = createMockState(saveDb.data);
 
     // compare first and second states
     expect(state2["_choices"]).toEqual(state["_choices"]);
@@ -115,17 +121,17 @@ test("exit scene", async () => {
         p: "scene1:exitNode1/scene2:exitNode2",
     });
 
-    expect(JSON.parse(saveDb.get())).toEqual(JSON.parse('{"c":"c1, c2 , lastChoice","l":"scene3:lastChoice","k":"  ate,slept","p":"scene1:exitNode1/scene2:exitNode2"}'));
+    expect(saveDb.data).toEqual(JSON.parse('{"c":"c1, c2 , lastChoice","l":"scene3:lastChoice","k":"  ate,slept","p":"scene1:exitNode1/scene2:exitNode2"}'));
 
     const scene = await state.exitScene();
 
     expect(scene?.entryNodeId).toBe("exitNode2");
-    expect(JSON.parse(saveDb.get())).toEqual(JSON.parse('{"l":"scene3:lastChoice","c":"c1,c2,lastChoice","k":"ate,slept","p":"scene1:exitNode1"}'));
+    expect(saveDb.data).toEqual(JSON.parse('{"l":"scene3:lastChoice","c":"c1,c2,lastChoice","k":"ate,slept","p":"scene1:exitNode1"}'));
 
 });
 
 test("enter scene", async () => {
-    const { state, saveDb } = createMockState({
+    const { state } = createMockState({
         c: "c1, c2 , lastChoice",
         l: "scene3:lastChoice",
         k: "  ate,slept",
@@ -150,11 +156,11 @@ test("path isn't serialized if null", async () => {
     }
 
     const { state, saveDb } = createMockState(data);
-    expect(JSON.parse(saveDb.get())["p"]).toBe("scene1:exitNode1");
+    expect(saveDb.data["p"]).toBe("scene1:exitNode1");
 
     await state.exitScene();
 
-    expect(JSON.parse(saveDb.get())["p"]).toBeUndefined();
+    expect(saveDb.data["p"]).toBeUndefined();
 });
 
 test("autosave", async () => {
@@ -174,16 +180,16 @@ test("autosave", async () => {
         
         // this will save new choice
         state.setChoice("choice");
-        expect(createMockState(JSON.parse(saveDb.get())).state["_choices"].has("choice")).toBe(shouldAutosave);
+        expect(createMockState(saveDb.data).state["_choices"].has("choice")).toBe(shouldAutosave);
 
         // this won't change anything yet because no new choice or state key
         await state.enterScene("newNode", "newScene")
-        expect(createMockState(JSON.parse(saveDb.get())).state["_currentSceneId"]).toBe("scene2");
+        expect(createMockState(saveDb.data).state["_currentSceneId"]).toBe("scene2");
 
         // now this should save and update scene, last choice, etc
         state.setChoice("wahoo");
-        expect(createMockState(JSON.parse(saveDb.get())).state["_currentSceneId"]).toBe(shouldAutosave ? "newScene" : "scene2");
-        expect(createMockState(JSON.parse(saveDb.get())).state["_choices"].has("wahoo")).toBe(shouldAutosave);
-        expect(createMockState(JSON.parse(saveDb.get())).state["_lastChoice"]).toEqual(shouldAutosave ? { sceneId: "newScene", nodeId: "wahoo" } : { sceneId: "scene2", nodeId: "lastChoice" });
+        expect(createMockState(saveDb.data).state["_currentSceneId"]).toBe(shouldAutosave ? "newScene" : "scene2");
+        expect(createMockState(saveDb.data).state["_choices"].has("wahoo")).toBe(shouldAutosave);
+        expect(createMockState(saveDb.data).state["_lastChoice"]).toEqual(shouldAutosave ? { sceneId: "newScene", nodeId: "wahoo" } : { sceneId: "scene2", nodeId: "lastChoice" });
     }
 });

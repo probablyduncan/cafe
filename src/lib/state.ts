@@ -1,6 +1,6 @@
 import { type Scene, type StateCondition } from "./contentSchemaTypes";
 
-export type StateSave = {
+export type SaveContainer = {
     l?: string; // last choice, "sceneId:nodeId"
     p?: string; // path to current scene, "scene1Id:exitNodeId/scene2Id:exitNodeId". Will not contain scene of last choice
     c?: string; // list of nodeIds of visited choices, "c1,c3,go-around-back"
@@ -12,8 +12,7 @@ export interface SceneDb {
 }
 
 export interface SaveDb {
-    get: () => string | undefined;
-    set: (val: string | undefined) => void;
+    data: SaveContainer;
 }
 
 export type StateDeps = {
@@ -27,18 +26,18 @@ export type StateOptions = {
 
 export class LocalStorageSaveDb implements SaveDb {
     private static KEY = "save-data";
+    
+    get data() {
+        const value = window.localStorage.getItem(LocalStorageSaveDb.KEY);
+        if (value !== null) {
+            return JSON.parse(value) as SaveContainer;
+        }
 
-    get() {
-        return window.localStorage.getItem(LocalStorageSaveDb.KEY) ?? undefined;
+        return {};
     }
 
-    set(val: string | undefined) {
-        if (val !== undefined) {
-            window.localStorage.setItem(LocalStorageSaveDb.KEY, val);
-        }
-        else {
-            window.localStorage.removeItem(LocalStorageSaveDb.KEY);
-        }
+    set data(val: SaveContainer) {
+        window.localStorage.setItem(LocalStorageSaveDb.KEY, JSON.stringify(val));
     }
 }
 
@@ -116,10 +115,7 @@ export class State {
      * Loads save data and returns the current scene, with correct entryNodeId
      */
     async load(): Promise<Scene> {
-        const json = this._saveDb.get();
-        if (json !== undefined) {
-            this.deserialize(json);
-        }
+        this.deserialize(this._saveDb.data);
 
         const scene = { ... await this.getCurrentScene() };
         if (this._lastChoice !== undefined) {
@@ -129,13 +125,9 @@ export class State {
         return scene;
     }
 
-    private deserialize(json: string | undefined) {
+    private deserialize(data: SaveContainer) {
 
-        if (json === undefined) {
-            return;
-        }
-
-        const { l, p, c, k } = JSON.parse(json) as StateSave;
+        const { l, p, c, k } = data;
 
         // parse last choice
         if (l !== undefined) {
@@ -159,7 +151,7 @@ export class State {
      * serializes and saves the curernt state
      */
     save() {
-        this._saveDb.set(this.serialize());
+        this._saveDb.data = this.serialize();
     }
 
     private autosave() {
@@ -170,8 +162,8 @@ export class State {
         this.save();
     }
 
-    private serialize(): string {
-        const save: StateSave = {};
+    private serialize(): SaveContainer {
+        const save: SaveContainer = {};
 
         // save last choice
         if (this._lastChoice !== undefined) {
@@ -203,7 +195,7 @@ export class State {
             save.k = Array.from(this._keys).join(",");
         }
 
-        return JSON.stringify(save);
+        return save;
     }
 
     async getCurrentScene(): Promise<Scene> {
