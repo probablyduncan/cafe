@@ -79,7 +79,7 @@ const { id, data } = Astro.props as StaticPathProps;
                 return _sceneCache.get(key)!;
             }
 
-            const response = await fetch(`/api/scenes/${key}.json`);
+            const response = await fetch(`/cafe/api/scenes/${key}.json`);
             const scene = (await response.json()) as Scene;
             _sceneCache.set(key, scene);
             return scene;

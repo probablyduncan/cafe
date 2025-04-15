@@ -50,7 +50,7 @@ export class HttpSceneDb implements SceneDb {
             return this._cache.get(sceneId)!;
         }
 
-        const response = await fetch(`/api/scenes/${sceneId}.json`);
+        const response = await fetch(`/cafe/api/scenes/${sceneId}.json`);
         const scene = await response.json() as Scene;
         this._cache.set(sceneId, scene);
         return scene;
