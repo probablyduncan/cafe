@@ -60,7 +60,7 @@ test("last choice deserializes", () => {
 test("choice updates lastChoice", async () => {
     const { state } = createMockState();
     expect(state["_lastChoice"]).toBeUndefined();
-    state.enterScene("fromNode", "scene2");
+    await state.enterScene("scene2", "fromNode");
 
     const currentScene = await state.getCurrentScene();
     expect(currentScene.sceneId).toBe("scene2");
@@ -138,7 +138,7 @@ test("enter scene", async () => {
         p: "scene1:exitNode1/scene2:exitNode2",
     });
 
-    await state.enterScene("fromNode", "scene4");
+    await state.enterScene("scene4", "fromNode");
     expect(state["_currentSceneId"]).toBe("scene4");
     expect(state["_path"].at(-1)).toEqual({
         sceneId: "scene3",
@@ -183,7 +183,7 @@ test("autosave", async () => {
         expect(createMockState(saveDb.data).state["_choices"].has("choice")).toBe(shouldAutosave);
 
         // this won't change anything yet because no new choice or state key
-        await state.enterScene("newNode", "newScene")
+        await state.enterScene("newScene", "newNode");
         expect(createMockState(saveDb.data).state["_currentSceneId"]).toBe("scene2");
 
         // now this should save and update scene, last choice, etc

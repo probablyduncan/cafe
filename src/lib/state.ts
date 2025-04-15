@@ -204,7 +204,7 @@ export class State {
     }
 
     // fetches new scene, adds it to hierarchy, and returns it
-    async enterScene(fromNodeId: string, sceneId: string): Promise<Scene> {
+    async enterScene(sceneId: string, fromNodeId: string): Promise<Scene> {
 
         this._path.push({
             sceneId: this._currentSceneId,
