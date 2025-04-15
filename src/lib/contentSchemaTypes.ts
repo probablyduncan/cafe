@@ -1,7 +1,7 @@
 import { z } from "astro/zod";
 
-export const timeSlot = z.enum(["morning", "afternoon", "evening", "closed"]);
-export type TimeSlot = z.infer<typeof timeSlot>;
+// export const timeSlot = z.enum(["morning", "afternoon", "evening", "closed"]);
+// export type TimeSlot = z.infer<typeof timeSlot>;
 
 
 export const getVisitedStateVariable = (nodeId: string) => `v:${nodeId}`;
@@ -110,6 +110,6 @@ export const sceneSchema = z.object({
     nodes: z.record(z.string(), nodeSchema).default({}),
     entryNodeId: z.string(),
     varsUsed: z.array(z.string()).default([]),
-    timeSlot: timeSlot.optional(),
+    // timeSlot: timeSlot.optional(),
 })
 export type Scene = z.infer<typeof sceneSchema>;
