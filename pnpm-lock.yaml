@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  dompurify: link:./src/lib/domPurifyOverwrite
+  dompurify: link:./src/lib/server/domPurifyOverwrite
 
 importers:
 
@@ -3729,7 +3729,7 @@ snapshots:
       d3-sankey: 0.12.3
       dagre-d3-es: 7.0.11
       dayjs: 1.11.13
-      dompurify: link:src/lib/domPurifyOverwrite
+      dompurify: link:src/lib/server/domPurifyOverwrite
       katex: 0.16.21
       khroma: 2.1.0
       lodash-es: 4.17.21

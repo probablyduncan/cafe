@@ -6,7 +6,7 @@ import mermaid from 'mermaid';
 import { type FlowEdge, type FlowVertex } from "../node_modules/mermaid/dist/diagrams/flowchart/types.d"
 import { marked } from 'marked';
 import { flowchart, getVisitedStateVariable, type Flowchart, type FlowchartEdge, type Scene, sceneSchema, nodeSchema, type SceneNode, childNodeSchema, type StateCondition, type SceneChild } from './lib/contentSchemaTypes';
-import { type FilePath, parsePath } from './lib/parsePath';
+import { type FilePath, parsePath } from './lib/server/parsePath';
 
 // migrate this stuff to another file eventually??
 // https://github.com/withastro/astro/issues/13253

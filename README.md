@@ -115,7 +115,7 @@ overwrite dompurify dependency with local module:
     // other config
     "pnpm": {
         "overrides": {
-            "dompurify": "link:./src/lib/domPurifyOverwrite"
+            "dompurify": "link:./src/lib/server/domPurifyOverwrite"
         }
     },
 }

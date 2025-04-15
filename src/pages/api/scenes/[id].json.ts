@@ -1,5 +1,5 @@
 import type { GetStaticPaths } from "astro";
-import { getStaticPathsImpl, type StaticPathProps } from "../../../lib/server";
+import { getStaticPathsImpl, type StaticPathProps } from "../../../lib/server/getStaticPaths";
 
 export async function GET({ props }: { props: StaticPathProps }) {
     return new Response(

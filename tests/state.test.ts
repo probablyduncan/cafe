@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { State, type SaveDb, type SceneDb, type StateOptions, type SaveContainer } from '../src/lib/state'
+import { State, type SaveDb, type SceneDb, type StateOptions, type SaveContainer } from '../src/lib/client/state'
 import { sceneSchema, type Scene } from '../src/lib/contentSchemaTypes';
 
 class MockSaveDb implements SaveDb {

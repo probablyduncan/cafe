@@ -4,7 +4,6 @@ import type {
     InferGetStaticPropsType,
     GetStaticPaths,
 } from "astro";
-import { sceneSchema, type Flowchart, type Scene } from "./contentSchemaTypes";
 
 export const getStaticPathsImpl = (async () => {
     const scenes = (await getCollection("scenes"));

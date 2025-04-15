@@ -1,6 +1,6 @@
 ---
 import "../../style.css";
-import { getStaticPathsImpl, type StaticPathProps } from "../../lib/server";
+import { getStaticPathsImpl, type StaticPathProps } from "../../lib/server/getStaticPaths";
 import type { GetStaticPaths } from "astro";
 
 export const getStaticPaths = (async () => {
@@ -16,7 +16,6 @@ const { id, data } = Astro.props as StaticPathProps;
         <title>Cafe Halcyon</title>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width" />
-        <script src="../../lib/client"></script>
     </head>
     <body>
         <nav>
