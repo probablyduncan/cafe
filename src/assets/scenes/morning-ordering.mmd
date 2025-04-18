@@ -1,19 +1,55 @@
 flowchart TD
 
-    i[*You walk up to the counter, which is a wide glass case. Aside from an enamel bowl of tomatoes and a few loose tortillas, it's mostly empty.*]
-    --> ii[*The woman behind the counter looks you up and down. She's old and her hair is all over the place. Like a hedgehog.*]
-    --> iii[What can I get for you? *she asks.*]
-    --> iv[*You don't see a menu anywhere.*]
+    %% i[*You walk up to the counter, which is a wide glass case. Aside from an enamel bowl of tomatoes and a few loose tortillas, it's mostly empty.*]
+    %% --> ii[*The woman behind the counter looks you up and down. She's old and her hair is all over the place. Like a hedgehog.*]
+    %% --> iii[What can I get for you? *she asks.*]
+    %% --> iv[*You don't see a menu anywhere.*]
 
-    iv --o c1[What do you have?]
-    --> c1-i[Oh!] --> c1-ii[*The woman looks behind her. There's a folding screen leaned up against the wall. She pulls it out next to the counter and unfolds it, revealing a thorough list of things that go in sandwiches.*] --> c1-c1[Read the list.] & c1-c2[Ask for the first thing on the list.]
+    %% iv --o c1[What do you have?]
+    %% --> c1-i[Oh!] --> c1-ii[*The woman looks behind her. There's a folding screen leaned up against the wall. She pulls it out next to the counter and unfolds it, revealing a thorough list of things that go in sandwiches.*] --> c1-c1[Read the list.] & c1-c2[Ask for ''the first thing'' on the list.]
 
-    c1-c1 --> c1-c1-i[You try, but it's all jibberish to you. Oh yeah. You can't read.] --> c1-c1-ii[How could you forget?]
+    %% c1-c1 --> c1-c1-i[You try, but it's all jibberish to you. Oh yeah. You can't read.] --> c1-c1-ii[How could you forget?]
 
-    iv --o c2[One cheese sandwhich, please.]
+    %% iv --o c2[One cheese sandwhich, please.]
     
-    iv --o c3[Coffee and a cigraette.]
+    %% iv --o c3[Coffee and a cigraette.]
     
-    iv --o c4[*Tell her to surprise you.*]
+    %% iv --o c4[*Tell her to surprise you.*]
     
-    iv --o c5[Ask her what her name is.]
+    %% iv --o c5[Ask her what her name is.]
+
+
+
+
+    start --> a[The door bangs shut behind you.
+        For a second, you think the glass has broken,
+        but it turns out it just makes that noise every time.]
+        --> b[There are only a few tables, and they're all occupied.]
+        
+        b -->|morning-start-outside:wavedAtOldMan| ba[
+            The old man in the window looks up.
+            He smiles at you.
+        ] --> c
+
+        b -->|morning-start-outside:ignoredOldMan| bb[
+            The old man in the window looks up at you,
+            his eyebrows raised.
+        ] --> c
+
+        b --> c
+
+        c[To your left, a gaggle of children hold court over a long table.]
+        --> d[
+            And in front of you is a wide glass counter,
+            where two women are talking.
+            One of them, with long dark hair
+            One of them seems to be the proprietor of the place.
+        ]
+        --o e[Approach the counter.] --> fish_convo.mmd
+
+
+        %% and he slapped the fish, one after the other. And they flopped around, of course. they're chatting and you have to interrupt them or wait?
+
+        %% once you've ordered, you have to choose where to sit.
+        %% and I have to make it really easy to go take your food outside and be alone.
+        %% but difficult/rewarding to sit down with some rando

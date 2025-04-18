@@ -290,3 +290,43 @@ different readability settings would be nice
 reduced motion/effects
 
 how to make this work for screen readers?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Rendering steps
+
+begin:
+- load state
+- render scene at entryNode
+
+render scene:
+- render first node in scene
+- continue rendering nodes
+- when nodes have been rendered, exit the scene
+
+render node:
+- if text, image component node, render text and render children
+- if choice, add choice
+- if passthrough, render children
+
+render children:
+- render first of each type, EXCEPT for choices. Render all choices, staggered
+
+
+should '' repeated apostrophes be turned into quotes? single ones should be turned into the correct character too right?
+
+so the delay between inline pauses and new line pauses is the same? The base delay at least. The threedots/etc pauses are extra

@@ -1,0 +1,143 @@
+flowchart TD
+    start 
+
+    %% You approach the counter.
+    %% Aside from an enamel bowl of tomatoes and a few loose tortillas, it's mostly empty.
+    %% There are two women at the counter, one in front, one behind. They're both turned away from you.
+    %% The server is in the middle of a story.
+
+    --> 0[You approach the counter.]
+    --> 1[
+        Aside from an enamel bowl of tomatoes,
+        and a few loose tortillas,
+        it's mostly empty.
+    ]
+    --> 2[
+        There are two women at the counter,
+        one in front, one behind.
+        They're both turned away from you.
+    ]
+    --> 3[
+        The server is in the middle of a story.
+    ]
+    --> a[
+        ''So then I say, 'where'd you get the fish, kid,'
+        and he says 'nowhere,'
+        and I say 'well, you got them somewhere, didn't you, Ottie,'
+        and he sort of gives me this look like a trapped dog.''
+    ]
+    --> b[
+        ''So where'd he get them?''
+        asks her friend.]
+    --> c[
+        ''Well I said to him, 'Otrock,' I said, 
+        'Otrock James Preballanack,'
+        addressing him fully to convey the gravity of the situation&mdash;''
+    ]
+    --> d[''As you should in times like those.'']
+    --> e[''As I should indeed.'']
+    
+    e --o 1c[''Um. Excuse me?''] --> turnaround
+    e --o 1sn[Say nothing.]
+
+    ---> f[
+        ''Otrock James Preballanack,' I said,
+        and that got his attention.
+        I said 'Otrock,
+        where did you get the fish.'''
+    ]
+    --> g[''And what'd he say?'']
+    ---> h[
+        ''He looks up at me like a seagull,
+        and says,
+        get this,
+        he says,
+        'What fish?'''
+    ]
+    ---> i[''What fish?!'']
+    --> j[
+        ''What fish!
+        Can you believe it?
+        Like he didn't smell like a goddamn Cauldron trawler.
+        Like he didn't have flotsam in his hair.''
+    ]
+    --> k[Both women chuckle.]
+
+    k --o 2c[Now's your chance! Say something!] 
+    --> 2c1[What should you say?] 
+    2c1 --o 2c1c1[''Hello?''] --> turnaround
+    2c1 --o 2c1c2[''Howdy!''] --> 2c1c2a[Nice choice, cowboy.] --> jumparound
+    2c1 --o 2c1c3[''Two eggs, please!''] --> 2c1c3a[
+        Two eggs? What, raw?
+    ] --> turnaround
+
+    k --o 2sn[Let the moment breathe.]
+
+    --> l[
+        ''You know how kids are.
+        They're so short.
+        They try to pretend like they don't have the detritus of their escapades tangled up in their hair,
+        because if *they* can't see it,
+        no one can,
+        but they're not fooling anyone.
+    ]
+    --> m[
+        ''Anyway, I grabbed his shoulders and spun him around like a top until he was facing the sofa.
+        He tried to act surprised,
+        but he's a bad actor.
+        And even he could see there's was nobody else to blame.
+    ]
+    --> m2[
+        ''We live alone.
+        Who else would have left a pile of fish on my sofa?''
+    ]
+
+    m2 --o 3c1[Tap her on the shoulder.] --> jumparound
+
+    m2 --o 3c2[''Hey! Can I order?''] --> turnaround
+
+    m2 --o 3sn[Find out who else would have left a pile of fish on her sofa.]
+
+    ----> n[
+        ''Maybe it was a gift from a suitor?
+        Have you seen Gregory recently?''
+    ]
+    --> o[
+        ''*Ha.*
+        No, I haven't.''
+        The server shakes her head.
+        ''If he's leaving fish on any girl's sofa,
+        she's certainly much younger than me.''
+    ]
+    
+    o ---> p[
+        Her friend glances back, and notices you.
+    ]
+
+    --> q[
+        ''He takes after his father, you know,''
+        continues the server.
+        ''Ottie.
+        It's funny.
+        It's like he never left.''
+    ]
+
+    q ----> r[
+        She's lost in thought.
+    ]
+
+    r --o 4c1[''Um. Excuse me?''] --> turnaround
+    
+    r --o 4c3[Make awkward eye contact with the server's friend.] 
+    --> 4c3a[
+        ''Hey Betty,''
+        says the server's friend.
+    ] --> turnaround
+
+    jumparound[The server jumps and spins around.] --> ohhi
+    turnaround[The server turns around.] --> ohhi
+    ohhi[
+        ''Oh!
+        I'm so sorry.
+        What can I get for you?''
+    ]

@@ -13,11 +13,61 @@ import "../style.css";
         <nav>
             <a href="/info" title="about this cafe">info</a>
             <!-- <span><span data-time></span> at the Cafe Halcyon</span> -->
-            <!-- <span>Cafe Halcyon</span> -->
+            <span style="font-family: monospace;">~ Cafe Halcyon ~</span>
             <a href="/ctrl" title="settings & save files">ctrl</a>
         </nav>
-        <div data-content>
-            
-        </div>
+        <div data-content></div>
+        <div data-choices></div>
     </body>
+    <script>
+        import { Renderer, type ChoiceContainer, type ContentContainer } from "../lib/client/renderer";
+        import { HttpSceneDb, LocalStorageSaveDb, State } from "../lib/client/state";
+
+        function init() {
+            const choices = document.querySelector("[data-choices]");
+            const content = document.querySelector("[data-content]");
+
+            if (!choices || !content) {
+                return;
+            }
+
+            const state = new State(
+                {
+                    saveDb: new LocalStorageSaveDb(),
+                    sceneDb: new HttpSceneDb(),
+                },
+                {
+                    autosave: false,
+                }
+            );
+
+            const choiceContainer: ChoiceContainer = {
+                add: (el: HTMLElement) => {
+                    choices.appendChild(el);
+                },
+                clear: () => {
+                    choices.innerHTML = "";
+                },
+            };
+
+            const contentContainer: ContentContainer = {
+                add: (el: HTMLElement) => {
+                    content.appendChild(el);
+                },
+                clear: () => {
+                    content.innerHTML = "";
+                },
+            };
+
+            const renderer = new Renderer({
+                state,
+                choiceContainer,
+                contentContainer,
+            });
+
+            renderer.begin();
+        }
+
+        document.addEventListener("DOMContentLoaded", init);
+    </script>
 </html>

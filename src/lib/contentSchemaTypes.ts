@@ -48,7 +48,7 @@ export const childNodeSchema = z.object({
     nodeId: z.string(),
     delay: z.object({
         cycles: z.number(),             // determined by edge length, 0 if no extra delay
-        style: z.enum(["threeDots"]).default("threeDots"),  // determined by edge stroke
+        style: z.enum(["threeDots", "newScene"]).default("threeDots"),  // determined by edge stroke
     }),
     requiredState: stateCondition.optional(),
     clearPrevious: z.boolean().default(false),

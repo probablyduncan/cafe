@@ -5,7 +5,7 @@ flowchart TD
     iii --> base-choices
     
     %% hub
-    base-choices --o go-inside(Go inside.) ==> inside
+    base-choices --o go-inside(Go inside.) --> inside[morning-ordering.mmd]
     base-choices --o check-hours(Check the hours.)
     base-choices -- ! --o peer-through-glass(Peer through the glass.)
     base-choices --o go-around-back(Go around back.)

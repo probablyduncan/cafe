@@ -276,6 +276,8 @@ export class State {
             this._keys.add(condition.name);
         }
 
-        this.autosave();
+        // not autosaving here because if we revert to a prev save,
+        // progress will resume at the last choice,
+        // not the last condition that was set
     }
 }
