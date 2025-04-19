@@ -330,3 +330,10 @@ render children:
 should '' repeated apostrophes be turned into quotes? single ones should be turned into the correct character too right?
 
 so the delay between inline pauses and new line pauses is the same? The base delay at least. The threedots/etc pauses are extra
+
+
+by default, the text is revealed at a certain speed, but if you hold down the mouse or space bar it accelerates
+so you can't just wholly skip, but you can speed it up
+
+additionally, text above the main text should have lower opacity than the current text
+and maybe the current text should be centered? Or the top of it should be at the center line? So that the first line of the current paragraph is always in the same place on the screen? Idk how that would be styled
