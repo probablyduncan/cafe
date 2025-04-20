@@ -7,6 +7,7 @@ import { type FlowEdge, type FlowVertex } from "../node_modules/mermaid/dist/dia
 import { marked } from 'marked';
 import { flowchart, getVisitedStateVariable, type Flowchart, type FlowchartEdge, type Scene, sceneSchema, nodeSchema, type SceneNode, childNodeSchema, type StateCondition, type SceneChild } from './lib/contentSchemaTypes';
 import { type FilePath, parsePath } from './lib/server/parsePath';
+import { formatQuotes } from './lib/agnostic/quoteResolver';
 
 // migrate this stuff to another file eventually??
 // https://github.com/withastro/astro/issues/13253
@@ -188,7 +189,7 @@ async function flowchartToScene(sceneId: string, chart: Flowchart): Promise<Scen
 
             if (side === "end" && edge.type === "arrow_circle") {
                 node.type = "choice";
-                node.html = marked.parseInline(vert.text!);
+                node.html = marked.parseInline(formatQuotes(vert.text));
                 // node.style =
             }
             else if (assets.has(vert.text!)) {
@@ -210,7 +211,7 @@ async function flowchartToScene(sceneId: string, chart: Flowchart): Promise<Scen
             }
             else if (vert.type !== undefined) {
                 node.type = "text";
-                node.html = await marked.parseInline(vert.text!);
+                node.html = marked.parseInline(formatQuotes(vert.text));
                 // node.style =
             }
             else {

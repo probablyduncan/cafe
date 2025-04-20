@@ -16,8 +16,12 @@ import "../style.css";
             <span style="font-family: monospace;">~ Cafe Halcyon ~</span>
             <a href="/ctrl" title="settings & save files">ctrl</a>
         </nav>
-        <div data-content></div>
-        <div data-choices></div>
+        <div>
+            <div data-content></div>
+        </div>
+        <div>
+            <div data-choices></div>
+        </div>
     </body>
     <script>
         import { Renderer, type ChoiceContainer, type ContentContainer } from "../lib/client/renderer";
@@ -57,6 +61,12 @@ import "../style.css";
                 clear: () => {
                     content.innerHTML = "";
                 },
+                scrollToEnd: () => {
+                    content.scrollIntoView({
+                        behavior: "smooth",
+                        block: "end",
+                    });
+                }
             };
 
             const renderer = new Renderer({

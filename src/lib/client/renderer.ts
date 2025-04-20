@@ -1,5 +1,6 @@
 import type { Scene, SceneChild, SceneNode } from "../contentSchemaTypes";
 import type { State } from "./state";
+import { htmlToTokens, splitHtml } from "../agnostic/letterSplitter";
 
 
 
@@ -9,24 +10,21 @@ import type { State } from "./state";
 
 
 
-
-
-
-
-
-
-
+// NO RECURSION??
+// so I'm thinking the loop is for rendering children
+// each group of children will render one child node *or* one group of choices
+// we can support more later, right now it doesn't matter
+// so we can basically do the rendering, and await rendering complete
+// and when the children are all done, the loop continues to the next?
+// or if choices, we exit the loop but clicking on a choice triggers the loop again?
 
 // 
 // THINGS TO DO
 // 
-// 1. transition to progressing with click instead of with autoplay
+// 1. animate spans of content
+// 
+// 2. transition to progressing with click instead of with autoplay
 // and then I can add autoplay later
-// 
-// 2. switch single quote &#39; to real quotes that look nicer
-// 
-// 3. add inline pauses in text nodes?
-// maybe think about what an mvp requires?
 // 
 
 
@@ -49,6 +47,7 @@ type RenderableNode = Exclude<SceneNode & SceneChild, { type: "choice"; }>
 export interface ContentContainer {
     clear: () => void;
     add: (el: HTMLElement) => void;
+    scrollToEnd: () => void;
 }
 
 export interface ChoiceContainer {
@@ -68,7 +67,7 @@ export class Renderer {
     private _choices: ChoiceContainer;
     private _content: ContentContainer;
 
-    private static BASE_DELAY: number = 1000;
+    private static BASE_DELAY: number = 400;
 
     constructor(deps: RendererDeps) {
         this._state = deps.state;
@@ -170,7 +169,7 @@ export class Renderer {
     private async renderChoices(scene: Scene, choices: RenderableChoice[]) {
         for (let i = 0; i < choices.length; i++) {
             await this.renderChoice(scene, choices[i]);
-            await this.wait(100);
+            await this.wait(Renderer.BASE_DELAY);
         }
     }
 
@@ -188,7 +187,7 @@ export class Renderer {
 
             this._choices.clear();
 
-            if (true || choice.clearPrevious) {
+            if (choice.clearPrevious) {
                 this._content.clear();
             }
 
@@ -208,14 +207,45 @@ export class Renderer {
         }
 
         const el = document.createElement("p");
+        el.classList.add(node.type);
+        el.classList.add(node.style);
+        el.innerHTML = "&nbsp;";
+        this._content.add(el);
+        this._content.scrollToEnd();
 
         await this.renderDelay(node.delay, el);
 
-        el.classList.add(node.type);
-        el.classList.add(node.style);
-        el.innerHTML = node.html;
+        const tokens = htmlToTokens(node.html);
+        for (let i = 0; i < tokens.length; i++) {
 
-        this._content.add(el);
+            const breathEl = document.createElement("span");
+
+            if (i === 0) {
+                el.replaceChildren(breathEl)
+            }
+            else {
+                el.appendChild(breathEl);
+            }
+
+
+            for (let j = 0; j < tokens[i].length; j++) {
+                const char = tokens[i][j];
+                const charEl = document.createElement(char.tag);
+                charEl.innerHTML = char.content;
+                breathEl.appendChild(charEl);
+                await this.wait(Renderer.BASE_DELAY / 10);
+            }
+
+            if (i < tokens.length - 1) {
+                const spaceEl = document.createElement("span");
+                spaceEl.innerHTML = "&nbsp;";
+                breathEl.appendChild(spaceEl);
+            }
+
+            this._content.scrollToEnd();
+            await this.wait(Renderer.BASE_DELAY);
+        }
+
         this._state.setCondition(node.setState);
 
         await this.wait(Renderer.BASE_DELAY);
@@ -254,10 +284,12 @@ export class Renderer {
     private async renderThreeDotDelay(el: HTMLElement) {
         for (let i = 0; i < 3; i++) {
             const span = document.createElement("span");
+            span.innerHTML = ".";
             span.classList.add("bounce");
             el.appendChild(span);
-            await this.wait(50);
+            await this.wait(Renderer.BASE_DELAY);
         }
+        el.innerHTML = "&nbsp;";
     }
 
     private async wait(ms: number) {

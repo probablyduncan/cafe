@@ -1,6 +1,6 @@
 flowchart TD
     start --> go-around-back-i[Good thinking.]
-    --> go-around-back-ii[Only loosers use the front door.]
+    --> go-around-back-ii[Only losers use the front door.]
     --> go-around-back-iii[Maybe there's another way in.]
     --> go-around-back-iv["You walk down the street until you come to a narrow alley, sloping down off the street between a tailor and a travel agent (both closed)."]
     --> go-around-back-v[You glance back along the street and, seeing nobody, descend into the alley.]
@@ -8,12 +8,27 @@ flowchart TD
     --> go-around-back-vii[There's a little iron door with a wire mesh screen that you can't quite see through, and a window the size of your hand. A lantern burns beside it. In the corner is an ill-contained pile of cafe detritus: cardboard boxes, empty tins, milk crates. The smell of fresh bread down hear is strong.] --> back-choices
 
     back-choices --o go-around-back-vii-i(1\. Knock on the door.)
-    --x go-around-back-vii-i-i[You knock on the metal door. It makes a tinny, hollow sound.] 
-    --> go-around-back-vii-i-ii[For a second, you're terrified. What if someone actually answers? What would you say? Why are you down here?]
-    --> go-around-back-vii-i-iii[Luckily, nobody comes to the door.]
+    --x go-around-back-vii-i-i[
+        You knock on the metal door.
+        It makes a tinny, hollow sound.
+    ] 
+    --> go-around-back-vii-i-ii[
+        For a second, you're terrified.
+        What if someone actually answers?
+        What would you say?
+        Why are you down here?
+    ]
+    --> go-around-back-vii-i-iii[
+        Luckily,
+        nobody comes to the door.
+    ]
     --> back-choices
     
-    back-choices -- !isLanternOut --o go-around-back-vii-ii(2\. Put out the lantern.) -- isLanternOut --x go-around-back-vii-ii-i[You flick the knob on the bottom of the lantern and the flame goes out. A little oil drips to the ground.] --> go-around-back-vii-ii-ii[Look at you. You're so mischievous] --> back-choices
+    back-choices -- !isLanternOut --o go-around-back-vii-ii(2\. Put out the lantern.) -- isLanternOut --x go-around-back-vii-ii-i[
+        You flick the knob on the bottom of the lantern
+        and the flame goes out.
+        A little oil drips to the ground.
+    ] --> go-around-back-vii-ii-ii[Look at you. You're so mischievous.] --> back-choices
 
     back-choices 
     -- !isTrashed --o 
