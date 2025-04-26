@@ -27,7 +27,7 @@ export type StateOptions = {
 
 export class LocalStorageSaveDb implements SaveDb {
     private static KEY = "save-data";
-    
+
     get data() {
         const value = window.localStorage.getItem(LocalStorageSaveDb.KEY);
         if (value !== null) {
@@ -90,9 +90,6 @@ export class State {
 
         this.setOptions(opts);
         this.setDefaults();
-
-
-        this.load();
     }
 
     private setDefaults() {

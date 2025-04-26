@@ -10,17 +10,20 @@ import "../style.css";
         <meta name="viewport" content="width=device-width" />
     </head>
     <body>
-        <nav>
-            <a href="/info" title="about this cafe">info</a>
-            <!-- <span><span data-time></span> at the Cafe Halcyon</span> -->
-            <span style="font-family: monospace;">~ Cafe Halcyon ~</span>
-            <a href="/ctrl" title="settings & save files">ctrl</a>
-        </nav>
         <div>
-            <div data-content></div>
-        </div>
-        <div>
-            <div data-choices></div>
+            <nav>
+                <a href="/info" title="about this cafe">info</a>
+                <!-- <span><span data-time></span> at the Cafe Halcyon</span> -->
+                <span style="font-family: monospace;">~ Cafe Halcyon ~</span>
+                <a href="/ctrl" title="settings & save files">ctrl</a>
+            </nav>
+
+            <div>
+                <div data-content></div>
+            </div>
+            <div>
+                <div data-choices></div>
+            </div>
         </div>
     </body>
     <script>
@@ -28,14 +31,14 @@ import "../style.css";
             Renderer,
             type ChoiceContainer,
             type ContentContainer,
-        } from "../lib/client/renderer";
+        } from "../../lib/client/renderer";
         import {
             HttpSceneDb,
             LocalStorageSaveDb,
             State,
-        } from "../lib/client/state";
+        } from "../../lib/client/state";
 
-        async function init() {
+        function init() {
             const choices = document.querySelector("[data-choices]");
             const content = document.querySelector("[data-content]");
 
@@ -49,7 +52,7 @@ import "../style.css";
                     sceneDb: new HttpSceneDb(),
                 },
                 {
-                    autosave: true,
+                    autosave: false,
                 },
             );
 

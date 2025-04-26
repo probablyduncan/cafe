@@ -76,16 +76,20 @@ export class Renderer {
     }
 
     async begin() {
-        const startScene = await this._state.getCurrentScene();
+        const startScene = await this._state.load();
         console.log(startScene);
-        this.renderChildren(startScene, [{
+
+        const startNode = startScene.nodes[startScene.entryNodeId];
+        const startChildren: SceneChild[] = startNode.type === "choice" ? startNode.children : [{
             nodeId: startScene.entryNodeId,
             delay: {
                 cycles: 2,
                 style: "newScene",
             },
             clearPrevious: false,
-        }])
+        }];
+
+        this.renderChildren(startScene, startChildren);
     }
 
     private async renderChildren(scene: Scene, children: SceneChild[]) {
