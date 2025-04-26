@@ -25,10 +25,10 @@ body {
     max-width: 65ch;
     padding: 0 1rem;
     height: 100svh;
-    
+
     display: grid;
     grid-template-rows: 1fr 1fr;
-    
+
     box-sizing: border-box;
 }
 
@@ -67,21 +67,23 @@ div:has([data-content]) {
 
     p.text {
 
-        & > * {
+        &>* {
             /* these are words */
+            display: inline-flex;
+            white-space: pre;
 
-            & > span {
-                /* these are individual characters */
-                animation: letter-enter 0.5s 1;
+            &>* {
                 display: inline-block;
-                white-space: pre;
+
+                span& {
+                    animation: letter-enter 0.5s 1;
+                }
+
+                em& {
+                    animation: em-letter-enter 0.5s 1;
+                }
             }
 
-            & > em {
-                animation: em-letter-enter 0.5s 1;
-                display: inline-block;
-                white-space: pre;
-            }
         }
     }
 
@@ -93,6 +95,7 @@ div:has([data-content]) {
         opacity: 0;
         transform: translate(-2px, 2px) rotate(10deg);
     }
+
     100% {
         opacity: 1;
         transform: translate(0, 0) rotate(0);
@@ -104,10 +107,12 @@ div:has([data-content]) {
         opacity: 0;
         transform: translate(-3px, 3px) rotate(12deg);
     }
+
     60% {
         opacity: 1;
         transform: translate(1.5px, -1.5px) rotate(-8deg);
     }
+
     100% {
         transform: translate(0, 0) rotate(0);
     }
@@ -116,7 +121,7 @@ div:has([data-content]) {
 [data-choices] {
 
     overflow-y: scroll;
-    
+
     button.choice {
 
         font-family: inherit;
