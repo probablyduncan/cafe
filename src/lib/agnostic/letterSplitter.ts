@@ -126,3 +126,129 @@ export function tokensToHtmlString(tokens: Token[][]): string {
 
     return result;
 }
+
+
+// this should be split into breaths, then words, then letter
+// 
+
+// return Token[][][]
+
+export type Char = {
+    tag: string;
+    content: string;
+}
+
+export type Word = {
+    chars: Char[];
+    delay: "punctuation" | "breath" | "none";
+}
+
+export function htmlToWords(html: string) {
+
+    // see whether this word ends in punctuation
+    function wordEndsInPunctuation(word: Word) {
+
+        const breathPoints = [".", ",", "?", "!", ";", "&mdash;",];
+        const breathWraps = ["”", "’", " "];
+
+        let i = word.chars.length - 1;
+        while (i >= 0 && breathWraps.includes(word.chars[i].content)) {
+            i--;
+        }
+
+        return breathPoints.includes(word.chars[i].content);
+    }
+
+    const DEFAULT_TAG = "span";
+    let currentTag = DEFAULT_TAG;
+
+    const words: Word[] = [];
+
+    const wordsHtml = html.split(" ");
+    for (let i = 0; i < wordsHtml.length; i++) {
+        const wordHtml = wordsHtml[i];
+
+        if (wordHtml === "") {
+            continue;
+        }
+
+        const word: Word = {
+            chars: [],
+            delay: "none",
+        }
+
+        for (let j = 0; j < wordHtml.length; j++) {
+            const char = wordHtml[j];
+
+            switch (char) {
+
+                // set current tag and skip to end of tag
+                case "<": {
+                    const endIndex = wordHtml.indexOf(">", j);
+                    const spaceIndex = wordHtml.indexOf(" ", j);
+
+                    if (
+                        endIndex > -1
+                        && (
+                            endIndex < spaceIndex
+                            || spaceIndex === -1
+                        )
+                    ) {
+                        currentTag = wordHtml[j + 1] === "/"
+                            ? DEFAULT_TAG
+                            : wordHtml.substring(j + 1, endIndex);
+
+                        j = endIndex;
+                        continue;
+                    }
+                    break;
+                }
+
+                // extract encoded char and keep together
+                case "&": {
+                    const endIndex = wordHtml.indexOf(";", j);
+                    const spaceIndex = wordHtml.indexOf(" ", j);
+
+                    if (
+                        endIndex > -1
+                        && (
+                            endIndex < spaceIndex
+                            || spaceIndex === -1
+                        )
+                    ) {
+
+                        // push new char
+                        word.chars.push({
+                            content: wordHtml.substring(j, endIndex + 1),
+                            tag: currentTag
+                        });
+
+                        j = endIndex;
+                        continue;
+                    }
+                    break;
+                }
+
+                // if line break, this is pause.
+                case "\n": {
+                    word.delay = "breath";
+                    continue;
+                }
+            }
+
+            word.chars.push({
+                content: char,
+                tag: currentTag,
+            })
+        }
+
+        // check if we should pause after this word
+        if (word.delay === "none" && wordEndsInPunctuation(word)) {
+            word.delay = "punctuation";
+        }
+
+        words.push(word);
+    }
+
+    return words;
+}

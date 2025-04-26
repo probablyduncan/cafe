@@ -5,7 +5,6 @@ flowchart TD
     ]
     --> ii[
         You're standing on the street, staring at it.
-        The door is yellow and the trim around the windowpanes is red.
         You hear clinking mugs and smell fresh bread.
     ]
     --> iii[
@@ -16,10 +15,11 @@ flowchart TD
     iii --> base-choices
     
     %% hub
-    base-choices --o go-inside(Go inside.) --> inside[morning-ordering.mmd]
+    base-choices --o go-inside(Go inside.) --x inside[morning-ordering.mmd]
     base-choices --o check-hours(Check the hours.)
+    base-choices --o investigate-feelings[Introspect.]
     base-choices -- ! --o peer-through-glass(Peer through the glass.)
-    base-choices --o go-around-back(Go around back.)
+    base-choices --o go-around-back(Go around back.) --x around-back[around-back.mmd] --> base-choices
     base-choices --o leave(Leave.)
 
     %% 
@@ -38,6 +38,20 @@ flowchart TD
         *Sunday: 07.30-23.00*
     ]
     --> check-hours-iii[Well, yep. They're open.]
+    --> base-choices
+
+    %% 
+    %% investigate your feelings
+    %% 
+
+    investigate-feelings --> if1[You reach inward.]
+    --> if2[Why are you here?]
+    ---> if6[You know very well why you're here.]
+    --> if3[You've passed this door hundreds, thousands of times.]
+    --> if4[It always seemed like the kind of place you'd go.]
+    --> if5[Or the kind of place the person you think you are would go.]
+    --> if9[But you've never gone inside.]
+    ---> if8[Will today be any different?]
     --> base-choices
 
     %% 
@@ -67,12 +81,6 @@ flowchart TD
     peer-through-glass-v --o peer-through-glass-v-ii(2\. Wave to him.) 
     -- wavedAtOldMan --> peer-through-glass-v-ii-i[His nose wrinkles as he smiles back at you.] 
     --> base-choices
-
-    %% 
-    %% go around back
-    %% 
-
-    go-around-back --> around-back[around-back.mmd] --> base-choices
     
     %% 
     %% leave

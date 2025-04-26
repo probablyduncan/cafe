@@ -1,6 +1,6 @@
 import type { Scene, SceneChild, SceneNode } from "../contentSchemaTypes";
 import type { State } from "./state";
-import { htmlToTokens, splitHtml } from "../agnostic/letterSplitter";
+import { htmlToTokens, htmlToWords, splitHtml } from "../agnostic/letterSplitter";
 
 
 
@@ -215,35 +215,50 @@ export class Renderer {
 
         await this.renderDelay(node.delay, el);
 
-        const tokens = htmlToTokens(node.html);
-        for (let i = 0; i < tokens.length; i++) {
-
-            const breathEl = document.createElement("span");
-
+        const words = htmlToWords(node.html);
+        for (let i = 0; i < words.length; i++) {
+            const wordEl = document.createElement("span");
+            
             if (i === 0) {
-                el.replaceChildren(breathEl)
+                el.replaceChildren(wordEl)
             }
             else {
-                el.appendChild(breathEl);
+                el.appendChild(wordEl);
             }
 
+            for (let j = 0; j < words[i].chars.length; j++) {
 
-            for (let j = 0; j < tokens[i].length; j++) {
-                const char = tokens[i][j];
+                // wordEl.innerHTML += words[i].chars[j].content;
+                // await this.wait(Renderer.BASE_DELAY / 8);
+
+                const char = words[i].chars[j];
                 const charEl = document.createElement(char.tag);
                 charEl.innerHTML = char.content;
-                breathEl.appendChild(charEl);
-                await this.wait(Renderer.BASE_DELAY / 10);
+                wordEl.appendChild(charEl);
+                await this.wait(Renderer.BASE_DELAY / 8);
             }
 
-            if (i < tokens.length - 1) {
+            if (i < words.length - 1) {
+
                 const spaceEl = document.createElement("span");
-                spaceEl.innerHTML = "&nbsp;";
-                breathEl.appendChild(spaceEl);
+                spaceEl.innerHTML = " ";
+                wordEl.appendChild(spaceEl);
+
+                // await this.wait(Renderer.BASE_DELAY / 8);
             }
 
             this._content.scrollToEnd();
-            await this.wait(Renderer.BASE_DELAY);
+
+            switch (words[i].delay) {
+                case "punctuation":
+                    await this.wait(Renderer.BASE_DELAY);
+                    break;
+                case "breath":
+                    await this.wait(Renderer.BASE_DELAY * 2);
+                    break;
+                // case "none":
+                //     await this.wait(Renderer.BASE_DELAY / 4);
+            }
         }
 
         this._state.setCondition(node.setState);

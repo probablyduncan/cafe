@@ -22,6 +22,7 @@ export type StateDeps = {
 
 export type StateOptions = {
     autosave: boolean;
+    startingScene: string;
 }
 
 export class LocalStorageSaveDb implements SaveDb {
@@ -59,8 +60,6 @@ export class HttpSceneDb implements SceneDb {
 
 export class State {
 
-    private static STARTING_SCENE: string = "morning-start-outside";
-
     private _choices: Set<string>;
     private _keys: Set<string>;
     private _path: {
@@ -78,6 +77,7 @@ export class State {
     private _options: StateOptions;
     private static DEFAULT_OPTIONS: StateOptions = {
         autosave: true,
+        startingScene: "morning-start-outside",
     }
 
     private _sceneDb: SceneDb;
@@ -88,8 +88,10 @@ export class State {
         this._sceneDb = deps.sceneDb;
         this._saveDb = deps.saveDb;
 
-        this.setDefaults();
         this.setOptions(opts);
+        this.setDefaults();
+
+
         this.load();
     }
 
@@ -97,8 +99,8 @@ export class State {
         this._choices = new Set();
         this._keys = new Set();
         this._path = [];
-        this._lastChoice;
-        this._currentSceneId = State.STARTING_SCENE;
+        // this._lastChoice;
+        this._currentSceneId = this._options.startingScene;
     }
 
     private setOptions(opts: Partial<StateOptions> = {}) {
