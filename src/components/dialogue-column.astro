@@ -9,7 +9,7 @@ const { ...stateOptions } = Astro.props;
 <main class="wrapper">
     <nav>
         <a href="/info" title="about this cafe">info</a>
-        <a href="/ctrl" title="settings & save files">ctrl</a>
+        <a onclick="window.localStorage.removeItem('save-data'); window.location.reload()" href="#" title="restart">reset</a>
     </nav>
     <div class="scroll-area">
         <div class="content" data-content data-state-options={stateOptions}>
