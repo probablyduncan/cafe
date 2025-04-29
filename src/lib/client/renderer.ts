@@ -188,7 +188,7 @@ export class Renderer {
         }
 
         el.onclick = () => {
-
+            
             this._choices.clear();
 
             if (choice.clearPrevious) {
@@ -254,10 +254,10 @@ export class Renderer {
             this._content.scrollToEnd();
 
             switch (words[i].delay) {
-                case "punctuation":
-                    await this.wait(Renderer.BASE_DELAY);
+                case "short":
+                    await this.wait(Renderer.BASE_DELAY / 2);
                     break;
-                case "breath":
+                case "long":
                     await this.wait(Renderer.BASE_DELAY * 2);
                     break;
                 // case "none":
@@ -305,6 +305,9 @@ export class Renderer {
             const span = document.createElement("span");
             span.innerHTML = ".";
             span.classList.add("bounce");
+            if (i === 0) {
+                el.innerHTML = "";
+            }
             el.appendChild(span);
             await this.wait(Renderer.BASE_DELAY);
         }

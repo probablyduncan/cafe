@@ -1,4 +1,5 @@
 ---
+import DialogueColumn from "../components/dialogue-column.astro";
 import "../style.css";
 ---
 
@@ -10,82 +11,6 @@ import "../style.css";
         <meta name="viewport" content="width=device-width" />
     </head>
     <body>
-        <nav>
-            <a href="/info" title="about this cafe">info</a>
-            <!-- <span><span data-time></span> at the Cafe Halcyon</span> -->
-            <span style="font-family: monospace;">~ Cafe Halcyon ~</span>
-            <a href="/ctrl" title="settings & save files">ctrl</a>
-        </nav>
-        <div>
-            <div data-content></div>
-        </div>
-        <div>
-            <div data-choices></div>
-        </div>
+        <DialogueColumn autosave={true} />
     </body>
-    <script>
-        import {
-            Renderer,
-            type ChoiceContainer,
-            type ContentContainer,
-        } from "../lib/client/renderer";
-        import {
-            HttpSceneDb,
-            LocalStorageSaveDb,
-            State,
-        } from "../lib/client/state";
-
-        async function init() {
-            const choices = document.querySelector("[data-choices]");
-            const content = document.querySelector("[data-content]");
-
-            if (!choices || !content) {
-                return;
-            }
-
-            const state = new State(
-                {
-                    saveDb: new LocalStorageSaveDb(),
-                    sceneDb: new HttpSceneDb(),
-                },
-                {
-                    autosave: true,
-                },
-            );
-
-            const choiceContainer: ChoiceContainer = {
-                add: (el: HTMLElement) => {
-                    choices.appendChild(el);
-                },
-                clear: () => {
-                    choices.innerHTML = "";
-                },
-            };
-
-            const contentContainer: ContentContainer = {
-                add: (el: HTMLElement) => {
-                    content.appendChild(el);
-                },
-                clear: () => {
-                    content.innerHTML = "";
-                },
-                scrollToEnd: () => {
-                    content.scrollIntoView({
-                        behavior: "smooth",
-                        block: "end",
-                    });
-                },
-            };
-
-            const renderer = new Renderer({
-                state,
-                choiceContainer,
-                contentContainer,
-            });
-
-            renderer.begin();
-        }
-
-        document.addEventListener("DOMContentLoaded", init);
-    </script>
 </html>

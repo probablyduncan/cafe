@@ -117,8 +117,8 @@ export class State {
         this.deserialize(this._saveDb.data);
 
         const scene = { ... await this.getCurrentScene() };
-        if (this._lastChoice !== undefined) {
-            scene.entryNodeId = this._lastChoice.nodeId;
+        if (this._lastChoice !== undefined && this._lastChoice.nodeId) {
+            scene.entryNodeId = this._lastChoice?.nodeId;
         }
 
         return scene;

@@ -140,23 +140,29 @@ export type Char = {
 
 export type Word = {
     chars: Char[];
-    delay: "punctuation" | "breath" | "none";
+    delay: "long" | "short" | "none";
 }
 
 export function htmlToWords(html: string) {
 
     // see whether this word ends in punctuation
-    function wordEndsInPunctuation(word: Word) {
+    function setWordDelay(word: Word) {
 
-        const breathPoints = [".", ",", "?", "!", ";", "&mdash;",];
-        const breathWraps = ["”", "’", " "];
+        const longDelayPunctuation = [".", "?", "!", ";", "&mdash;",];
+        const shortDelayPunctuation = [",",];
+        const breathWraps = ["”", "’", " ",];
 
         let i = word.chars.length - 1;
         while (i >= 0 && breathWraps.includes(word.chars[i].content)) {
             i--;
         }
 
-        return breathPoints.includes(word.chars[i].content);
+        if (shortDelayPunctuation.includes(word.chars[i].content)) {
+            word.delay = "short";
+        }
+        else if (longDelayPunctuation.includes(word.chars[i].content)) {
+            word.delay = "long";
+        }
     }
 
     const DEFAULT_TAG = "span";
@@ -231,7 +237,7 @@ export function htmlToWords(html: string) {
 
                 // if line break, this is pause.
                 case "\n": {
-                    word.delay = "breath";
+                    word.delay = "long";
                     continue;
                 }
             }
@@ -243,8 +249,8 @@ export function htmlToWords(html: string) {
         }
 
         // check if we should pause after this word
-        if (word.delay === "none" && wordEndsInPunctuation(word)) {
-            word.delay = "punctuation";
+        if (word.delay === "none") {
+            setWordDelay(word)
         }
 
         words.push(word);

@@ -340,3 +340,6 @@ and maybe the current text should be centered? Or the top of it should be at the
 
 NO RECURSION??
 LOOPS ONLY
+
+
+I'm thinking maybe the text, choices, etc should all be in the same container. Choices should be rendered as elements in the big content scroll thing

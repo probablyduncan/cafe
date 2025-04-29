@@ -1,0 +1,152 @@
+---
+import type { StateOptions } from "../lib/client/state";
+
+interface Props extends Partial<StateOptions> {}
+
+const { ...stateOptions } = Astro.props;
+---
+
+<main class="wrapper">
+    <nav>
+        <a href="/info" title="about this cafe">info</a>
+        <a href="/ctrl" title="settings & save files">ctrl</a>
+    </nav>
+    <div class="scroll-area">
+        <div class="content" data-content data-state-options={stateOptions}>
+        </div>
+    </div>
+</main>
+<style>
+    :root {
+        --content-width: 65ch;
+    }
+
+    .wrapper {
+        position: relative;
+        margin: 0 auto;
+        width: var(--content-width);
+        max-width: 100%;
+    }
+
+    .scroll-area {
+        height: 100svh;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        display: flex;
+        flex-direction: column-reverse;
+    }
+
+    .content {
+        padding: 20svh 1em 20svh;
+        box-sizing: border-box;
+
+        p.text {
+
+            margin: 1.5em 0;
+
+            & > * {
+                /* these are words */
+                display: inline-flex;
+                white-space: pre;
+
+                & > * {
+                    display: inline-block;
+
+                    span& {
+                        animation: letter-enter 0.5s 1;
+                    }
+
+                    em& {
+                        animation: em-letter-enter 0.5s 1;
+                    }
+                }
+            }
+        }
+    }
+
+    nav {
+        display: flex;
+        justify-content: space-between;
+        background-color: #0000000a;
+        backdrop-filter: blur(4px);
+        border-bottom: 2px solid var(--text-color);
+
+        position: absolute;
+        top: 0;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 1rem;
+
+        a {
+            color: unset;
+            text-decoration: none;
+            font-style: italic;
+
+            &:hover {
+                text-decoration: underline dotted;
+            }
+        }
+    }
+
+    @keyframes letter-enter {
+        0% {
+            opacity: 0;
+            /* transform: translate(-2px, 2px) rotate(10deg); */
+        }
+
+        100% {
+            opacity: 1;
+            /* transform: translate(0, 0) rotate(0); */
+        }
+    }
+
+    @keyframes em-letter-enter {
+        0% {
+            opacity: 0;
+            transform: translate(-3px, 3px) rotate(12deg);
+        }
+
+        60% {
+            opacity: 1;
+            transform: translate(1.5px, -1.5px) rotate(-8deg);
+        }
+
+        100% {
+            transform: translate(0, 0) rotate(0);
+        }
+    }
+</style>
+<script>
+    import { Renderer, type ContentContainer } from "../lib/client/renderer";
+    import {
+        HttpSceneDb,
+        LocalStorageSaveDb,
+        State,
+        type StateOptions,
+    } from "../lib/client/state";
+
+    function initDialogueColumn() {
+        const content = document.querySelector("[data-content]") as HTMLElement;
+        const options = content.dataset.stateOptions as Partial<StateOptions>;
+
+        const saveDb = new LocalStorageSaveDb();
+        const sceneDb = new HttpSceneDb();
+
+        const contentContainer: ContentContainer = {
+            clear: () => (content.innerHTML = ""),
+            add: (el) => content.appendChild(el),
+            scrollToEnd: () => {},
+        };
+
+        const state = new State({ saveDb, sceneDb }, options);
+        const renderer = new Renderer({
+            state,
+            contentContainer,
+            choiceContainer: { ...contentContainer, clear: () => {} },
+        });
+
+        renderer.begin();
+    }
+
+    document.addEventListener("DOMContentLoaded", initDialogueColumn);
+</script>

@@ -1,0 +1,119 @@
+---
+const variables = [
+    ["old_man_convo:wavedAtOldMan", true],
+    ["old_man_convo:ignoredOldMan", false],
+    ["old_man_convo:cowboy", true],
+    ["morning_start:bristly", true],
+];
+const choiceHistory = [
+    ["old_man_convo:34c2", "Say goodbye."],
+    ["old_man_convo:c1", "Ask about the weather."],
+    ["old_man_convo:c0", "Comment on his knee."],
+    ["inside:c17", "Approach the old man."],
+    ["inside:c14", "Wander around, aimless."],
+];
+---
+
+<aside>
+    <span>*Debug Panel*</span>
+    <h2>State variables</h2>
+    <ul class="variables">
+        {
+            variables.map(([id, val]) => (
+                <li>
+                    <>
+                        <input type="checkbox" checked={val} />
+                        <label onclick="(this).previousElementSibling.checked = !(this).previousElementSibling.checked;">
+                            {id}
+                        </label>
+                    </>
+                </li>
+            ))
+        }
+    </ul>
+    <br />
+    <h2>Choice history</h2>
+    <ul class="choice-history">
+        {
+            choiceHistory.map(([id, text], i) => (
+                <li>
+                    <button data-go-to-choice={id}>
+                        <>
+                            <span>{text}</span>
+                            <span />
+                            <span>↩</span>
+                        </>
+                    </button>
+                </li>
+            ))
+        }
+    </ul>
+    <h2>Actions</h2>
+    <button onclick="window.localStorage.removeItem('save-data'); window.location.reload();">Clear state and restart</button>
+</aside>
+<style>
+    aside {
+        /* resize: horizontal; */
+        overflow: scroll;
+
+        width: 100%;
+        padding: 1rem;
+        border-left: 2px solid var(--text-color);
+        box-sizing: border-box;
+    }
+
+    ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    ul.variables {
+        label,
+        input {
+            cursor: pointer;
+        }
+    }
+
+    ul.choice-history button[data-go-to-choice] {
+        border: unset;
+        background: unset;
+        font-family: unset;
+        font-size: unset;
+        padding: 0;
+        margin: 0;
+        cursor: pointer;
+
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        transition: column-gap 0.2s;
+        column-gap: 1em;
+        width: 100%;
+
+        & > span:nth-child(2) {
+            transition: border-bottom-style 0.2s;
+            border-bottom: 1px dotted currentColor;
+            height: 0.8em;
+        }
+
+        & > span:nth-child(3) {
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+
+        &:hover {
+            column-gap: 0.5em;
+            font-style: italic;
+
+            span:nth-child(2) {
+                border-bottom-width: 0.5px;
+                border-bottom-style: solid;
+            }
+
+            span:nth-child(3) {
+                /* transform: rotate(-30deg) scale(1.1); */
+            }
+        }
+    }
+</style>
+<script></script>

@@ -1,16 +1,12 @@
 flowchart TD
-    i[
-        Here it is.
-        You've *arrived*.
-    ]
+    i[Here it is. You've *arrived*.]
     --> ii[
-        You're standing on the street, staring at it.
+        You're standing on the street, staring at the door.
         You hear clinking mugs and smell fresh bread.
     ]
     --> iii[
         It's been a long time coming, but here you are.
-        *Cafe Halcyon*.
-        Time to see what all the fuss is about.
+        *Cafe Halcyon*. Time to see what all the fuss is about.
     ]
     iii --> base-choices
     
@@ -27,17 +23,40 @@ flowchart TD
     %% 
 
     check-hours 
-    --> check-hours-i[There's a sign on the window to the left of the door. It reads:] 
-    --> check-hours-ii-mon[
-        *Monday: 07.30-23.00*
-        *Tuesday: 07.30-23.00*
-        *Wednesday: 07.30-23.00*
-        *Thursday: 07.30-23.00*
-        *Friday: 07.30-02.00*
-        *Saturday: 07.30-02.00*
-        *Sunday: 07.30-23.00*
+    --> check-hours-i[There's a sign on the door. It reads:]
+    ---> mon[
+        Monday:
+        07.30-23.00.
     ]
-    --> check-hours-iii[Well, yep. They're open.]
+    --> tues[
+        Tuesday:
+        07.30-23.00.
+    ]
+    --> wed[
+        Wednesday:
+        07.30-23.00.
+    ]
+    --> thurs[
+        Thursday:
+        07.30-23.00.
+    ]
+    --> fri[
+        Friday:
+        07.30-02.00.
+    ]
+    --> sat[
+        Saturday:
+        07.30-02.00.
+    ]
+    --> sun[
+        Sunday:
+        07.30-23.00.
+    ]
+    ----> check-hours-iii[
+        Well,
+        yep.
+        They're open.
+    ]
     --> base-choices
 
     %% 
