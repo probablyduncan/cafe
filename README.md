@@ -343,3 +343,6 @@ LOOPS ONLY
 
 
 I'm thinking maybe the text, choices, etc should all be in the same container. Choices should be rendered as elements in the big content scroll thing
+
+
+option in debug mode to click on a rendered piece of text to go back to that point?

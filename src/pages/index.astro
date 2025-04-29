@@ -1,6 +1,6 @@
 ---
 import DialogueColumn from "../components/dialogue-column.astro";
-// import "../style.css";
+import "../style.css";
 ---
 
 <!doctype html>
@@ -14,23 +14,3 @@ import DialogueColumn from "../components/dialogue-column.astro";
         <DialogueColumn autosave={true} />
     </body>
 </html>
-<style is:global>
-    :root {
-        color-scheme: light dark;
-        --bg-color: light-dark(white, black);
-        --text-color: light-dark(black, white);
-    }
-
-    html {
-        width: 100%;
-        height: 100%;
-        color: var(--text-color);
-        background-color: var(--bg-color);
-        font-family: serif;
-    }
-
-    html,
-    body {
-        margin: 0;
-    }
-</style>

@@ -1,17 +1,11 @@
 :root {
-    --bg-color: #fff;
-    --text-color: #000;
-}
-
-@media (prefers-color-scheme: dark) {
-    :root {
-        --bg-color: #000;
-        --text-color: #fff;
-    }
+    color-scheme: light dark;
+    --bg-color: light-dark(white, black);
+    --text-color: light-dark(black, white);
+    --content-width: 65ch;
 }
 
 html {
-    margin: 0;
     width: 100%;
     height: 100%;
     color: var(--text-color);
@@ -19,140 +13,15 @@ html {
     font-family: serif;
 }
 
+html,
 body {
-    position: relative;
-    margin: 0 auto;
-    max-width: 65ch;
-    padding: 0 1rem;
-    height: 100svh;
-
-    display: grid;
-    grid-template-rows: 1fr 1fr;
-
-    box-sizing: border-box;
+    margin: 0;
 }
 
-nav {
-    display: flex;
-    justify-content: space-between;
-
-    position: absolute;
-    padding: 1rem;
-    width: 100%;
-    box-sizing: border-box;
-
-    a {
-        color: unset;
-        text-decoration: none;
-        font-style: italic;
-
-        &:hover {
-            text-decoration: underline dotted;
-        }
-    }
-}
-
-div:has([data-content]) {
-    overflow-y: scroll;
-}
-
-[data-content] {
-
-    display: flex;
-    flex-flow: column;
-    justify-content: flex-end;
-    min-height: 100%;
-    padding: 4em 0 2em;
-    box-sizing: border-box;
-
-    p.text {
-
-        &>* {
-            /* these are words */
-            display: inline-flex;
-            white-space: pre;
-
-            &>* {
-                display: inline-block;
-
-                span& {
-                    animation: letter-enter 0.5s 1;
-                }
-
-                em& {
-                    animation: em-letter-enter 0.5s 1;
-                }
-            }
-
-        }
-    }
-
-
-}
-
-@keyframes letter-enter {
-    0% {
-        opacity: 0;
-        transform: translate(-2px, 2px) rotate(10deg);
-    }
-
-    100% {
-        opacity: 1;
-        transform: translate(0, 0) rotate(0);
-    }
-}
-
-@keyframes em-letter-enter {
-    0% {
-        opacity: 0;
-        transform: translate(-3px, 3px) rotate(12deg);
-    }
-
-    60% {
-        opacity: 1;
-        transform: translate(1.5px, -1.5px) rotate(-8deg);
-    }
-
-    100% {
-        transform: translate(0, 0) rotate(0);
-    }
-}
-
-[data-choices] {
-
-    overflow-y: scroll;
-
-    button.choice {
-
-        font-family: inherit;
-
-        display: block;
-        text-align: left;
-
-        border-radius: unset;
-        border: unset;
-        border-top: 2px solid var(--text-color);
-        color: var(--text-color);
-        background-color: var(--bg-color);
-
-        font-size: unset;
-        box-shadow: unset;
-
-        box-sizing: border-box;
-        width: 100%;
-        padding: 0.5rem;
-        padding-top: 0.75rem;
-        margin-bottom: 0.25rem;
-
-        cursor: pointer;
-
-        &:hover:not(:active) {
-            color: var(--bg-color);
-            background-color: var(--text-color);
-        }
-
-        &.visited {
-            opacity: 0.5;
-        }
-    }
+button {
+    background-color: unset;
+    border: unset;
+    font-size: unset;
+    font-family: unset;
+    text-align: unset;
 }

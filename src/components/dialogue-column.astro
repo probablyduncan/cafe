@@ -1,7 +1,9 @@
 ---
 import type { StateOptions } from "../lib/client/state";
 
-interface Props extends Partial<StateOptions> {}
+interface Props extends Partial<StateOptions> {
+    // debug?: boolean;
+}
 
 const { ...stateOptions } = Astro.props;
 ---
@@ -9,7 +11,11 @@ const { ...stateOptions } = Astro.props;
 <main class="wrapper">
     <nav>
         <a href="/info" title="about this cafe">info</a>
-        <a onclick="window.localStorage.removeItem('save-data'); window.location.reload()" href="#" title="restart">reset</a>
+        <a
+            onclick="window.localStorage.removeItem('save-data'); window.location.reload()"
+            href="#"
+            title="restart">reset</a
+        >
     </nav>
     <div class="scroll-area">
         <div class="content" data-content data-state-options={stateOptions}>
@@ -17,10 +23,6 @@ const { ...stateOptions } = Astro.props;
     </div>
 </main>
 <style>
-    :root {
-        --content-width: 65ch;
-    }
-
     .wrapper {
         position: relative;
         margin: 0 auto;
@@ -37,11 +39,9 @@ const { ...stateOptions } = Astro.props;
     }
 
     .content {
-        padding: 20svh 1em 20svh;
-        box-sizing: border-box;
+        padding: 20svh 0;
 
         p.text {
-
             margin: 1.6em 0;
             line-height: 1.6em;
 
@@ -63,6 +63,34 @@ const { ...stateOptions } = Astro.props;
                 }
             }
         }
+
+        .choice {
+            box-sizing: border-box;
+            padding-bottom: 0.5rem;
+            padding-top: 0.75rem;
+            margin-bottom: 0.25rem;
+            border-top: 2px solid var(--text-color);
+
+            p& {
+                opacity: 0.5;
+            }
+
+            button& {
+                display: block;
+                width: 100%;
+
+                cursor: pointer;
+
+                &:hover:not(:active) {
+                    color: var(--bg-color);
+                    background-color: var(--text-color);
+                }
+
+                &.visited {
+                    opacity: 0.5;
+                }
+            }
+        }
     }
 
     nav {
@@ -75,8 +103,9 @@ const { ...stateOptions } = Astro.props;
         position: absolute;
         top: 0;
         width: 100%;
+
+        padding: 1rem 0;
         box-sizing: border-box;
-        padding: 1rem;
 
         a {
             color: unset;
@@ -118,7 +147,11 @@ const { ...stateOptions } = Astro.props;
     }
 </style>
 <script>
-    import { Renderer, type ContentContainer } from "../lib/client/renderer";
+    import {
+        Renderer,
+        type ChoiceContainer,
+        type ContentContainer,
+    } from "../lib/client/renderer";
     import {
         HttpSceneDb,
         LocalStorageSaveDb,
@@ -139,11 +172,20 @@ const { ...stateOptions } = Astro.props;
             scrollToEnd: () => {},
         };
 
+        const choiceContainer: ChoiceContainer = {
+            ...contentContainer,
+            clear: () => {
+                content
+                    .querySelectorAll("button.choice")
+                    .forEach((n) => n.remove());
+            },
+        };
+
         const state = new State({ saveDb, sceneDb }, options);
         const renderer = new Renderer({
             state,
             contentContainer,
-            choiceContainer: { ...contentContainer, clear: () => {} },
+            choiceContainer,
         });
 
         renderer.begin();

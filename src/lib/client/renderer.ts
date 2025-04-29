@@ -188,12 +188,18 @@ export class Renderer {
         }
 
         el.onclick = () => {
-            
-            this._choices.clear();
 
             if (choice.clearPrevious) {
                 this._content.clear();
             }
+            else {
+                const madeChioce = document.createElement("p");
+                madeChioce.innerHTML = el.innerHTML;
+                madeChioce.classList.add("choice");
+                this._content.add(madeChioce);
+            }
+            
+            this._choices.clear();
 
             this._state.setCondition(choice.setState);
             this._state.setChoice(choice.nodeId);
