@@ -67,7 +67,7 @@ export class Renderer {
     private _choices: ChoiceContainer;
     private _content: ContentContainer;
 
-    private static BASE_DELAY: number = 4//400;
+    private static BASE_DELAY: number = 400;
 
     constructor(deps: RendererDeps) {
         this._state = deps.state;

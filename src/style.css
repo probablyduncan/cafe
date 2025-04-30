@@ -19,6 +19,7 @@ body {
 }
 
 button {
+    color: unset;
     background-color: unset;
     padding: 0;
     border: unset;
