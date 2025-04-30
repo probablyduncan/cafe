@@ -9,111 +9,138 @@ const { ...stateOptions } = Astro.props;
 ---
 
 <main class="wrapper">
-    <nav>
-        <a href="/info" title="about this cafe">info</a>
-        <a
-            onclick="window.localStorage.removeItem('save-data'); window.location.reload()"
-            href="#"
-            title="restart">reset</a
-        >
-    </nav>
+    <div class="navbar">
+        <nav class="content-width">
+            <a href="/info" title="about this cafe">info</a>
+            <a
+                onclick="window.localStorage.removeItem('save-data'); window.location.reload()"
+                href="#"
+                title="restart">reset</a
+            >
+        </nav>
+    </div>
     <div class="scroll-area">
-        <div class="content" data-content data-state-options={stateOptions}>
+        <div
+            class="content content-width"
+            data-content
+            data-state-options={stateOptions}
+        >
         </div>
     </div>
 </main>
 <style>
     .wrapper {
         position: relative;
-        margin: 0 auto;
-        width: var(--content-width);
+        width: 100%;
+
+        /* display: grid; */
+        /* grid-template-rows: auto 1fr; */
+    }
+
+    .content-width {
+        width: 65ch;
         max-width: 100%;
+        margin: 0 auto;
     }
 
-    .scroll-area {
-        height: 100svh;
-        overflow-y: scroll;
-        overflow-x: hidden;
-        display: flex;
-        flex-direction: column-reverse;
-    }
-
-    .content {
-        padding: 20svh 0;
-
-        p.text {
-            margin: 1.6em 0;
-            line-height: 1.6em;
-
-            & > * {
-                /* these are words */
-                display: inline-flex;
-                white-space: pre;
-
-                & > * {
-                    display: inline-block;
-
-                    span& {
-                        animation: letter-enter 0.5s 1;
-                    }
-
-                    em& {
-                        animation: em-letter-enter 0.5s 1;
-                    }
-                }
-            }
-        }
-
-        .choice {
-            box-sizing: border-box;
-            padding-bottom: 0.5rem;
-            padding-top: 0.75rem;
-            margin-bottom: 0.25rem;
-            border-top: 2px solid var(--text-color);
-
-            p& {
-                opacity: 0.5;
-            }
-
-            button& {
-                display: block;
-                width: 100%;
-
-                cursor: pointer;
-
-                &:hover:not(:active) {
-                    color: var(--bg-color);
-                    background-color: var(--text-color);
-                }
-
-                &.visited {
-                    opacity: 0.5;
-                }
-            }
-        }
-    }
-
-    nav {
-        display: flex;
-        justify-content: space-between;
-        background-color: #0000000a;
-        backdrop-filter: blur(4px);
-        border-bottom: 2px solid var(--text-color);
-
+    .navbar {
         position: absolute;
         top: 0;
         width: 100%;
 
-        padding: 1rem 0;
+        background-image: linear-gradient(var(--bg-color) 0%, transparent 120%);
+        backdrop-filter: blur(2px);
+
+        padding: 0 1rem;
         box-sizing: border-box;
 
-        a {
-            color: unset;
-            text-decoration: none;
-            font-style: italic;
+        nav {
+            @include content-width;
+            padding: 1rem 0;
 
-            &:hover {
-                text-decoration: underline dotted;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 2px solid var(--text-color);
+
+            a {
+                color: unset;
+                text-decoration: none;
+                font-style: italic;
+
+                &:hover {
+                    text-decoration: underline dotted;
+                }
+            }
+        }
+    }
+
+    .scroll-area {
+        overflow-y: scroll;
+        width: 100%;
+        display: flex;
+        flex-direction: column-reverse;
+
+        max-height: 100svh;
+        padding: 0 1rem;
+        box-sizing: border-box;
+
+        .content {
+            @include content-width;
+            padding: 4rem 0;
+
+            p.text {
+                margin: 1.6em 0;
+                line-height: 1.6em;
+
+                /* these are words */
+                & > * {
+                    display: inline-flex;
+                    white-space: pre;
+
+                    & > * {
+                        display: inline-block;
+
+                        span& {
+                            animation: letter-enter 0.5s 1;
+                        }
+
+                        em& {
+                            animation: em-letter-enter 0.5s 1;
+                        }
+                    }
+                }
+            }
+
+            .choice {
+                --choice-unit: 2px;
+                padding-bottom: calc(var(--choice-unit) * 4);
+                padding-top: calc(var(--choice-unit) * 4);
+                margin-bottom: calc(var(--choice-unit) * 2);
+                border-top: var(--choice-unit) solid var(--text-color);
+
+                box-sizing: border-box;
+
+                /* chocies that have already been made */
+                p& {
+                    opacity: 0.5;
+                }
+
+                /* choices that can be made */
+                button& {
+                    display: block;
+                    width: 100%;
+
+                    cursor: pointer;
+
+                    &:hover:not(:active) {
+                        color: var(--bg-color);
+                        background-color: var(--text-color);
+                    }
+
+                    &.visited {
+                        opacity: 0.5;
+                    }
+                }
             }
         }
     }

@@ -49,7 +49,12 @@ const choiceHistory = [
         }
     </ul>
     <h2>Actions</h2>
-    <button onclick="window.localStorage.removeItem('save-data'); window.location.reload();">Clear state and restart</button>
+    <button
+        style="text-decoration: underline dotted; cursor: pointer;"
+        onclick="window.localStorage.removeItem('save-data'); window.location.reload();"
+    >
+        Clear state and restart
+    </button>
 </aside>
 <style>
     aside {
@@ -57,9 +62,12 @@ const choiceHistory = [
         overflow: scroll;
 
         width: 100%;
+        max-width: 65ch;
+        height: 100svh;
+
+        box-sizing: border-box;
         padding: 1rem;
         border-left: 2px solid var(--text-color);
-        box-sizing: border-box;
     }
 
     ul {
