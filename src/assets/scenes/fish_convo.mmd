@@ -36,12 +36,7 @@ flowchart TD
     --> k[Both women chuckle.]
 
     k --o 2c[Now's your chance! Say something!] 
-    --> 2c1[What should you say?] 
-    2c1 --o 2c1c1[''Hello?''] --> turnaround
-    2c1 --o 2c1c2[''Howdy!''] --> 2c1c2a[Nice choice, cowboy.] --> jumparound
-    2c1 --o 2c1c3[''Two eggs, please!''] --> 2c1c3a[
-        Two eggs? What, raw?
-    ] --> turnaround
+    --> 2c1[What should you say?] --> things-to-say
 
     k --o 2sn[Let the moment breathe.]
 
@@ -86,20 +81,17 @@ flowchart TD
     ]
 
     --> q[
-        ''He takes after his father, you know,''
-        continues the server.
+        ''He takes after his father, you know,'' continues the server.
         ''Ottie. It's funny.'' She pauses. ''It's like he never left.''
     ]
 
-    q ----> r[She's lost in thought.]
+    q ----> r[She's lost in thought.] --> things-to-say
 
-    r --o 4c1[''Um. Excuse me?''] --> turnaround
-    
-    r --o 4c3[Make awkward eye contact with the server's friend.] 
-    --> 4c3a[
-        ''Hey Betty,''
-        says the server's friend.
-    ] --> turnaround
+    things-to-say --o 2c1c1[''Hello?''] --> turnaround
+    things-to-say --o 2c1c2[''Howdy!''] 
+    --> 2c1c2a[Nice choice, cowboy.] --> turnaround
+    things-to-say --o 2c1c3[''Two eggs, please!''] 
+    --> 2c1c3a[Two eggs? What, raw?] --> turnaround
 
     jumparound[The server jumps and spins around.] --> ohhi
     turnaround[The server turns around.] --> ohhi

@@ -69,6 +69,7 @@ const textNodeSchema = nodeBaseSchema.extend({
 const choiceNodeSchema = nodeBaseSchema.extend({
     type: z.literal("choice"),
     html: z.string().default(""),
+    number: z.string().optional(),
     style: z.enum(["default"]).default("default"),
 });
 

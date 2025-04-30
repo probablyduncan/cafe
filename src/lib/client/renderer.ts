@@ -67,7 +67,7 @@ export class Renderer {
     private _choices: ChoiceContainer;
     private _content: ContentContainer;
 
-    private static BASE_DELAY: number = 400;
+    private static BASE_DELAY: number = 4//400;
 
     constructor(deps: RendererDeps) {
         this._state = deps.state;
@@ -89,6 +89,7 @@ export class Renderer {
             clearPrevious: false,
         }];
 
+        this.initChoiceListener();
         this.renderChildren(startScene, startChildren);
     }
 
@@ -120,7 +121,6 @@ export class Renderer {
 
         if (choices.length === 0 && firstValidSequentialNode === undefined) {
             const prevScene = await this._state.exitScene();
-            console.log(prevScene);
             if (prevScene !== undefined) {
                 const entryNode = prevScene.nodes[prevScene.entryNodeId];
                 this.renderChildren(prevScene, entryNode.children);
@@ -172,7 +172,8 @@ export class Renderer {
 
     private async renderChoices(scene: Scene, choices: RenderableChoice[]) {
         for (let i = 0; i < choices.length; i++) {
-            await this.renderChoice(scene, choices[i]);
+            const number = choices[i].number ?? (i + 1).toString();
+            await this.renderChoice(scene, { ...choices[i], number });
             await this.wait(Renderer.BASE_DELAY);
         }
     }
@@ -181,6 +182,10 @@ export class Renderer {
 
         const el = document.createElement("button");
         el.classList.add("choice");
+
+        el.dataset.choice = JSON.stringify(choice);
+        el.dataset.choiceKey = choice.number?.toLowerCase() ?? "";
+
         el.innerHTML = choice.html;
 
         if (this._state.wasChoiceMade(choice.nodeId)) {
@@ -188,26 +193,56 @@ export class Renderer {
         }
 
         el.onclick = () => {
-
-            if (choice.clearPrevious) {
-                this._content.clear();
-            }
-            else {
-                const madeChioce = document.createElement("p");
-                madeChioce.innerHTML = el.innerHTML;
-                madeChioce.classList.add("choice");
-                this._content.add(madeChioce);
-            }
-            
-            this._choices.clear();
-
-            this._state.setCondition(choice.setState);
-            this._state.setChoice(choice.nodeId);
-
-            this.renderChildren(scene, choice.children);
-        };
+            this.choose(el, scene, choice);
+        }
 
         this._choices.add(el);
+    }
+
+    private initChoiceListener() {
+        document.addEventListener("keydown", e => {
+            const choiceEl = document.querySelector(`button.choice[data-choice-key="${e.key.toLowerCase()}"]`) as HTMLElement;
+            if (choiceEl) {
+                e.preventDefault();
+                this.choose(choiceEl);
+            }
+        });
+    }
+
+    private async choose(choiceEl: HTMLElement, scene?: Scene, choice?: RenderableChoice) {
+
+        if (choice === undefined) {
+            const choiceJson = choiceEl.dataset.choice;
+            if (choiceJson === undefined) {
+                return;
+            }
+
+            choice = JSON.parse(choiceJson) as RenderableChoice;
+        }
+
+        if (scene === undefined) {
+            scene = await this._state.getCurrentScene();
+        }
+
+        if (choice.clearPrevious) {
+            this._content.clear();
+        }
+        else {
+            const madeChioce = document.createElement("p");
+            madeChioce.innerHTML = choiceEl.innerHTML;
+            madeChioce.classList.add("choice");
+            madeChioce.dataset.choiceKey = choiceEl.dataset.choiceKey;
+            
+            
+            this._content.add(madeChioce);
+        }
+
+        this._choices.clear();
+
+        this._state.setCondition(choice.setState);
+        this._state.setChoice(choice.nodeId);
+
+        this.renderChildren(scene, choice.children);
     }
 
     private async renderText(node: Extract<RenderableNode, { type: "text" }>) {
@@ -228,7 +263,7 @@ export class Renderer {
         const words = htmlToWords(node.html);
         for (let i = 0; i < words.length; i++) {
             const wordEl = document.createElement("span");
-            
+
             if (i === 0) {
                 el.replaceChildren(wordEl)
             }
@@ -274,14 +309,6 @@ export class Renderer {
         this._state.setCondition(node.setState);
 
         await this.wait(Renderer.BASE_DELAY);
-    }
-
-    private async enterScene(node: SceneNode) {
-
-    }
-
-    private async passThrough(node: SceneNode) {
-
     }
 
     private async renderComponent(node: SceneNode) {

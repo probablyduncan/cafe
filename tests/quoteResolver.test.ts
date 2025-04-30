@@ -19,4 +19,4 @@ test.for([
 
 ])("formatQuotes(\"%s\") -> \"%s\"", ([input, output]) => {
     expect(formatQuotes(input)).toBe(output);
-})
+});

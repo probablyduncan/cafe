@@ -20,6 +20,7 @@ body {
 
 button {
     background-color: unset;
+    padding: 0;
     border: unset;
     font-size: unset;
     font-family: unset;

@@ -8,6 +8,7 @@ import { marked } from 'marked';
 import { flowchart, getVisitedStateVariable, type Flowchart, type FlowchartEdge, type Scene, sceneSchema, nodeSchema, type SceneNode, childNodeSchema, type StateCondition, type SceneChild } from './lib/contentSchemaTypes';
 import { type FilePath, parsePath } from './lib/server/parsePath';
 import { formatQuotes } from './lib/agnostic/quoteResolver';
+import { resolveChoiceNumber } from './lib/agnostic/choiceNumberResolver';
 
 // migrate this stuff to another file eventually??
 // https://github.com/withastro/astro/issues/13253
@@ -34,9 +35,12 @@ function sceneLoader(): Loader {
 
                 fs.readdirSync(path.join(process.cwd(), "/public/assets/images/")).forEach((val) => {
                     assets.set(val, "image");
-                })
+                });
     
-                const scenes = import.meta.glob("/src/assets/scenes/**/*.{md,mmd}");
+                const scenes = 
+                    // import.meta.glob("/src/assets/scenes/**/_test.mmd");
+                    import.meta.glob("/src/assets/scenes/**/*.{md,mmd}");
+                
                 await Promise.all(Object.keys(scenes).map(async filePath => {
                     const parsedPath = parsePath(filePath);
                     await updateAsset("add", parsedPath);
@@ -189,7 +193,12 @@ async function flowchartToScene(sceneId: string, chart: Flowchart): Promise<Scen
 
             if (side === "end" && edge.type === "arrow_circle") {
                 node.type = "choice";
-                node.html = marked.parseInline(formatQuotes(vert.text));
+
+                const withQuotes = formatQuotes(vert.text);
+                const { text, number } = resolveChoiceNumber(withQuotes);
+
+                node.number = number;
+                node.html = marked.parseInline(text);
                 // node.style =
             }
             else if (assets.has(vert.text!)) {

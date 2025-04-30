@@ -89,8 +89,7 @@ const { ...stateOptions } = Astro.props;
             padding: 4rem 0;
 
             p.text {
-                margin: 1.6em 0;
-                line-height: 1.6em;
+                line-height: 1.4;
 
                 /* these are words */
                 & > * {
@@ -105,7 +104,11 @@ const { ...stateOptions } = Astro.props;
                         }
 
                         em& {
-                            animation: em-letter-enter 0.5s 1;
+                            animation: italic-letter-enter 0.5s 1;
+                        }
+
+                        strong& {
+                            animation: bold-letter-enter 0.5s 1;
                         }
                     }
                 }
@@ -120,9 +123,23 @@ const { ...stateOptions } = Astro.props;
 
                 box-sizing: border-box;
 
+                &::before {
+                    content: attr(data-choice-key) ".";
+                    padding-right: 0.5em;
+                    padding-left: 0.2em;
+                }
+
+                p&, button&:first-of-type {
+                    margin-top: 3rem;
+                }
+
                 /* chocies that have already been made */
                 p& {
                     opacity: 0.5;
+
+                    &::before {
+                        opacity: 0.5;
+                    }
                 }
 
                 /* choices that can be made */
@@ -148,16 +165,16 @@ const { ...stateOptions } = Astro.props;
     @keyframes letter-enter {
         0% {
             opacity: 0;
-            /* transform: translate(-2px, 2px) rotate(10deg); */
+            transform: translate(-1px, 1px) rotate(10deg);
         }
 
         100% {
             opacity: 1;
-            /* transform: translate(0, 0) rotate(0); */
+            transform: translate(0, 0) rotate(0);
         }
     }
 
-    @keyframes em-letter-enter {
+    @keyframes italic-letter-enter {
         0% {
             opacity: 0;
             transform: translate(-3px, 3px) rotate(12deg);
@@ -170,6 +187,26 @@ const { ...stateOptions } = Astro.props;
 
         100% {
             transform: translate(0, 0) rotate(0);
+        }
+    }
+
+    @keyframes bold-letter-enter {
+        0% {
+            opacity: 0;
+            transform: translate(-2px, -2px) scale(1.5) rotate(10deg);
+        }
+
+        40% {
+            transform: translate(1px, 0.5px) scale(1.5) rotate(10deg);
+        }
+
+        60% {
+            transform: translate(-0.5px, 0) scale(0.9) rotate(-2deg);
+        }
+
+        100% {
+            opacity: 1;
+            transform: translate(0, 0) scale(1);
         }
     }
 </style>
