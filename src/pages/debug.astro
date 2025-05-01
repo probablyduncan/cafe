@@ -1,23 +1,21 @@
 ---
 import DebugPanel from "../components/debug-panel.astro";
 import DialoguePanel from "../components/dialogue-panel.astro";
+import Layout from "../components/layout.astro";
+import MainColumn from "../components/main-column.astro";
 import "../style.css";
 ---
 
-<!doctype html>
-<html lang="en">
-    <head>
-        <title>Cafe Halcyon</title>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width" />
-    </head>
-    <body>
-        <DialoguePanel />
+<Layout>
+    <div>
+        <MainColumn scrollDirection="reverse">
+            <DialoguePanel autosave={false} />
+        </MainColumn>
         <DebugPanel />
-    </body>
-</html>
+    </div>
+</Layout>
 <style>
-    body {
+    div {
         display: grid;
         grid-template-columns: auto 1fr;
         overflow: hidden;

@@ -1,0 +1,19 @@
+---
+interface Props {
+    title?: string;
+}
+
+const { title = "Cafe Halcyon" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>{title}</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+    </head>
+    <body>
+        <slot />
+    </body>
+</html>

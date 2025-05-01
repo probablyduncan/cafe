@@ -1,4 +1,8 @@
 ---
+import DebugPanel from "../../components/debug-panel.astro";
+import DialoguePanel from "../../components/dialogue-panel.astro";
+import Layout from "../../components/layout.astro";
+import MainColumn from "../../components/main-column.astro";
 import "../../style.css";
 import {
     getStaticPathsImpl,
@@ -13,91 +17,18 @@ export const getStaticPaths = (async () => {
 const { id } = Astro.props as StaticPathProps;
 ---
 
-<!doctype html>
-<html lang="en">
-    <head>
-        <title>Cafe Halcyon</title>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width" />
-    </head>
-    <body>
-        <nav>
-            <a href="/info" title="about this cafe">info</a>
-            <!-- <span><span data-time></span> at the Cafe Halcyon</span> -->
-            <span style="font-family: monospace;">~ debugging {id}.mmd ~</span>
-            <a href="/ctrl" title="settings & save files">ctrl</a>
-        </nav>
-        <div>
-            <div data-content data-scene={id}></div>
-        </div>
-        <div>
-            <div data-choices></div>
-        </div>
-    </body>
-</html>
-<script>
-    import {
-        Renderer,
-        type ChoiceContainer,
-        type ContentContainer,
-    } from "../../lib/client/renderer";
-    import {
-        HttpSceneDb,
-        LocalStorageSaveDb,
-        State,
-    } from "../../lib/client/state";
-
-    function init() {
-        const choices = document.querySelector("[data-choices]") as HTMLElement;
-        const content = document.querySelector("[data-content]") as HTMLElement;
-
-        if (!choices || !content) {
-            return;
-        }
-
-        const state = new State(
-            {
-                saveDb: new LocalStorageSaveDb(),
-                sceneDb: new HttpSceneDb(),
-            },
-            {
-                autosave: false,
-                startingScene: content.dataset.scene,
-            },
-        );
-
-        const choiceContainer: ChoiceContainer = {
-            add: (el: HTMLElement) => {
-                choices.appendChild(el);
-            },
-            clear: () => {
-                choices.innerHTML = "";
-            },
-        };
-
-        const contentContainer: ContentContainer = {
-            add: (el: HTMLElement) => {
-                content.appendChild(el);
-            },
-            clear: () => {
-                content.innerHTML = "";
-            },
-            scrollToEnd: () => {
-                content.scrollIntoView({
-                    behavior: "smooth",
-                    block: "end",
-                });
-            },
-        };
-
-        const renderer = new Renderer({
-            state,
-            choiceContainer,
-            contentContainer,
-        });
-
-        renderer.begin();
+<Layout>
+    <div>
+        <MainColumn scrollDirection="reverse">
+            <DialoguePanel autosave={false} startingScene={id} />
+        </MainColumn>
+        <DebugPanel />
+    </div>
+</Layout>
+<style>
+    div {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        overflow: hidden;
     }
-
-    document.addEventListener("DOMContentLoaded", init);
-</script>
+</style>

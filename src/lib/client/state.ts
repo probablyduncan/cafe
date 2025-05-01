@@ -114,7 +114,10 @@ export class State {
      * Loads save data and returns the current scene, with correct entryNodeId
      */
     async load(): Promise<Scene> {
-        this.deserialize(this._saveDb.data);
+
+        if (this._options.autosave) {
+            this.deserialize(this._saveDb.data);
+        }
 
         const scene = { ... await this.getCurrentScene() };
         if (this._lastChoice !== undefined && this._lastChoice.nodeId) {

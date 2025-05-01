@@ -1,16 +1,12 @@
 ---
 import DialoguePanel from "../components/dialogue-panel.astro";
+import Layout from "../components/layout.astro";
+import MainColumn from "../components/main-column.astro";
 import "../style.css";
 ---
 
-<!doctype html>
-<html lang="en">
-    <head>
-        <title>Cafe Halcyon</title>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width" />
-    </head>
-    <body>
+<Layout>
+    <MainColumn scrollDirection="reverse">
         <DialoguePanel autosave={true} />
-    </body>
-</html>
+    </MainColumn>
+</Layout>
