@@ -1,0 +1,25 @@
+---
+import Layout from "../components/layout.astro";
+import MainColumn from "../components/main-column.astro";
+import { Content } from "../assets/copy/info.md";
+---
+
+<Layout title="Info - Cafe Halcyon">
+    <MainColumn>
+        <main>
+            <Content />
+        </main>
+        <a href="/" slot="nav">cafe</a>
+        <a href="/config" slot="nav">config</a>
+    </MainColumn>
+</Layout>
+<style>
+    main {
+        margin-top: 4.5rem;
+    }
+
+    img {
+        width: 100%;
+        display: block;
+    }
+</style>

@@ -9,14 +9,10 @@ const { scrollDirection } = Astro.props;
 <div class="wrapper">
     <header>
         <nav class="content-width">
-            <a href="/info" title="about this cafe">info</a>
-            <a
-                onclick="window.localStorage.removeItem('save-data'); window.location.reload()"
-                href="#"
-                title="restart"
-            >
-                reset
-            </a>
+            <slot name="nav">
+                <a href="/info" title="about this cafe">info</a>
+                <a href="/config" slot="nav">config</a>
+            </slot>
         </nav>
     </header>
     <main class:list={["scroll-area", scrollDirection]}>
@@ -27,6 +23,13 @@ const { scrollDirection } = Astro.props;
     <footer>
         <span>Duncanpetrie.com</span>
         <span>Cafe Halcyon</span>
+        <a
+            title="start over"
+            onclick="window.localStorage.removeItem('save-data'); window.location.reload()"
+            href="#"
+        >
+            reset
+        </a>
         <span>ACT I</span>
         <span>Morning</span>
         <span>9:43 AM</span>
@@ -91,32 +94,6 @@ const { scrollDirection } = Astro.props;
         }
     }
 
-    /* footer {
-        position: absolute;
-        bottom: 0;
-        z-index: 10;
-        width: 100%;
-
-        background-image: linear-gradient(transparent 0%, var(--bg-color) 120%);
-        backdrop-filter: blur(2px);
-
-        padding: 0 1rem;
-        box-sizing: border-box;
-
-        & > nav {
-            display: flex;
-            justify-content: space-between;
-
-            border-top: 2px solid var(--text-color);
-            padding: 1rem 0;
-
-            & > span {
-                font-size: 0.8em;
-                font-style: italic;
-            }
-        }
-    } */
-
     footer {
         position: absolute;
         bottom: 0;
@@ -134,5 +111,12 @@ const { scrollDirection } = Astro.props;
         justify-content: space-between;
 
         font-size: 0.8em;
+
+        a, button {
+            font-style: italic;
+            &:hover {
+                text-decoration: underline dotted;
+            }
+        }
     }
 </style>

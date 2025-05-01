@@ -18,11 +18,12 @@ body {
     margin: 0;
 }
 
-button {
+button, a {
     color: unset;
     background-color: unset;
     padding: 0;
     border: unset;
+    text-decoration: unset;
     font-size: unset;
     font-family: unset;
     text-align: unset;
