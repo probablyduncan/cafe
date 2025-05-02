@@ -5,6 +5,5 @@ import mdx from "@astrojs/mdx";
 // https://astro.build/config
 export default defineConfig({
     integrations: [mdx()],
-    site: "https://probablyduncan.github.io",
-    base: "cafe",
+    site: "https://duncans.cafe",
 });
