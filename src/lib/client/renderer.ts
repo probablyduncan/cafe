@@ -86,7 +86,6 @@ export class Renderer {
                 cycles: 2,
                 style: "newScene",
             },
-            clearPrevious: false,
         }];
 
         this.initChoiceListener();
@@ -151,7 +150,6 @@ export class Renderer {
                         cycles: 2,
                         style: "newScene",
                     },
-                    clearPrevious: false,
                 }]);
                 break;
             case "image":
@@ -224,7 +222,7 @@ export class Renderer {
             scene = await this._state.getCurrentScene();
         }
 
-        if (choice.clearPrevious) {
+        if (choice.clearOnChoose) {
             this._content.clear();
         }
         else {
@@ -232,12 +230,12 @@ export class Renderer {
             madeChioce.innerHTML = choiceEl.innerHTML;
             madeChioce.classList.add("choice");
             madeChioce.dataset.choiceKey = choiceEl.dataset.choiceKey;
-            
-            
             this._content.add(madeChioce);
+    
+            this._choices.clear();
         }
 
-        this._choices.clear();
+        
 
         this._state.setCondition(choice.setState);
         this._state.setChoice(choice.nodeId);
@@ -246,10 +244,6 @@ export class Renderer {
     }
 
     private async renderText(node: Extract<RenderableNode, { type: "text" }>) {
-
-        if (node.clearPrevious) {
-            this._content.clear();
-        }
 
         const el = document.createElement("p");
         el.classList.add(node.type);
