@@ -1,28 +1,22 @@
 flowchart TD
-    start --> go-around-back-i[Good thinking.]
+    start -- coward --> coward1[Still thinking about it?] --> coward3[Go for it. What have you got to lose?] --> coward-choices
+    
+    start--> go-around-back-i[Good thinking.]
     --> go-around-back-ii[Only losers use the front door.]
-    --> go-around-back-iii[Maybe there's another way in.]
-    --x go-around-back-iv["You walk down the street until you come to a narrow alley, sloping down off the street between a tailor and a travel agent (both closed)."]
-    --> go-around-back-v[You glance back along the street and, seeing nobody, descend into the alley.]
-    --> go-around-back-vi[Soon you reach a dead end. You're below street level now, and the ground floor of the Cafe Halcyon hangs above you.]
-    --> go-around-back-vii[There's a little iron door with a wire mesh screen that you can't quite see through, and a window the size of your hand. A lantern burns beside it. In the corner is an ill-contained pile of cafe detritus: cardboard boxes, empty tins, milk crates. The smell of fresh bread down here is strong.] --> back-choices
+    --> coward-choices
 
-    back-choices --o go-around-back-vii-i(Knock on the door.)
-    --x go-around-back-vii-i-i[
-        You knock on the metal door.
-        It makes a tinny, hollow sound.
-    ] 
-    --> go-around-back-vii-i-ii[
-        For a second, you're terrified.
-        What if someone actually answers?
-        What would you say?
-        Why are you down here?
-    ]
-    --> go-around-back-vii-i-iii[
-        Luckily,
-        nobody comes to the door.
-    ]
-    --> back-choices
+    coward-choices -- !coward --o continue0[Maybe I *am* a loser?] -- coward --> coward[Yeah. Maybe.] --> coward2[Okay. You're still in front of the cafe.] --> return
+
+    coward-choices -- coward --o continue2[A lot, probably.] --> coward4[Right. Okay, sure. It's your own time you're wasting, here.] --> return
+    
+    coward-choices --o continue1[Snoop around; find another way in.]
+    -- !coward --x go-around-back-iv["You walk down the street until you come to a narrow alley, sloping down off the street between a tailor and a travel agent (both closed)."]
+    --> go-around-back-v[You glance back along the empty street. What a gloomy, dreary, day.] --o go-down[Enter the alley.]
+    --> go-around-back-vi[You descend into the canyon alley. Soon you're below street level, and the ground floor of the Cafe Halcyon hangs above you.]
+    --> go-around-back-vii[There's a little metal door with a wire mesh screen that you can't quite see through. A lantern burns beside it. In the corner is an ill-contained pile of cafe detritus: cardboard boxes, empty tins, milk crates. The smell of rot down here is strong.] --> back-choices
+
+    back-choices --o knock(Knock on the door.)
+    -- knocked --x go-around-back-vii-i-i[You knock on the metal door. It makes a tinny, hollow sound.] --> go-around-back-vii-i-ii[For a second, you're terrified. What if someone actually answers? What would you say?] --> go-around-back-vii-i-iii[Luckily, nobody comes to the door.] --> back-choices
     
     back-choices -- !isLanternOut --o go-around-back-vii-ii(Put out the lantern.) 
     -- isLanternOut --x go-around-back-vii-ii-i[You flick the knob on the bottom of the lantern and the flame goes out. A little oil drips to the ground.] 
