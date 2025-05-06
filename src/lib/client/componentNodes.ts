@@ -4,7 +4,9 @@ export const componentNodes = {
 } as const;
 
 export type ComponentKey = keyof typeof componentNodes;
-export const componentKeys: [ComponentKey] = Object.keys(componentNodes) as [ComponentKey];
+export const componentKeys = Object.keys(componentNodes) as [ComponentKey];
+
+// BEGIN COMPONENTS of type `(context: ComponentNodeContext) => Promise<void>`
 
 async function confetti(context) {
     context.state.isConditionMet({
