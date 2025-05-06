@@ -15,7 +15,7 @@ flowchart TD
     base-choices --o check-hours(Check the hours.)
     base-choices --o investigate-feelings[Introspect.]
     base-choices -- ! --o peer-through-glass(Peer through the glass.)
-    base-choices --o go-around-back(Go around back.) --x around-back[around-back.mmd] --> base-choices
+    base-choices --o go-around-back(Go around back.) --> around-back[around-back.mmd] --> base-choices
     base-choices --o leave(Leave.)
 
     %% 
@@ -26,31 +26,31 @@ flowchart TD
     --> check-hours-i[There's a sign on the door. It reads:]
     ---> mon[
         Monday:
-        07.30-23.00.
+        07.00-23.00.
     ]
     --> tues[
         Tuesday:
-        07.30-23.00.
+        07.00-23.00.
     ]
     --> wed[
         Wednesday:
-        07.30-23.00.
+        07.00-23.00.
     ]
     --> thurs[
         Thursday:
-        07.30-23.00.
+        07.00-23.00.
     ]
     --> fri[
         Friday:
-        07.30-02.00.
+        07.00-00.00.
     ]
     --> sat[
         Saturday:
-        07.30-02.00.
+        07.00-late.
     ]
     --> sun[
         Sunday:
-        07.30-23.00.
+        07.00-23.00.
     ]
     ----> check-hours-iii[
         Well,
@@ -63,7 +63,7 @@ flowchart TD
     %% investigate your feelings
     %% 
 
-    investigate-feelings --> if1[You reach inward. Why are you here?]
+    investigate-feelings --x if1[You reach inward. Why are you here?]
     ---> if6[You know very well why you're here. You've passed this door hundreds, thousands of times. It always seemed like the kind of place you'd go.]
     --> if5[Or the kind of place the person you *think* you are would go. But you've never gone inside.]
     ---> if8[Will today be any different?]
@@ -73,7 +73,7 @@ flowchart TD
     %% peer through glass
     %% 
 
-    peer-through-glass --> peer-through-glass-i[You approach the window beside the door and peer through it, brushing aside the fronds of a rosemary plant. The window is wet from dew and last night's rain.]
+    peer-through-glass --x peer-through-glass-i[You approach the window beside the door and peer through it, brushing aside the fronds of a rosemary plant. The window is wet from dew and last night's rain.]
     --> peer-through-glass-ii[You get closer, but you can't see inside.]
 
     %% don't wipe glass

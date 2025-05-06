@@ -52,7 +52,6 @@ export const childNodeSchema = z.object({
         style: z.enum(["threeDots", "newScene"]).default("threeDots"),  // determined by edge stroke
     }),
     requiredState: stateCondition.optional(),
-    clearPrevious: z.boolean().default(false),
 });
 
 const nodeBaseSchema = z.object({
@@ -72,6 +71,7 @@ const choiceNodeSchema = nodeBaseSchema.extend({
     html: z.string().default(""),
     number: z.string().optional(),
     style: z.enum(["default"]).default("default"),
+    clearOnChoose: z.boolean().default(false),
 });
 
 const passthroughNodeSchema = nodeBaseSchema.extend({

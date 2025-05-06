@@ -195,6 +195,10 @@ async function flowchartToScene(sceneId: string, chart: Flowchart): Promise<Scen
             nodes[key] = node;
         }
 
+        if (node.type === "choice" && side === "start" && edge.type === "arrow_cross") {
+            node.clearOnChoose = true;
+        }
+
         return node;
 
         /**
@@ -251,7 +255,6 @@ async function flowchartToScene(sceneId: string, chart: Flowchart): Promise<Scen
                 cycles: edge.length - 1,
                 // style: TODO haven't added options yet
             },
-            clearPrevious: edge.type === "arrow_cross",
         });
 
         // stateVariables
