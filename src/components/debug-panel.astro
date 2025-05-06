@@ -1,4 +1,6 @@
 ---
+import { getCollection } from "astro:content";
+
 const variables = [
     ["old_man_convo:wavedAtOldMan", true],
     ["old_man_convo:ignoredOldMan", false],
@@ -12,6 +14,8 @@ const choiceHistory = [
     ["inside:c17", "Approach the old man."],
     ["inside:c14", "Wander around, aimless."],
 ];
+
+const allScenes = await getCollection("scenes");
 ---
 
 <aside>
@@ -55,6 +59,10 @@ const choiceHistory = [
     >
         Clear state and restart
     </button>
+    <h2>Scenes</h2>
+    <select>
+        {allScenes.map(s => <option>{s.id}</option>)}
+    </select>
 </aside>
 <style>
     aside {

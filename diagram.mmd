@@ -1,0 +1,25 @@
+flowchart TD
+    a[begin]
+    --> b{where to start?}
+
+    b -- debug--> c[check query params or start at beginning]
+
+    b --no save data--> d[start at beginning]
+
+    b --save data--> e[load from localstorage]
+
+    c & d & e --> f[now we have nodeId and sceneId to start from] --> g[render nodeId and sceneId]
+
+    da{debug}
+
+    da --> db[update state keys] --> di[(state)]
+    da --> dd[go back] --> dg[get prev node] --> dh[(from state, update state)] --> g
+    da --> dc[go to scene] --> di[fetch scene with entry node] --> df[(update state)] & g
+    da --> de[go to node, click to select it] --> dj[remove all items in the content up to the selected one, and render selected one again] --> dk[(update state)]
+
+
+
+    g --> h[get children] --> i[find first elligable linear node or all elligable choices, whichever comes first]
+
+    %% events should be things YOU can do as the user
+    %% I can controller everything else

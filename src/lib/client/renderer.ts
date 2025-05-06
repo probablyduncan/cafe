@@ -1,6 +1,6 @@
-import type { Scene, SceneChild, SceneNode } from "../contentSchemaTypes";
 import type { State } from "./state";
-import { htmlToTokens, htmlToWords, splitHtml } from "../agnostic/letterSplitter";
+import { htmlToWords } from "../agnostic/letterSplitter";
+import type { SceneNode, SceneChild, Scene } from "../schemasAndTypes";
 
 
 
@@ -234,8 +234,6 @@ export class Renderer {
     
             this._choices.clear();
         }
-
-        
 
         this._state.setCondition(choice.setState);
         this._state.setChoice(choice.nodeId);

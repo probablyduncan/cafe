@@ -153,6 +153,18 @@ const { ...stateOptions } = Astro.props;
         type StateOptions,
     } from "../lib/client/state";
 
+    function init() {
+        const options = {
+            contentSelector: "[data-content]",
+            debug: false,
+            saveKey: "save-data",
+            prefsKey: "prefs-data",
+            autosave: true,
+        }
+
+        const controller = new DialogueController(options).begin();
+    }
+
     function initDialogueColumn() {
         const content = document.querySelector("[data-content]") as HTMLElement;
         const options = (

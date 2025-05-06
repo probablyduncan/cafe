@@ -3,15 +3,11 @@ import { z } from "astro/zod";
 // export const timeSlot = z.enum(["morning", "afternoon", "evening", "closed"]);
 // export type TimeSlot = z.infer<typeof timeSlot>;
 
-
-export const getVisitedStateVariable = (nodeId: string) => `v:${nodeId}`;
-
 export const flowchartVertex = z.object({
     id: z.string(),
     text: z.string().optional(),
     type: z.enum(["square", "round", "diamond", "subroutine", "circle", "hexagon", "cylinder", "stadium", "doublecircle"]).optional(),
 });
-export type FlowchartVertex = z.infer<typeof flowchartVertex>;
 
 export const flowchartEdge = z.object({
     start: z.string(),
@@ -21,20 +17,21 @@ export const flowchartEdge = z.object({
     type: z.enum(["arrow_point", "arrow_circle", "arrow_cross", "arrow_open"]).default("arrow_point"),
     stroke: z.enum(["normal", "thick", "dotted", "invisible"]).default("normal"),
 });
-export type FlowchartEdge = z.infer<typeof flowchartEdge>;
 
 export const flowchart = z.object({
     vertices: z.record(z.string(), flowchartVertex),
     edges: z.array(flowchartEdge),
 });
+
 export type Flowchart = z.infer<typeof flowchart>;
+export type FlowchartVertex = z.infer<typeof flowchartVertex>;
+export type FlowchartEdge = z.infer<typeof flowchartEdge>;
 
 
 export const stateCondition = z.object({
     name: z.string(),
     negated: z.boolean().default(false),
 });
-export type StateCondition = z.infer<typeof stateCondition>;
 
 
 // need to control:
@@ -91,7 +88,7 @@ const nestedSceneNodeSchema = nodeBaseSchema.extend({
 
 const componentNodeSchema = nodeBaseSchema.extend({
     type: z.literal("component"),
-    componentId: z.string().default(""),
+    componentKey: z.string().default(""),
 });
 
 export const nodeSchema = z.union([
@@ -103,14 +100,24 @@ export const nodeSchema = z.union([
     componentNodeSchema,
 ]);
 
-export type SceneNode = z.infer<typeof nodeSchema>;
-export type SceneChild = z.infer<typeof childNodeSchema>;
-
 export const sceneSchema = z.object({
     sceneId: z.string(),
     nodes: z.record(z.string(), nodeSchema).default({}),
     entryNodeId: z.string(),
     varsUsed: z.array(z.string()).default([]),
     // timeSlot: timeSlot.optional(),
-})
+});
+
+export type NodePosition = {
+    nodeId: string,
+    sceneId: string,
+}
+
+export type StateCondition = z.infer<typeof stateCondition>;
+
+export type SceneNode = z.infer<typeof nodeSchema>;
+export type SceneChild = z.infer<typeof childNodeSchema>;
 export type Scene = z.infer<typeof sceneSchema>;
+
+export type RenderableLinearNode = Exclude<SceneNode, { type: "choice" }> & SceneChild & NodePosition;
+export type RenderableChoice = Extract<SceneNode, { type: "choice" }> & SceneChild & NodePosition;

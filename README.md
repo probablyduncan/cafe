@@ -346,3 +346,4 @@ I'm thinking maybe the text, choices, etc should all be in the same container. C
 
 
 option in debug mode to click on a rendered piece of text to go back to that point?
+option to restart from last choice? Like rerender all the linear nodes after the most recent choice was made

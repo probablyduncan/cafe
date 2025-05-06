@@ -5,10 +5,11 @@ import fs from "fs";
 import mermaid from 'mermaid';
 import { type FlowEdge, type FlowVertex } from "../node_modules/mermaid/dist/diagrams/flowchart/types.d"
 import { marked } from 'marked';
-import { flowchart, getVisitedStateVariable, type Flowchart, type FlowchartEdge, type Scene, sceneSchema, nodeSchema, type SceneNode, childNodeSchema, type StateCondition, type SceneChild } from './lib/contentSchemaTypes';
+import { flowchart, sceneSchema, nodeSchema, childNodeSchema, type Flowchart, type FlowchartEdge, type SceneNode, type Scene, type SceneChild } from './lib/schemasAndTypes';
 import { type FilePath, parsePath } from './lib/server/parsePath';
 import { formatQuotes } from './lib/agnostic/quoteResolver';
 import { resolveChoiceNumber } from './lib/agnostic/choiceNumberResolver';
+import { componentNodes } from './lib/client/componentNodes';
 
 // migrate this stuff to another file eventually??
 // https://github.com/withastro/astro/issues/13253
@@ -36,11 +37,13 @@ function sceneLoader(): Loader {
                 fs.readdirSync(path.join(process.cwd(), "/public/assets/images/")).forEach((val) => {
                     assets.set(val, "image");
                 });
-    
-                const scenes = 
+                
+                Object.keys(componentNodes).forEach(key => assets.set(key, "component"));
+
+                const scenes =
                     // import.meta.glob("/src/assets/scenes/**/_test.mmd");
                     import.meta.glob("/src/assets/scenes/**/*.{md,mmd}");
-                
+
                 await Promise.all(Object.keys(scenes).map(async filePath => {
                     const parsedPath = parsePath(filePath);
                     await updateAsset("add", parsedPath);
@@ -212,7 +215,7 @@ async function flowchartToScene(sceneId: string, chart: Flowchart): Promise<Scen
                         node.sceneId = path.parse(vert.text!).name;
                         break;
                     case "component":
-                        node.componentId = vert.text;
+                        node.componentKey = vert.text;
                         break;
                     case "image":
                         // TODO how do I pass in alt
@@ -252,7 +255,7 @@ async function flowchartToScene(sceneId: string, chart: Flowchart): Promise<Scen
 
             if (edge.text === "!") {
                 // special case, only allow this node once
-                name = getVisitedStateVariable(edge.end);
+                name = sceneId + ":V_" + edge.end;
 
                 child.requiredState = { name, negated: true };
                 endNode.setState = { name, negated: false };
@@ -260,6 +263,11 @@ async function flowchartToScene(sceneId: string, chart: Flowchart): Promise<Scen
             else {
                 const negated = edge.text.startsWith("!");
                 name = negated ? edge.text.substring(1) : edge.text;
+
+                // qualify name so it doesn't overlap with other scenes
+                if (name.indexOf(":") === -1) {
+                    name = sceneId + ":" + name;
+                }
 
                 if (startNode.type === "choice") {
                     // need to set this state on choosing the choice

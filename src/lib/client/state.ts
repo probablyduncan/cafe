@@ -1,4 +1,4 @@
-import { type Scene, type StateCondition } from "../contentSchemaTypes";
+import type { Scene, StateCondition } from "../schemasAndTypes";
 
 export type SaveContainer = {
     l?: string; // last choice, "sceneId:nodeId"
