@@ -9,9 +9,15 @@ import { flowchart, getVisitedStateVariable, type Flowchart, type FlowchartEdge,
 import { type FilePath, parsePath } from './lib/server/parsePath';
 import { formatQuotes } from './lib/agnostic/quoteResolver';
 import { resolveChoiceNumber } from './lib/agnostic/choiceNumberResolver';
+import { componentKeys } from './lib/client/componentNodes';
 
 // migrate this stuff to another file eventually??
 // https://github.com/withastro/astro/issues/13253
+
+const VERBOSE: boolean = false;
+function log(message?: any, ...optionalArgs: any[]) {
+    if (VERBOSE) console.log(message, ...optionalArgs);
+}
 
 const scenes = defineCollection({
     loader: sceneLoader(),
@@ -33,8 +39,14 @@ function sceneLoader(): Loader {
                 context.store.clear();
                 assets.clear();
 
-                fs.readdirSync(path.join(process.cwd(), "/public/assets/images/")).forEach((val) => {
-                    assets.set(val, "image");
+                fs.readdirSync(path.join(process.cwd(), "/public/assets/images/")).forEach((filename) => {
+                    assets.set(filename, "image");
+                    log("image:", filename);
+                });
+
+                componentKeys.forEach(key => {
+                    assets.set(key, "component");
+                    log("component:", key);
                 });
     
                 const scenes = 
@@ -58,7 +70,7 @@ function sceneLoader(): Loader {
 
             async function updateAsset(event: "add" | "change" | "unlink", parsedPath: FilePath) {
                 if (path.matchesGlob(parsedPath.relativePath, "src/assets/scenes/**/*.{md,mmd}")) {
-                    console.log(event, "scene:", parsedPath.file);
+                    log(event, "scene:", parsedPath.file);
 
                     switch (event) {
                         case "add":
@@ -76,7 +88,7 @@ function sceneLoader(): Loader {
                 }
 
                 else if (path.matchesGlob(parsedPath.relativePath, "public/assets/images/**/*.{svg,webp,jpg}")) {
-                    console.log(event, "image:", parsedPath.file);
+                    log(event, "image:", parsedPath.file);
 
                     switch (event) {
                         case "add":
@@ -137,7 +149,7 @@ async function parseMMD(filePath: FilePath, content: string, context: LoaderCont
 }
 
 async function parseMD(filePath: FilePath, content: string, context: LoaderContext) {
-    // console.log(content)
+    log(content);
 }
 
 async function flowchartToScene(sceneId: string, chart: Flowchart): Promise<Scene | undefined> {
@@ -208,7 +220,7 @@ async function flowchartToScene(sceneId: string, chart: Flowchart): Promise<Scen
                         node.sceneId = path.parse(vert.text!).name;
                         break;
                     case "component":
-                        node.componentId = vert.text;
+                        node.componentKey = vert.text;
                         break;
                     case "image":
                         // TODO how do I pass in alt

@@ -1,4 +1,5 @@
 import { z } from "astro/zod";
+import { componentKeys } from "./client/componentNodes";
 
 // export const timeSlot = z.enum(["morning", "afternoon", "evening", "closed"]);
 // export type TimeSlot = z.infer<typeof timeSlot>;
@@ -91,7 +92,7 @@ const nestedSceneNodeSchema = nodeBaseSchema.extend({
 
 const componentNodeSchema = nodeBaseSchema.extend({
     type: z.literal("component"),
-    componentId: z.string().default(""),
+    componentKey: z.enum(componentKeys).default("confetti"),
 });
 
 export const nodeSchema = z.union([
