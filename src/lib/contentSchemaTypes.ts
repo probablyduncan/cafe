@@ -35,7 +35,6 @@ export const stateCondition = z.object({
     name: z.string(),
     negated: z.boolean().default(false),
 });
-export type StateCondition = z.infer<typeof stateCondition>;
 
 
 // need to control:
@@ -106,6 +105,16 @@ export const nodeSchema = z.union([
 
 export type SceneNode = z.infer<typeof nodeSchema>;
 export type SceneChild = z.infer<typeof childNodeSchema>;
+
+export type NodePosition = {
+    nodeId: string;
+    sceneId: string;
+}
+
+export type RenderableLinearNode = Exclude<SceneNode, { type: "choice" }> & SceneChild & NodePosition;
+export type RenderableChoice = Extract<SceneNode, { type: "choice" }> & SceneChild & NodePosition;
+
+export type StateCondition = z.infer<typeof stateCondition>;
 
 export const sceneSchema = z.object({
     sceneId: z.string(),

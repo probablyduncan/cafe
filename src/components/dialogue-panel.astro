@@ -143,13 +143,13 @@ const { ...stateOptions } = Astro.props;
 <script>
     import {
         Renderer,
-        type ChoiceContainer,
-        type ContentContainer,
+        type IChoiceContainer,
+        type IContentContainer,
     } from "../lib/client/renderer";
+    import { LocalStorageSaveStore } from "../lib/client/saveStore";
+    import { HTTPSceneStore } from "../lib/client/sceneStore";
     import {
-        HttpSceneDb,
-        LocalStorageSaveDb,
-        State,
+        GameState,
         type StateOptions,
     } from "../lib/client/state";
 
@@ -161,16 +161,13 @@ const { ...stateOptions } = Astro.props;
                 : {}
         ) as Partial<StateOptions>;
 
-        const saveDb = new LocalStorageSaveDb();
-        const sceneDb = new HttpSceneDb();
-
-        const contentContainer: ContentContainer = {
+        const contentContainer: IContentContainer = {
             clear: () => (content.innerHTML = ""),
             add: (el) => content.appendChild(el),
             scrollToEnd: () => {},
         };
 
-        const choiceContainer: ChoiceContainer = {
+        const choiceContainer: IChoiceContainer = {
             ...contentContainer,
             clear: () => {
                 content
@@ -179,11 +176,12 @@ const { ...stateOptions } = Astro.props;
             },
         };
 
-        const state = new State({ saveDb, sceneDb }, options);
+        const state = new GameState(new LocalStorageSaveStore(window.localStorage), options);
         const renderer = new Renderer({
-            state,
             contentContainer,
             choiceContainer,
+            state,
+            sceneStore: new HTTPSceneStore(),
         });
 
         renderer.begin();

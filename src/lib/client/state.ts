@@ -1,260 +1,198 @@
-import { type Scene, type StateCondition } from "../contentSchemaTypes";
+import { getNodeKey, parseNodeKey, toNodePosition } from "../agnostic/nodeHelper";
+import { type NodePosition, type RenderableChoice, type StateCondition } from "../contentSchemaTypes";
+import type { ISaveStore } from "./saveStore";
 
-export type SaveContainer = {
-    l?: string; // last choice, "sceneId:nodeId"
-    p?: string; // path to current scene, "scene1Id:exitNodeId/scene2Id:exitNodeId". Will not contain scene of last choice
-    c?: string; // list of nodeIds of visited choices, "c1,c3,go-around-back"
-    k?: string; // list of active state keys, "sceneId:ate,sceneId:ranAway"
-}
+type SaveJSON = {
+    // this stuff only gets updated on screen clear
+    s?: string;    // scene path, "scene1:c3/scene2:node7"
+    c?: string;     // made choices, "scene1:c1,scene1:c3"
+    k?: string;     // true state keys, "name,name2,name3"
 
-export interface SceneDb {
-    get: (sceneId: string) => Promise<Scene>;
-}
+    l?: string;    // scene:node, last clear choice. If undefined, screen hasn't been cleared yet
 
-export interface SaveDb {
-    data: SaveContainer;
-}
-
-export type StateDeps = {
-    saveDb: SaveDb;
-    sceneDb: SceneDb;
+    // all choices since last screen clear. Includes last screen clear and most recent choice
+    h?: string;    // "scene1:c3/scene2:node7"
 }
 
 export type StateOptions = {
     autosave: boolean;
-    startingScene: string;
 }
 
-export class LocalStorageSaveDb implements SaveDb {
-    private static KEY = "save-data";
-
-    get data() {
-        const value = window.localStorage.getItem(LocalStorageSaveDb.KEY);
-        if (value !== null) {
-            return JSON.parse(value) as SaveContainer;
-        }
-
-        return {};
-    }
-
-    set data(val: SaveContainer) {
-        window.localStorage.setItem(LocalStorageSaveDb.KEY, JSON.stringify(val));
-    }
-}
-
-export class HttpSceneDb implements SceneDb {
-    private _cache = new Map<string, Scene>();
-
-    async get(sceneId: string): Promise<Scene> {
-
-        if (this._cache.has(sceneId)) {
-            return this._cache.get(sceneId)!;
-        }
-
-        const response = await fetch(`/api/scenes/${sceneId}.json`);
-        const scene = await response.json() as Scene;
-        this._cache.set(sceneId, scene);
-        return scene;
-    }
-}
-
-export class State {
-
-    private _choices: Set<string>;
-    private _keys: Set<string>;
-    private _path: {
-        sceneId: string;
-        exitNodeId: string;
-    }[];
-
-    private _lastChoice: {
-        sceneId: string;
-        nodeId: string;
-    } | undefined;
-
-    private _currentSceneId: string;
-
-    private _options: StateOptions;
-    private static DEFAULT_OPTIONS: StateOptions = {
-        autosave: true,
-        startingScene: "morning-start-outside",
-    }
-
-    private _sceneDb: SceneDb;
-    private _saveDb: SaveDb;
-
-    constructor(deps: StateDeps, opts?: Partial<StateOptions>) {
-
-        this._sceneDb = deps.sceneDb;
-        this._saveDb = deps.saveDb;
-
-        this.setOptions(opts);
-        this.setDefaults();
-    }
-
-    private setDefaults() {
-        this._choices = new Set();
-        this._keys = new Set();
-        this._path = [];
-        // this._lastChoice;
-        this._currentSceneId = this._options.startingScene;
-    }
-
-    private setOptions(opts: Partial<StateOptions> = {}) {
-        this._options = { ...State.DEFAULT_OPTIONS };
-        for (const [key, value] of Object.entries(opts)) {
-            if (value === undefined || value === null) {
-                continue;
-            }
-            this._options[key] = value;
-        }
-    }
+export interface IGameState {
 
     /**
-     * Loads save data and returns the current scene, with correct entryNodeId
+     * Updates scene path.
      */
-    async load(): Promise<Scene> {
-
-        if (this._options.autosave) {
-            this.deserialize(this._saveDb.data);
-        }
-
-        const scene = { ... await this.getCurrentScene() };
-        if (this._lastChoice !== undefined && this._lastChoice.nodeId) {
-            scene.entryNodeId = this._lastChoice?.nodeId;
-        }
-
-        return scene;
-    }
-
-    private deserialize(data: SaveContainer) {
-
-        const { l, p, c, k } = data;
-
-        // parse last choice
-        if (l !== undefined) {
-            const [sceneId, nodeId] = l.trim().split(":");
-            this._currentSceneId = sceneId;
-            this._lastChoice = { sceneId, nodeId };
-        }
-
-        // parse path to current position
-        this._path = p?.split("/").filter(str => str).map((sceneAndExitNode: string) => {
-            const [sceneId, exitNodeId] = sceneAndExitNode.trim().split(":");
-            return { sceneId, exitNodeId };
-        }) ?? [];
-
-        // parse sets
-        this._choices = new Set(c?.split(",").filter(str => str).map(str => str.trim()));
-        this._keys = new Set(k?.split(",").filter(str => str).map(str => str.trim()));
-    }
+    onEnterScene(exitPos: NodePosition): void;
 
     /**
-     * serializes and saves the curernt state
+     * Updates scene path and returns position we exited the previous scene.
      */
-    save() {
-        this._saveDb.data = this.serialize();
+    onExitScene(): NodePosition | undefined;
+
+    /**
+     * Updates choices made, sets choice condition, and saves. Handles stateCondition, choice history, onClear, etc.
+     */
+    onChoose(choice: Pick<RenderableChoice, "nodeId" | "sceneId" | "clearOnChoose" | "setState">): void;
+
+    /**
+     * Sets state as of last clear,
+     * and returns choice history starting from last clear,
+     * to be fast forwarded to current pos.
+     */
+    loadToLastClear(): {
+        lastClear: NodePosition | undefined;
+        choicePath: NodePosition[];
+    };
+
+    /**
+     * Returns true if the given choice has already been visited.
+     */
+    wasChoiceMade(choice: Pick<RenderableChoice, "nodeId" | "sceneId">): boolean;
+
+    /**
+     * Updates state keys with the given condition if it exists,
+     * and returns true if the condition was changed.
+     */
+    // setCondition(condition: StateCondition | undefined): boolean;
+
+    /**
+     * Returns true if the condition is met or undefined,
+     * false if the condition is not met.
+     */
+    isConditionMet(condition: StateCondition | undefined): boolean;
+}
+
+export class GameState implements IGameState {
+
+    // these props are up to date, but will only get saved on screen clear
+    private _choices: Set<string> = new Set();
+    private _keys: Set<string> = new Set();
+    private _scenePath: NodePosition[] = [];    // will NOT NECESSARILY include the current scene.
+
+    private _lastClearChoice: NodePosition | undefined;
+    private _lastClearState: Omit<SaveJSON, "h" | "l"> = {}
+
+    // [0] is last clear choice, last el is most recent choice
+    private _choicePath: NodePosition[] = [];
+
+    private _autosave: boolean = false;
+
+    constructor(private readonly _saveStore: ISaveStore, options?: Partial<StateOptions>) {
+        if (options?.autosave !== undefined) {
+            this._autosave = options.autosave;
+        }
     }
 
-    private autosave() {
-        if (!this._options.autosave) {
-            return;
-        }
-
-        this.save();
+    onEnterScene(exitPos: NodePosition): void {
+        this._scenePath.push(exitPos);
     }
 
-    private serialize(): SaveContainer {
-        const save: SaveContainer = {};
-
-        // save last choice
-        if (this._lastChoice !== undefined) {
-            save.l = this._lastChoice.sceneId + ":" + this._lastChoice.nodeId;
-        }
-
-        // save scene path
-        if (this._path?.length > 0) {
-
-            // exclude the last item in the path if the last choice was in that scene,
-            // because when we load this save we'll resume at the last choice
-
-            const lastChoiceInPrevScene = (this._lastChoice?.sceneId) === (this._path.at(-1)!.sceneId);
-            const path = this._path.slice(0, lastChoiceInPrevScene ? -1 : undefined);
-
-
-            if (path.length > 0) {
-                save.p = path.map(sc => sc.sceneId + ":" + sc.exitNodeId).join("/");
-            }
-        }
-
-        // save choices
-        if (this._choices.size > 0) {
-            save.c = Array.from(this._choices).join(",");
-        }
-
-        // save state keys
-        if (this._keys.size > 0) {
-            save.k = Array.from(this._keys).join(",");
-        }
-
-        return save;
+    onExitScene(): NodePosition | undefined {
+        return this._scenePath.pop();
     }
 
-    async getCurrentScene(): Promise<Scene> {
-        const scene = await this._sceneDb.get(this._currentSceneId);
-        return { ...scene };
-    }
+    onChoose(choice: Pick<RenderableChoice, "nodeId" | "sceneId" | "clearOnChoose" | "setState">) {
 
-    // fetches new scene, adds it to hierarchy, and returns it
-    async enterScene(sceneId: string, fromNodeId: string): Promise<Scene> {
+        this._choices.add(getNodeKey(choice));
+        this._setCondition(choice.setState);
 
-        this._path.push({
-            sceneId: this._currentSceneId,
-            exitNodeId: fromNodeId,
-        });
-
-        this._currentSceneId = sceneId;
-
-        this.autosave();
-
-        return await this.getCurrentScene();
-    }
-
-    // returns scene that we're re-entering, with correct entry point set
-    async exitScene(): Promise<Scene | undefined> {
-
-        if (this._path.length === 0) {
-            return undefined;
+        if (choice.clearOnChoose) {
+            this._updateLastClearState(choice);
+        }
+        else {
+            this._addChoiceToPath(choice);
         }
 
-        const { sceneId, exitNodeId: fromNodeId } = this._path.pop()!;
-        this._currentSceneId = sceneId;
-
-        const parentScene = await this.getCurrentScene();
-
-        // overwrite entryNode to be the node
-        // that we left the parent from
-        parentScene.entryNodeId = fromNodeId;
-
-        this.autosave();
-
-        return parentScene;
+        if (this._autosave) {
+            this._save();
+        }
     }
 
-    wasChoiceMade(nodeId: string) {
-        return this._choices.has(nodeId);
+    private _addChoiceToPath(choice: NodePosition) {
+        this._choicePath.push(toNodePosition(choice));
     }
 
-    setChoice(nodeId: string) {
+    private _updateLastClearState(choice: NodePosition) {
+        this._choicePath = [];
+        this._lastClearChoice = toNodePosition(choice);
+        this._lastClearState = {};
 
-        this._lastChoice = {
-            sceneId: this._currentSceneId,
-            nodeId,
+        const choices = [...this._choices];
+        if (choices.length > 0) {
+            this._lastClearState.c = choices.join(",");
         }
 
-        this._choices.add(nodeId);
+        const keys = [...this._keys];
+        if (keys.length > 0) {
+            this._lastClearState.k = keys.join(",");
+        }
 
-        this.autosave();
+        if (this._scenePath.length > 0) {
+            this._lastClearState.s = this._scenePath.map(getNodeKey).join("/");
+        }
+    }
+
+    private _save() {
+
+        const saveData: SaveJSON = { ...this._lastClearState };
+
+        if (this._lastClearChoice !== undefined) {
+            saveData.l = getNodeKey(this._lastClearChoice);
+        }
+
+        if (this._choicePath.length > 0) {
+            saveData.h = this._choicePath.map(getNodeKey).join("/");
+        }
+
+        this._saveStore.set<SaveJSON>("save-data", saveData);
+    }
+
+    loadToLastClear(): {
+        lastClear: NodePosition | undefined;
+        choicePath: NodePosition[];
+    } {
+
+        const saveData = this._saveStore.get<SaveJSON>("save-data");
+        if (saveData === undefined) {
+            return {
+                lastClear: undefined,
+                choicePath: [],
+            };
+        }
+
+        const choicePath = saveData.h?.split("/").map(parseNodeKey) ?? [];
+
+        if (saveData.c !== undefined) {
+            this._choices = new Set(saveData.c.split(","));
+        }
+
+        if (saveData.k !== undefined) {
+            this._keys = new Set(saveData.k.split(","));
+        }
+
+        if (saveData.l !== undefined) {
+            this._lastClearChoice = parseNodeKey(saveData.l);
+        }
+
+        if (saveData.s !== undefined) {
+            this._scenePath = saveData.s.split("/").map(parseNodeKey);
+        }
+
+        if (saveData.h !== undefined) {
+            this._choicePath = saveData.h.split("/").map(parseNodeKey);
+        }
+
+        this._lastClearState = saveData;
+
+        return {
+            lastClear: this._lastClearChoice,
+            choicePath,
+        };
+    }
+
+    wasChoiceMade(choice: Pick<RenderableChoice, "nodeId" | "sceneId">) {
+        return this._choices.has(getNodeKey(choice));
     }
 
     isConditionMet(condition: StateCondition | undefined): boolean {
@@ -267,7 +205,7 @@ export class State {
         return this._keys.has(condition.name) !== condition.negated;
     }
 
-    setCondition(condition: StateCondition | undefined) {
+    private _setCondition(condition: StateCondition | undefined) {
         if (condition === undefined) {
             return;
         }
@@ -277,9 +215,5 @@ export class State {
         } else {
             this._keys.add(condition.name);
         }
-
-        // not autosaving here because if we revert to a prev save,
-        // progress will resume at the last choice,
-        // not the last condition that was set
     }
 }

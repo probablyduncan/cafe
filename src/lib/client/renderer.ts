@@ -1,6 +1,8 @@
-import type { Scene, SceneChild, SceneNode } from "../contentSchemaTypes";
-import type { State } from "./state";
-import { htmlToTokens, htmlToWords, splitHtml } from "../agnostic/letterSplitter";
+import type { NodePosition, RenderableChoice, RenderableLinearNode, Scene, SceneChild, SceneNode } from "../contentSchemaTypes";
+import type { IGameState } from "./state";
+import { htmlToWords } from "../agnostic/letterSplitter";
+import type { ISceneStore } from "./sceneStore";
+import { toNodePosition } from "../agnostic/nodeHelper";
 
 
 
@@ -33,39 +35,30 @@ import { htmlToTokens, htmlToWords, splitHtml } from "../agnostic/letterSplitter
 
 
 
-
-
-
-
-
-
-
-type RenderableChild = SceneNode & SceneChild;
-type RenderableChoice = Extract<SceneNode & SceneChild, { type: "choice"; }>
-type RenderableNode = Exclude<SceneNode & SceneChild, { type: "choice"; }>
-
-export interface ContentContainer {
+export interface IContentContainer {
     clear: () => void;
     add: (el: HTMLElement) => void;
     scrollToEnd: () => void;
 }
 
-export interface ChoiceContainer {
+export interface IChoiceContainer {
     clear: () => void;
     add: (el: HTMLElement) => void;
 }
 
 interface RendererDeps {
-    state: State;
-    contentContainer: ContentContainer;
-    choiceContainer: ChoiceContainer;
+    state: IGameState;
+    sceneStore: ISceneStore;
+    contentContainer: IContentContainer;
+    choiceContainer: IChoiceContainer;
 }
 
 export class Renderer {
 
-    private _state: State;
-    private _choices: ChoiceContainer;
-    private _content: ContentContainer;
+    private _state: IGameState;
+    private _choices: IChoiceContainer;
+    private _content: IContentContainer;
+    private _sceneStore: ISceneStore;
 
     private static BASE_DELAY: number = 400;
 
@@ -73,13 +66,23 @@ export class Renderer {
         this._state = deps.state;
         this._choices = deps.choiceContainer;
         this._content = deps.contentContainer;
+        this._sceneStore = deps.sceneStore;
     }
 
     async begin() {
-        const startScene = await this._state.load();
-        console.log(startScene);
 
-        const startNode = startScene.nodes[startScene.entryNodeId];
+        // here we load at the beginning
+        const { lastClear, choicePath } = this._state.loadToLastClear();
+        
+        console.log("fast forward start at:", lastClear ?? "beginning");
+        console.log("choice path:", choicePath);
+
+        const startSceneId = lastClear?.sceneId ?? "morning-start-outside";
+        const startScene = await this._sceneStore.get(startSceneId);
+        const startNode = startScene.nodes[lastClear?.nodeId ?? startScene.entryNodeId];
+
+        console.log("starting scene:", startScene);
+
         const startChildren: SceneChild[] = startNode.type === "choice" ? startNode.children : [{
             nodeId: startScene.entryNodeId,
             delay: {
@@ -89,13 +92,25 @@ export class Renderer {
         }];
 
         this.initChoiceListener();
+
+        // TODO:
+        // this.fastForward(startScene, choicePath);
+
         this.renderChildren(startScene, startChildren);
+    }
+
+    private fastForward(scene: Scene, choicePath: NodePosition[]) {
+        for (let choice of choicePath) {
+
+            // let startNode = 
+            this.renderChildren(scene, scene.nodes[choice.nodeId].children);
+        }
     }
 
     private async renderChildren(scene: Scene, children: SceneChild[]) {
 
         const choices: RenderableChoice[] = [];
-        let firstValidSequentialNode: RenderableNode | undefined = undefined;
+        let firstValidSequentialNode: RenderableLinearNode | undefined = undefined;
 
         // we can only render the first child
         // but we can also render all choices
@@ -104,7 +119,7 @@ export class Renderer {
 
             const _c = children[i];
             const _n = scene.nodes[_c.nodeId];
-            const child: RenderableChild = { ..._c, ..._n };
+            const child = { ..._c, ..._n, sceneId: scene.sceneId };
 
             if (!this._state.isConditionMet(child.requiredState)) {
                 continue;
@@ -119,12 +134,15 @@ export class Renderer {
         }
 
         if (choices.length === 0 && firstValidSequentialNode === undefined) {
-            const prevScene = await this._state.exitScene();
-            if (prevScene !== undefined) {
-                const entryNode = prevScene.nodes[prevScene.entryNodeId];
-                this.renderChildren(prevScene, entryNode.children);
+            const prevSceneExitPos = this._state.onExitScene();
+
+            if (prevSceneExitPos === undefined) {
+                return;
             }
-            return;
+            
+            const prevScene = await this._sceneStore.get(prevSceneExitPos.sceneId);
+            const entryNode = prevScene.nodes[prevSceneExitPos.nodeId];
+            this.renderChildren(prevScene, entryNode.children);
         }
 
         if (firstValidSequentialNode !== undefined) {
@@ -134,7 +152,7 @@ export class Renderer {
         this.renderChoices(scene, choices);
     }
 
-    private async renderNode(scene: Scene, node: RenderableNode) {
+    private async renderNode(scene: Scene, node: RenderableLinearNode) {
 
         switch (node.type) {
             case "text":
@@ -142,7 +160,8 @@ export class Renderer {
                 this.renderChildren(scene, node.children);
                 break;
             case "scene":
-                const newScene = await this._state.enterScene(node.sceneId, node.nodeId);
+                this._state.onEnterScene(toNodePosition(node));
+                const newScene = await this._sceneStore.get(node.sceneId);
                 console.log(newScene);
                 this.renderChildren(newScene, [{
                     nodeId: newScene.entryNodeId,
@@ -186,7 +205,10 @@ export class Renderer {
 
         el.innerHTML = choice.html;
 
-        if (this._state.wasChoiceMade(choice.nodeId)) {
+        if (this._state.wasChoiceMade({
+            nodeId: choice.nodeId,
+            sceneId: scene.sceneId
+        })) {
             el.classList.add("visited");
         }
 
@@ -219,7 +241,7 @@ export class Renderer {
         }
 
         if (scene === undefined) {
-            scene = await this._state.getCurrentScene();
+            scene = await this._sceneStore.get(choice.sceneId);
         }
 
         if (choice.clearOnChoose) {
@@ -231,19 +253,16 @@ export class Renderer {
             madeChioce.classList.add("choice");
             madeChioce.dataset.choiceKey = choiceEl.dataset.choiceKey;
             this._content.add(madeChioce);
-    
+
             this._choices.clear();
         }
 
-        
-
-        this._state.setCondition(choice.setState);
-        this._state.setChoice(choice.nodeId);
+        this._state.onChoose(choice);
 
         this.renderChildren(scene, choice.children);
     }
 
-    private async renderText(node: Extract<RenderableNode, { type: "text" }>) {
+    private async renderText(node: Extract<RenderableLinearNode, { type: "text" }>) {
 
         const el = document.createElement("p");
         el.classList.add(node.type);
@@ -300,8 +319,6 @@ export class Renderer {
             }
         }
 
-        this._state.setCondition(node.setState);
-
         await this.wait(Renderer.BASE_DELAY);
     }
 
@@ -313,7 +330,7 @@ export class Renderer {
 
     }
 
-    private async renderDelay(delay: RenderableNode["delay"], el: HTMLElement) {
+    private async renderDelay(delay: SceneChild["delay"], el: HTMLElement) {
         for (let i = 0; i < delay.cycles; i++) {
             switch (delay.style) {
                 case "threeDots":
