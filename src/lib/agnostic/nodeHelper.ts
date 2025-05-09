@@ -14,6 +14,11 @@ export function getNodeKey(node: NodePosition): string {
  */
 export function parseNodeKey(key: string): NodePosition {
     const split = key.trim().split(":");
+
+    if (split.length !== 2) {
+        throw "Invalid node key.";
+    }
+
     return {
         sceneId: split[0],
         nodeId: split[1]

@@ -124,3 +124,5 @@ export const sceneSchema = z.object({
     // timeSlot: timeSlot.optional(),
 })
 export type Scene = z.infer<typeof sceneSchema>;
+
+export const SAVE_DATA_KEY = "save-data" as const;

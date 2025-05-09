@@ -1,5 +1,5 @@
 import { getNodeKey, parseNodeKey, toNodePosition } from "../agnostic/nodeHelper";
-import { type NodePosition, type RenderableChoice, type StateCondition } from "../contentSchemaTypes";
+import { SAVE_DATA_KEY, type NodePosition, type RenderableChoice, type StateCondition } from "../contentSchemaTypes";
 import type { ISaveStore } from "./saveStore";
 
 type SaveJSON = {
@@ -145,7 +145,7 @@ export class GameState implements IGameState {
             saveData.h = this._choicePath.map(getNodeKey).join("/");
         }
 
-        this._saveStore.set<SaveJSON>("save-data", saveData);
+        this._saveStore.set<SaveJSON>(SAVE_DATA_KEY, saveData);
     }
 
     loadToLastClear(): {
@@ -153,7 +153,7 @@ export class GameState implements IGameState {
         choicePath: NodePosition[];
     } {
 
-        const saveData = this._saveStore.get<SaveJSON>("save-data");
+        const saveData = this._saveStore.get<SaveJSON>(SAVE_DATA_KEY);
         if (saveData === undefined) {
             return {
                 lastClear: undefined,
