@@ -5,12 +5,12 @@ flowchart TD
     --> go-around-back-ii[Only losers use the front door.]
     --> coward-choices
 
-    coward-choices -- !coward --o continue0[Maybe I *am* a loser?] -- coward --> coward[Yeah. Maybe.] --> coward2[Okay. You're still in front of the cafe.] --> return
+    coward-choices -- !coward --o continue0[On second thought...] -- coward --> coward0[Maybe *you're* a loser?] ---> coward[Yeah. Maybe.] --> coward2[Okay. You're still in front of the cafe.] --> return
 
     coward-choices -- coward --o continue2[A lot, probably.] --> coward4[Right. Okay, sure. It's your own time you're wasting, here.] --> return
     
-    coward-choices --o continue1[Snoop around; find another way in.]
-    -- !coward --x go-around-back-iv["You walk down the street until you come to a narrow alley, sloping down off the street between a tailor and a travel agent (both closed)."]
+    coward-choices --o continue1[Find the back of the cafe.]
+    -- !coward --x go-around-back-iv["You walk down the street until you come to a narrow alley, down off the street between a tailor and a travel agent (both closed)."]
     --> go-around-back-v[You glance back along the empty street. What a gloomy, dreary, day.] --o go-down[Enter the alley.]
     --> go-around-back-vi[You descend into the canyon alley. Soon you're below street level, and the ground floor of the Cafe Halcyon hangs above you.]
     --> go-around-back-vii[There's a little metal door with a wire mesh screen that you can't quite see through. A lantern burns beside it. In the corner is an ill-contained pile of cafe detritus: cardboard boxes, empty tins, milk crates. The smell of rot down here is strong.] --> back-choices
@@ -73,12 +73,12 @@ flowchart TD
     
     %% illusion of choice
     go-around-back-iii-ii-i-xi-b --o go-around-back-iii-ii-i-viii-i[Take a bite.] --> go-around-back-iii-ii-i-xii
-    go-around-back-iii-ii-i-xi-b --o go-around-back-iii-ii-i-viii-ii[Resist the croissant.] --> go-around-back-iii-ii-i-viii-iii[You try to resist, but it looks so tasty.] --> go-around-back-iii-ii-i-xii
+    go-around-back-iii-ii-i-xi-b --o go-around-back-iii-ii-i-viii-ii[Resist the croissant.] --> go-around-back-iii-ii-i-viii-iii[You try to resist, but it looks so tasty.] --o go-around-back-iii-ii-i-viii-iv[Take a bite.] --> go-around-back-iii-ii-i-xii
 
     go-around-back-iii-ii-i-xii[You take a bite, chew. There's a pain in your chest.] --o go-around-back-iii-ii-i-xii2[Take another bite.] -- ate-croissant --> go-around-back-iii-ii-i-xiii[It's disgusting, of course. You spit it out. The rat breaks from its stupor and darts down the drain.] --> go-around-back-iii-ii-i-xiv[What's gotten into you? You drop the croissant and try your best to kick the mess of garbage back into a pile. Hopefully nobody will notice.] --> back-choices
     
     %% no toothpicks for you
-    go-around-back-vii-iii-ii --o go-around-back-vii-iii-ii-ii[Leave it.] --> back-choices
+    go-around-back-vii-iii-ii --o go-around-back-vii-iii-ii-ii[Leave it.] --x go-around-back-vii-iii-ii-iii[That's probably wise.] --> back-choices
 
     %% leave alley
-    back-choices --o go-around-back-vii-iv[Leave the alley.] --> go-around-back-vii-iv-i[Why'd you come down here, anyway?] --> go-around-back-vii-iv-ii[You leave the alley and return to the front of the cafe.] --> return
+    back-choices --o go-around-back-vii-iv[Leave the alley.] --x go-around-back-vii-iv-i[Why'd you come down here, anyway?] --> go-around-back-vii-iv-ii[You leave the alley and return to the front of the cafe.] --> return
