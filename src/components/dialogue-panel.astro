@@ -1,5 +1,5 @@
 ---
-import type { StateOptions } from "../lib/client/state";
+import type { StateOptions } from "../lib/client/gameState";
 
 interface Props extends Partial<StateOptions> {
     // debug?: boolean;
@@ -142,16 +142,16 @@ const { ...stateOptions } = Astro.props;
 </style>
 <script>
     import {
-        Renderer,
+        GameDriver,
         type IChoiceContainer,
         type IContentContainer,
-    } from "../lib/client/renderer";
+    } from "../lib/client/gameDriver";
     import { LocalStorageSaveStore } from "../lib/client/saveStore";
     import { HTTPSceneStore } from "../lib/client/sceneStore";
     import {
         GameState,
         type StateOptions,
-    } from "../lib/client/state";
+    } from "../lib/client/gameState";
 
     function initDialogueColumn() {
         const content = document.querySelector("[data-content]") as HTMLElement;
@@ -177,7 +177,7 @@ const { ...stateOptions } = Astro.props;
         };
 
         const state = new GameState(new LocalStorageSaveStore(window.localStorage), options);
-        const renderer = new Renderer({
+        const renderer = new GameDriver({
             contentContainer,
             choiceContainer,
             state,

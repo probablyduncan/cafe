@@ -1,9 +1,7 @@
 import type { NodePosition, RenderableChoice, RenderableLinearNode, Scene, SceneChild, SceneNode } from "../contentSchemaTypes";
-import type { IGameState } from "./state";
+import type { IGameState } from "./gameState";
 import { htmlToWords } from "../agnostic/letterSplitter";
 import type { ISceneStore } from "./sceneStore";
-import { toNodePosition } from "../agnostic/nodeHelper";
-
 
 
 export interface IContentContainer {
@@ -17,14 +15,14 @@ export interface IChoiceContainer {
     add: (el: HTMLElement) => void;
 }
 
-interface RendererDeps {
+type GameDriverDeps = {
     state: IGameState;
     sceneStore: ISceneStore;
     contentContainer: IContentContainer;
     choiceContainer: IChoiceContainer;
 }
 
-export class Renderer {
+export class GameDriver {
 
     private _state: IGameState;
     private _choices: IChoiceContainer;
@@ -33,7 +31,7 @@ export class Renderer {
 
     private static BASE_DELAY: number = 4//00;
 
-    constructor(deps: RendererDeps) {
+    constructor(deps: GameDriverDeps) {
         this._state = deps.state;
         this._choices = deps.choiceContainer;
         this._content = deps.contentContainer;
@@ -182,7 +180,7 @@ export class Renderer {
         for (let i = 0; i < choices.length; i++) {
             const number = choices[i].number ?? (i + 1).toString();
             await this.renderChoice(scene, { ...choices[i], number });
-            await this.wait(Renderer.BASE_DELAY);
+            await this.wait(GameDriver.BASE_DELAY);
         }
     }
 
@@ -278,13 +276,13 @@ export class Renderer {
             for (let j = 0; j < words[i].chars.length; j++) {
 
                 // wordEl.innerHTML += words[i].chars[j].content;
-                // await this.wait(Renderer.BASE_DELAY / 8);
+                // await this.wait(GameDriver.BASE_DELAY / 8);
 
                 const char = words[i].chars[j];
                 const charEl = document.createElement(char.tag);
                 charEl.innerHTML = char.content;
                 wordEl.appendChild(charEl);
-                await this.wait(Renderer.BASE_DELAY / 8);
+                await this.wait(GameDriver.BASE_DELAY / 8);
             }
 
             if (i < words.length - 1) {
@@ -293,24 +291,24 @@ export class Renderer {
                 spaceEl.innerHTML = " ";
                 wordEl.appendChild(spaceEl);
 
-                // await this.wait(Renderer.BASE_DELAY / 8);
+                // await this.wait(GameDriver.BASE_DELAY / 8);
             }
 
             this._content.scrollToEnd();
 
             switch (words[i].delay) {
                 case "short":
-                    await this.wait(Renderer.BASE_DELAY / 2);
+                    await this.wait(GameDriver.BASE_DELAY / 2);
                     break;
                 case "long":
-                    await this.wait(Renderer.BASE_DELAY * 2);
+                    await this.wait(GameDriver.BASE_DELAY * 2);
                     break;
                 // case "none":
-                //     await this.wait(Renderer.BASE_DELAY / 4);
+                //     await this.wait(GameDriver.BASE_DELAY / 4);
             }
         }
 
-        await this.wait(Renderer.BASE_DELAY);
+        await this.wait(GameDriver.BASE_DELAY);
     }
 
     private async renderDelay(delay: SceneChild["delay"], el: HTMLElement) {
@@ -318,10 +316,10 @@ export class Renderer {
             switch (delay.style) {
                 case "threeDots":
                     await this.renderThreeDotDelay(el);
-                    await this.wait(Renderer.BASE_DELAY);
+                    await this.wait(GameDriver.BASE_DELAY);
                     break;
                 case "newScene":
-                    // await this.wait(Renderer.BASE_DELAY);
+                    // await this.wait(GameDriver.BASE_DELAY);
                     break;
             }
         }
@@ -336,7 +334,7 @@ export class Renderer {
                 el.innerHTML = "";
             }
             el.appendChild(span);
-            await this.wait(Renderer.BASE_DELAY);
+            await this.wait(GameDriver.BASE_DELAY);
         }
         el.innerHTML = "&nbsp;";
     }
