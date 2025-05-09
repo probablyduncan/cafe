@@ -86,7 +86,7 @@ const imageNodeSchema = nodeBaseSchema.extend({
 
 const nestedSceneNodeSchema = nodeBaseSchema.extend({
     type: z.literal("scene"),
-    sceneId: z.string().default(""),
+    sceneKey: z.string().default(""),
 });
 
 const componentNodeSchema = nodeBaseSchema.extend({

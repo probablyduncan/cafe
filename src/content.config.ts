@@ -221,7 +221,7 @@ async function flowchartToScene(sceneId: string, chart: Flowchart): Promise<Scen
                 node.type = assets.get(vert.text!);
                 switch (node.type as SceneNode["type"]) {
                     case "scene":
-                        node.sceneId = path.parse(vert.text!).name;
+                        node.sceneKey = path.parse(vert.text!).name;
                         break;
                     case "component":
                         node.componentKey = vert.text;

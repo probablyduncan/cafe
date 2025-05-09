@@ -6,35 +6,6 @@ import { toNodePosition } from "../agnostic/nodeHelper";
 
 
 
-
-
-
-
-
-
-// NO RECURSION??
-// so I'm thinking the loop is for rendering children
-// each group of children will render one child node *or* one group of choices
-// we can support more later, right now it doesn't matter
-// so we can basically do the rendering, and await rendering complete
-// and when the children are all done, the loop continues to the next?
-// or if choices, we exit the loop but clicking on a choice triggers the loop again?
-
-// 
-// THINGS TO DO
-// 
-// 1. animate spans of content
-// 
-// 2. transition to progressing with click instead of with autoplay
-// and then I can add autoplay later
-// 
-
-
-
-
-
-
-
 export interface IContentContainer {
     clear: () => void;
     add: (el: HTMLElement) => void;
@@ -60,7 +31,7 @@ export class Renderer {
     private _content: IContentContainer;
     private _sceneStore: ISceneStore;
 
-    private static BASE_DELAY: number = 400;
+    private static BASE_DELAY: number = 4//00;
 
     constructor(deps: RendererDeps) {
         this._state = deps.state;
@@ -69,123 +40,143 @@ export class Renderer {
         this._sceneStore = deps.sceneStore;
     }
 
-    async begin() {
-
-        // here we load at the beginning
-        const { lastClear, choicePath } = this._state.loadToLastClear();
-        
-        console.log("fast forward start at:", lastClear ?? "beginning");
-        console.log("choice path:", choicePath);
-
-        const startSceneId = lastClear?.sceneId ?? "morning-start-outside";
-        const startScene = await this._sceneStore.get(startSceneId);
-        const startNode = startScene.nodes[lastClear?.nodeId ?? startScene.entryNodeId];
-
-        console.log("starting scene:", startScene);
-
-        const startChildren: SceneChild[] = startNode.type === "choice" ? startNode.children : [{
-            nodeId: startScene.entryNodeId,
+    async renderAtNode(node: NodePosition) {
+        let scene = await this._sceneStore.get(node.sceneId);
+        const startNode: SceneNode = scene.nodes[node.nodeId];
+        let children: SceneChild[] = startNode.type === "choice" ? startNode.children : [{
+            nodeId: node.nodeId,
             delay: {
-                cycles: 2,
+                cycles: 0,
                 style: "newScene",
-            },
+            }
         }];
 
-        this.initChoiceListener();
+        while (true) {
+            const { type, result } = this.getRenderableChildren(children, scene);
 
-        // TODO:
-        // this.fastForward(startScene, choicePath);
+            if (type === "node") {
+                // render node, then continue
 
-        this.renderChildren(startScene, startChildren);
-    }
+                switch (result.type) {
+                    case "text":
+                        // await ___CONTENT___.renderLinearNode(result);
+                        await this.renderText(result);
+                        children = result.children;
+                        continue;   
+                    case "scene":
+                        this._state.onEnterScene(result);
+                        scene = await this._sceneStore.get(result.sceneKey);
+                        children = [{
+                            nodeId: scene.entryNodeId,
+                            delay: {
+                                cycles: 0,
+                                style: "newScene",
+                            }
+                        }];
+                        continue;
+                    case "passthrough":
+                    default:
+                        children = result.children;
+                        continue;
+                }
+            }
 
-    private fastForward(scene: Scene, choicePath: NodePosition[]) {
-        for (let choice of choicePath) {
+            if (type === "choices") {
+                // render choices, then break
+                // await ___CONTENT___.renderChoiceGroup(result);
+                await this.renderChoices(scene, result);
+                break;
+            }
 
-            // let startNode = 
-            this.renderChildren(scene, scene.nodes[choice.nodeId].children);
+            if (type === "none") {
+                // try to traverse up the scene path
+                const parentSceneExitPos = this._state.onExitScene();
+                if (parentSceneExitPos === undefined) {
+                    break;
+                }
+
+                scene = await this._sceneStore.get(parentSceneExitPos.sceneId);
+                children = scene.nodes[parentSceneExitPos.nodeId].children;
+            }
         }
     }
 
-    private async renderChildren(scene: Scene, children: SceneChild[]) {
-
+    getRenderableChildren(children: SceneChild[], scene: Scene): {
+        type: "node",
+        result: RenderableLinearNode,
+    } | {
+        type: "choices",
+        result: RenderableChoice[],
+    } | {
+        type: "none",
+        result: undefined,
+    } {
         const choices: RenderableChoice[] = [];
-        let firstValidSequentialNode: RenderableLinearNode | undefined = undefined;
-
-        // we can only render the first child
-        // but we can also render all choices
-
-        for (let i = 0; i < children.length; i++) {
-
-            const _c = children[i];
-            const _n = scene.nodes[_c.nodeId];
-            const child = { ..._c, ..._n, sceneId: scene.sceneId };
+        for (let child of children) {
 
             if (!this._state.isConditionMet(child.requiredState)) {
                 continue;
             }
 
-            if (child.type === "choice") {
-                choices.push(child);
+            const node: SceneChild & SceneNode & NodePosition = {
+                ...child,
+                ...scene.nodes[child.nodeId],
+                sceneId: scene.sceneId,
+            };
+
+            if (node.type === "choice") {
+                // add all eligable choices to be rendered
+                choices.push(node);
             }
-            else if (firstValidSequentialNode === undefined) {
-                firstValidSequentialNode = child;
+            else if (choices.length === 0) {
+                // first eligable node is not a choice, so we just render that
+                return {
+                    type: "node",
+                    result: node,
+                }
             }
         }
 
-        if (choices.length === 0 && firstValidSequentialNode === undefined) {
-            const prevSceneExitPos = this._state.onExitScene();
-
-            if (prevSceneExitPos === undefined) {
-                return;
-            }
-            
-            const prevScene = await this._sceneStore.get(prevSceneExitPos.sceneId);
-            const entryNode = prevScene.nodes[prevSceneExitPos.nodeId];
-            this.renderChildren(prevScene, entryNode.children);
+        if (choices.length > 0) {
+            return {
+                type: "choices",
+                result: choices,
+            };
         }
 
-        if (firstValidSequentialNode !== undefined) {
-            this.renderNode(scene, firstValidSequentialNode);
-        }
-
-        this.renderChoices(scene, choices);
+        return {
+            type: "none",
+            result: undefined,
+        };
     }
 
-    private async renderNode(scene: Scene, node: RenderableLinearNode) {
+    async begin() {
 
-        switch (node.type) {
-            case "text":
-                await this.renderText(node);
-                this.renderChildren(scene, node.children);
-                break;
-            case "scene":
-                this._state.onEnterScene(toNodePosition(node));
-                const newScene = await this._sceneStore.get(node.sceneId);
-                console.log(newScene);
-                this.renderChildren(newScene, [{
-                    nodeId: newScene.entryNodeId,
-                    delay: {
-                        cycles: 2,
-                        style: "newScene",
-                    },
-                }]);
-                break;
-            case "image":
-                await this.renderImage(node);
-                this.renderChildren(scene, node.children);
-                break;
-            case "component":
-                await this.renderComponent(node);
-                this.renderChildren(scene, node.children);
-                break;
-            case "passthrough":
-            default:
-                this.renderChildren(scene, node.children);
-                break;
-        }
+        // here we load at the beginning
+        const { lastClear, choicePath } = this._state.loadToLastClear();
+        
+        const startSceneId = lastClear?.sceneId ?? "morning-start-outside";
+        const startScene = await this._sceneStore.get(startSceneId);
+        const startNode = startScene.nodes[lastClear?.nodeId ?? startScene.entryNodeId];
+        
+        console.log("fast forward start at:", lastClear ?? "beginning");
+        console.log("choice path:", choicePath);
+        console.log("starting scene:", startScene);
 
+        // TODO:
+        // this.fastForward(startScene, choicePath);
+
+        this.initChoiceListener();
+        this.renderAtNode({ nodeId: lastClear?.nodeId ?? startScene.entryNodeId, sceneId: startSceneId });
     }
+
+    // private fastForward(scene: Scene, choicePath: NodePosition[]) {
+    //     for (let choice of choicePath) {
+
+    //         let startNode = {}
+    //         this.renderAtNode(scene.nodes[choice.nodeId]);
+    //     }
+    // }
 
     private async renderChoices(scene: Scene, choices: RenderableChoice[]) {
         for (let i = 0; i < choices.length; i++) {
@@ -259,7 +250,7 @@ export class Renderer {
 
         this._state.onChoose(choice);
 
-        this.renderChildren(scene, choice.children);
+        this.renderAtNode(choice);
     }
 
     private async renderText(node: Extract<RenderableLinearNode, { type: "text" }>) {
@@ -320,14 +311,6 @@ export class Renderer {
         }
 
         await this.wait(Renderer.BASE_DELAY);
-    }
-
-    private async renderComponent(node: SceneNode) {
-
-    }
-
-    private async renderImage(node: SceneNode) {
-
     }
 
     private async renderDelay(delay: SceneChild["delay"], el: HTMLElement) {
