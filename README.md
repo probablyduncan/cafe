@@ -346,3 +346,12 @@ I'm thinking maybe the text, choices, etc should all be in the same container. C
 
 
 option in debug mode to click on a rendered piece of text to go back to that point?
+
+
+## todo:
+[ ] - implement IRenderer up to what's currently working
+[ ] - back rendering / fast forwarding in renderer
+[ ] - global state keys ? for date/time
+[ ] - basic events implementation for RESET button and MAKE CHOICE only
+[ ] - save files? quicksave, save file browser
+[ ] - writing!! that is probably top priority lol and how I will learn what new features I need
