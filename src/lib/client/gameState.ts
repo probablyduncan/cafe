@@ -1,4 +1,4 @@
-import { getNodeKey, parseNodeKey, toNodePosition } from "../agnostic/nodeHelper";
+import { getNodeKey, nodePositionsToPath, parseNodeKey, pathToNodePositions, toNodePosition } from "../agnostic/nodeHelper";
 import { SAVE_DATA_KEY, type NodePosition, type RenderableChoice, type StateCondition } from "../contentSchemaTypes";
 import type { ISaveStore } from "./saveStore";
 
@@ -66,9 +66,9 @@ export interface IGameState {
 export class GameState implements IGameState {
 
     // these props are up to date, but will only get saved on screen clear
-    private _choices: Set<string> = new Set();
-    private _keys: Set<string> = new Set();
-    private _scenePath: NodePosition[] = [];    // will NOT NECESSARILY include the current scene.
+    private _choices: Set<string> = new Set();  // stringified node positions
+    private _keys: Set<string> = new Set();     
+    private _scenePath: NodePosition[] = [];    // will NOT include the current scene.
 
     private _lastClearChoice: NodePosition | undefined;
     private _lastClearState: Omit<SaveJSON, "h" | "l"> = {}
@@ -129,7 +129,7 @@ export class GameState implements IGameState {
         }
 
         if (this._scenePath.length > 0) {
-            this._lastClearState.s = this._scenePath.map(getNodeKey).join("/");
+            this._lastClearState.s = nodePositionsToPath(this._scenePath);
         }
     }
 
@@ -142,7 +142,7 @@ export class GameState implements IGameState {
         }
 
         if (this._choicePath.length > 0) {
-            saveData.h = this._choicePath.map(getNodeKey).join("/");
+            saveData.h = nodePositionsToPath(this._choicePath);
         }
 
         this._saveStore.set<SaveJSON>(SAVE_DATA_KEY, saveData);
@@ -161,8 +161,6 @@ export class GameState implements IGameState {
             };
         }
 
-        const choicePath = saveData.h?.split("/").map(parseNodeKey) ?? [];
-
         if (saveData.c !== undefined) {
             this._choices = new Set(saveData.c.split(","));
         }
@@ -175,19 +173,14 @@ export class GameState implements IGameState {
             this._lastClearChoice = parseNodeKey(saveData.l);
         }
 
-        if (saveData.s !== undefined) {
-            this._scenePath = saveData.s.split("/").map(parseNodeKey);
-        }
-
-        if (saveData.h !== undefined) {
-            this._choicePath = saveData.h.split("/").map(parseNodeKey);
-        }
+        this._scenePath = pathToNodePositions(saveData.s);
+        this._choicePath = pathToNodePositions(saveData.h);
 
         this._lastClearState = saveData;
 
         return {
             lastClear: this._lastClearChoice,
-            choicePath,
+            choicePath: this._choicePath,
         };
     }
 

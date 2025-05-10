@@ -34,3 +34,27 @@ export function toNodePosition(extendsNodePosition: NodePosition): NodePosition 
         nodeId: extendsNodePosition.nodeId,
     };
 }
+
+/**
+ * Takes string value like `"scene1:node7/scene2:node4/scene3:node8"` and returns array of NodePositions.
+ */
+export function pathToNodePositions(path?: string): NodePosition[] {
+
+    if (path === undefined || path === "") {
+        return [];
+    }
+
+    return path.split("/").map(parseNodeKey);
+}
+
+/**
+ * Takes list of NodePositions and returns string value like `"scene1:node7/scene2:node4/scene3:node8"`. 
+ */
+export function nodePositionsToPath(nodes?: NodePosition[]): string {
+
+    if (nodes === undefined || nodes.length === 0) {
+        return "";
+    }
+
+    return nodes.map(getNodeKey).join("/");
+}
