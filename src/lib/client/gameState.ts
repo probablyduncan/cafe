@@ -70,12 +70,20 @@ export interface IGameState {
     onChoose(choice: Pick<RenderableChoice, "nodeId" | "sceneId" | "clearOnChoose" | "setState">): void;
 
     /**
-     * Sets state as of last clear,
-     * and returns choice history starting from last clear,
+     * Loads state as of last screen clear,
+     * and returns choice history starting from last screen clear,
      * to be fast forwarded to current pos.
      */
     loadToLastClear(): {
+        
+        /**
+         * Last choice which cleared the screen, or undefined if no choice has done that yet.
+         */
         lastClear: NodePosition | undefined;
+        
+        /**
+         * All choices made after the last screen clear.
+         */
         choicePath: NodePosition[];
     };
 

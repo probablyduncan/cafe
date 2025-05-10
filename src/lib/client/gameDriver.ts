@@ -38,6 +38,26 @@ export class GameDriver {
         this._sceneStore = deps.sceneStore;
     }
 
+    async begin() {
+
+        // here we load at the beginning
+        const { lastClear, choicePath } = this._state.loadToLastClear();
+        
+        const startSceneId = lastClear?.sceneId ?? "morning-start-outside";
+        const startScene = await this._sceneStore.get(startSceneId);
+        const startNode = startScene.nodes[lastClear?.nodeId ?? startScene.entryNodeId];
+        
+        console.log("fast forward start at:", lastClear ?? "beginning");
+        console.log("choice path:", choicePath);
+        console.log("starting scene:", startScene);
+
+        // TODO:
+        // this.fastForward(startScene, choicePath);
+
+        this.initChoiceListener();
+        this.renderAtNode({ nodeId: lastClear?.nodeId ?? startScene.entryNodeId, sceneId: startSceneId });
+    }
+
     async renderAtNode(node: NodePosition) {
         let scene = await this._sceneStore.get(node.sceneId);
         const startNode: SceneNode = scene.nodes[node.nodeId];
@@ -146,26 +166,6 @@ export class GameDriver {
             type: "none",
             result: undefined,
         };
-    }
-
-    async begin() {
-
-        // here we load at the beginning
-        const { lastClear, choicePath } = this._state.loadToLastClear();
-        
-        const startSceneId = lastClear?.sceneId ?? "morning-start-outside";
-        const startScene = await this._sceneStore.get(startSceneId);
-        const startNode = startScene.nodes[lastClear?.nodeId ?? startScene.entryNodeId];
-        
-        console.log("fast forward start at:", lastClear ?? "beginning");
-        console.log("choice path:", choicePath);
-        console.log("starting scene:", startScene);
-
-        // TODO:
-        // this.fastForward(startScene, choicePath);
-
-        this.initChoiceListener();
-        this.renderAtNode({ nodeId: lastClear?.nodeId ?? startScene.entryNodeId, sceneId: startSceneId });
     }
 
     // private fastForward(scene: Scene, choicePath: NodePosition[]) {
