@@ -194,10 +194,7 @@ export class GameDriver {
 
         el.innerHTML = choice.html;
 
-        if (this._state.wasChoiceMade({
-            nodeId: choice.nodeId,
-            sceneId: scene.sceneId
-        })) {
+        if (this._state.wasChoiceMade(choice)) {
             el.classList.add("visited");
         }
 

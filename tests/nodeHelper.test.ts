@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { getNodeKey, nodePositionsToPath, parseNodeKey, pathToNodePositions, toNodePosition } from "../src/lib/agnostic/nodeHelper";
+import { getNodeKey, nodePositionsToPath, parseNodeKey, pathToNodePositions, sceneNodeMapToString, stringToSceneNodeMap, toNodePosition } from "../src/lib/agnostic/nodeHelper";
 
 test(parseNodeKey, () => {
     expect(parseNodeKey("s1:n1")).toEqual({
@@ -61,3 +61,13 @@ test(nodePositionsToPath, () => {
     expect(nodePositionsToPath([])).toBe("");
     expect(nodePositionsToPath()).toBe("");
 })
+
+test(sceneNodeMapToString, () => {
+    expect(sceneNodeMapToString(new Map([["s1", new Set(["c1", "c2"])]]))).toBe("s1:c1,c2");
+    expect(sceneNodeMapToString(new Map([["s1", new Set(["c1", "c2"])], ["s2", new Set(["c4", "c5"])]]))).toBe("s1:c1,c2|s2:c4,c5");
+});
+
+test(stringToSceneNodeMap, () => {
+    expect(stringToSceneNodeMap("s1:c1,c2")).toEqual(new Map([["s1", new Set(["c1", "c2"])]]));
+    expect(stringToSceneNodeMap("s1:c1,c2|s2:c4,c5")).toEqual(new Map([["s1", new Set(["c1", "c2"])], ["s2", new Set(["c4", "c5"])]]));
+});

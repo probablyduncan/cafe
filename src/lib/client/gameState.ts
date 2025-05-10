@@ -1,4 +1,4 @@
-import { getNodeKey, nodePositionsToPath, parseNodeKey, pathToNodePositions, toNodePosition } from "../agnostic/nodeHelper";
+import { getNodeKey, nodePositionsToPath, parseNodeKey, pathToNodePositions, sceneNodeMapToString, stringToSceneNodeMap, toNodePosition } from "../agnostic/nodeHelper";
 import { SAVE_DATA_KEY, type NodePosition, type RenderableChoice, type StateCondition } from "../contentSchemaTypes";
 import type { ISaveStore } from "./saveStore";
 
@@ -101,7 +101,7 @@ export class GameState implements IGameState {
     /**
      * All choices made, as node keys like `"scene2:node4"`.
      */
-    private _choices: Set<string> = new Set();
+    private _choices: Map<string, Set<string>> = new Map();
 
     /**
      * All state keys currently true.
@@ -163,7 +163,7 @@ export class GameState implements IGameState {
 
     onChoose(choice: Pick<RenderableChoice, "nodeId" | "sceneId" | "clearOnChoose" | "setState">) {
 
-        this._choices.add(getNodeKey(choice));
+        this._setChoiceMade(choice);
         this._setCondition(choice.setState);
 
         if (choice.clearOnChoose) {
@@ -189,9 +189,9 @@ export class GameState implements IGameState {
         this._lastClearState = {};
         this._lastClearState.l = getNodeKey(choice);
 
-        const choices = [...this._choices];
-        if (choices.length > 0) {
-            this._lastClearState.c = choices.join(",");
+        const choices = sceneNodeMapToString(this._choices);
+        if (choices !== "") {
+            this._lastClearState.c = choices;
         }
 
         const keys = [...this._keys];
@@ -228,22 +228,14 @@ export class GameState implements IGameState {
             };
         }
 
-        if (saveData.c !== undefined) {
-            this._choices = new Set(saveData.c.split(","));
-        }
+        this._choices = stringToSceneNodeMap(saveData.c);
+        this._keys = new Set(saveData.k?.split(","));
 
-        if (saveData.k !== undefined) {
-            this._keys = new Set(saveData.k.split(","));
-        }
-
-        if (saveData.l !== undefined) {
-            this._lastClearChoice = parseNodeKey(saveData.l);
-        }
-
+        this._lastClearChoice = saveData.l ? parseNodeKey(saveData.l) : undefined;
+        this._lastClearState = saveData;
+        
         this._scenePath = pathToNodePositions(saveData.s);
         this._choicePath = pathToNodePositions(saveData.h);
-
-        this._lastClearState = saveData;
 
         return {
             lastClear: this._lastClearChoice,
@@ -251,8 +243,18 @@ export class GameState implements IGameState {
         };
     }
 
-    wasChoiceMade(choice: Pick<RenderableChoice, "nodeId" | "sceneId">) {
-        return this._choices.has(getNodeKey(choice));
+    wasChoiceMade(choice: Pick<RenderableChoice, "nodeId" | "sceneId">): boolean {
+        return this._choices.get(choice.sceneId)?.has(choice.nodeId) ?? false;
+    }
+
+    private _setChoiceMade(choice: Pick<RenderableChoice, "nodeId" | "sceneId">) {
+        const choicesForScene = this._choices.get(choice.sceneId);
+        if (choicesForScene !== undefined) {
+            choicesForScene.add(choice.nodeId);
+        }
+        else {
+            this._choices.set(choice.sceneId, new Set([choice.nodeId]));
+        }
     }
 
     isConditionMet(condition: StateCondition | undefined): boolean {

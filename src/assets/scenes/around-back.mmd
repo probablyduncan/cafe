@@ -1,16 +1,19 @@
 flowchart TD
-    start -- coward --> coward1[Still thinking about it?] --> coward3[Go for it. What have you got to lose?] --> coward-choices
     
-    start--> go-around-back-i[Good thinking.]
+    start-- !coward --> go-around-back-i[Good thinking.]
     --> go-around-back-ii[Only losers use the front door.]
     --> coward-choices
+
+    start -- coward --> coward1[Still thinking about it?] --> coward3[Go for it. What have you got to lose?] --> coward-choices
 
     coward-choices -- !coward --o continue0[On second thought...] -- coward --> coward0[Maybe *you're* a loser?] ---> coward[Yeah. Maybe.] --> coward2[Okay. You're still in front of the cafe.] --> return
 
     coward-choices -- coward --o continue2[A lot, probably.] --> coward4[Right. Okay, sure. It's your own time you're wasting, here.] --> return
     
-    coward-choices --o continue1[Find the back of the cafe.]
-    -- !coward --x go-around-back-iv["You walk down the street until you come to a narrow alley, down off the street between a tailor and a travel agent (both closed)."]
+    coward-choices 
+    --o continue1[Find the back of the cafe.]
+    -- !coward --x continue3[You're not a loser.]
+    --> go-around-back-iv["You walk down the street until you come to a narrow alley, down off the street between a tailor and a travel agent (both closed)."]
     --> go-around-back-v[You glance back along the empty street. What a gloomy, dreary, day.] --o go-down[Enter the alley.]
     --> go-around-back-vi[You descend into the canyon alley. Soon you're below street level, and the ground floor of the Cafe Halcyon hangs above you.]
     --> go-around-back-vii[There's a little metal door with a wire mesh screen that you can't quite see through. A lantern burns beside it. In the corner is an ill-contained pile of cafe detritus: cardboard boxes, empty tins, milk crates. The smell of rot down here is strong.] --> back-choices

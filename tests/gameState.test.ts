@@ -46,13 +46,46 @@ function createMockState(data?: any, opts?: Partial<StateOptions>) {
     return { state, store };
 }
 
-test("wasChoiceMade", () => {
+test("choice tracking", () => {
 
-    const { state, store } = createMockState();
+    const { state } = createMockState();
     const choice = { nodeId: "i", sceneId: "s", clearOnChoose: false };
+    const sameNodeNewScene = { nodeId: "i", sceneId: "s2", clearOnChoose: false };
+    const sameSceneNewNode = { nodeId: "i2", sceneId: "s", clearOnChoose: false };
+    const clearOnChoose = { nodeId: "i2", sceneId: "s2", clearOnChoose: true };
 
     expect(state.wasChoiceMade(choice)).toBe(false);
+    expect(state.wasChoiceMade(sameNodeNewScene)).toBe(false);
+    expect(state.wasChoiceMade(sameSceneNewNode)).toBe(false);
+    expect(state.wasChoiceMade(clearOnChoose)).toBe(false);
+
     state.onChoose(choice);
 
-    expect(state.wasChoiceMade(choice)).toBe(true)
+    expect(state.wasChoiceMade(choice)).toBe(true);
+    expect(state.wasChoiceMade(sameNodeNewScene)).toBe(false);
+    expect(state.wasChoiceMade(sameSceneNewNode)).toBe(false);
+    expect(state.wasChoiceMade(clearOnChoose)).toBe(false);
+
+    state.onChoose(choice);
+    state.onChoose(sameNodeNewScene);
+
+    expect(state.wasChoiceMade(choice)).toBe(true);
+    expect(state.wasChoiceMade(sameNodeNewScene)).toBe(true);
+    expect(state.wasChoiceMade(sameSceneNewNode)).toBe(false);
+    expect(state.wasChoiceMade(clearOnChoose)).toBe(false);
+
+    state.onChoose(sameSceneNewNode);
+
+    expect(state.wasChoiceMade(choice)).toBe(true);
+    expect(state.wasChoiceMade(sameNodeNewScene)).toBe(true);
+    expect(state.wasChoiceMade(sameSceneNewNode)).toBe(true);
+    expect(state.wasChoiceMade(clearOnChoose)).toBe(false);
+
+    state.onChoose(clearOnChoose);
+    state.onChoose(sameSceneNewNode);
+
+    expect(state.wasChoiceMade(choice)).toBe(true);
+    expect(state.wasChoiceMade(sameNodeNewScene)).toBe(true);
+    expect(state.wasChoiceMade(sameSceneNewNode)).toBe(true);
+    expect(state.wasChoiceMade(clearOnChoose)).toBe(true);
 });
