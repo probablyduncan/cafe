@@ -349,7 +349,7 @@ option in debug mode to click on a rendered piece of text to go back to that poi
 
 
 ## todo:
-[ ] - implement IRenderer up to what's currently working
+[x] - implement IRenderer up to what's currently working
 [ ] - back rendering / fast forwarding in renderer
 [ ] - global state keys ? for date/time
 [ ] - basic events implementation for RESET button and MAKE CHOICE only

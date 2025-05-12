@@ -44,6 +44,10 @@ const { ...stateOptions } = Astro.props;
             }
         }
 
+        .choice-group {
+            margin-top: 3rem;
+        }
+
         .choice {
             --choice-unit: 2px;
             padding-bottom: calc(var(--choice-unit) * 4);
@@ -59,8 +63,7 @@ const { ...stateOptions } = Astro.props;
                 padding-left: 0.2em;
             }
 
-            p&,
-            button&:first-of-type {
+            p& {
                 margin-top: 3rem;
             }
 
@@ -141,50 +144,33 @@ const { ...stateOptions } = Astro.props;
     }
 </style>
 <script>
-    import {
-        GameDriver,
-        type IChoiceContainer,
-        type IContentContainer,
-    } from "../lib/client/gameDriver";
+    import { GameDriver } from "../lib/client/gameDriver";
     import { LocalStorageSaveStore } from "../lib/client/saveStore";
     import { HTTPSceneStore } from "../lib/client/sceneStore";
+    import { GameState } from "../lib/client/gameState";
     import {
-        GameState,
-        type StateOptions,
-    } from "../lib/client/gameState";
+        StandardNodeRenderer,
+        type INodeRenderer,
+    } from "../lib/client/nodeRenderer";
 
     function initDialogueColumn() {
-        const content = document.querySelector("[data-content]") as HTMLElement;
-        const options = (
-            content.dataset.stateOptions
-                ? JSON.parse(content.dataset.stateOptions)
-                : {}
-        ) as Partial<StateOptions>;
 
-        const contentContainer: IContentContainer = {
-            clear: () => (content.innerHTML = ""),
-            add: (el) => content.appendChild(el),
-            scrollToEnd: () => {},
-        };
+        const state = new GameState(
+            new LocalStorageSaveStore(window.localStorage),
+        );
 
-        const choiceContainer: IChoiceContainer = {
-            ...contentContainer,
-            clear: () => {
-                content
-                    .querySelectorAll("button.choice")
-                    .forEach((n) => n.remove());
-            },
-        };
+        const nodeRenderer: INodeRenderer = new StandardNodeRenderer(
+            "[data-content]",
+            state,
+        );
 
-        const state = new GameState(new LocalStorageSaveStore(window.localStorage), options);
-        const renderer = new GameDriver({
-            contentContainer,
-            choiceContainer,
+        const driver = new GameDriver({
+            nodeRenderer,
             state,
             sceneStore: new HTTPSceneStore(),
         });
 
-        renderer.begin();
+        driver.begin();
     }
 
     document.addEventListener("DOMContentLoaded", initDialogueColumn);
