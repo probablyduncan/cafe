@@ -350,10 +350,12 @@ option in debug mode to click on a rendered piece of text to go back to that poi
 
 ## todo:
 [x] - implement IRenderer up to what's currently working
-[ ] - back rendering / fast forwarding in renderer
-[ ] - global state keys ? for date/time
+[x] - back rendering / fast forwarding in renderer
 [ ] - basic events implementation for RESET button and MAKE CHOICE only
+[ ] - global state keys ? for date/time
+[ ] - back rendering fade in effect
+[ ] - better text effects
 [ ] - save files? quicksave, save file browser
 [ ] - writing!! that is probably top priority lol and how I will learn what new features I need
-[ ] - maybe don't serialize last clear choice in choices map, so it doesn't get stored twice?
+[x] - maybe don't serialize last clear choice in choices map, so it doesn't get stored twice?
 
