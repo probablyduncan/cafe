@@ -94,7 +94,7 @@ const componentNodeSchema = nodeBaseSchema.extend({
     componentKey: z.enum(componentKeys).default("confetti"),
 });
 
-export const nodeSchema = z.union([
+export const nodeSchema = z.discriminatedUnion("type", [
     textNodeSchema,
     choiceNodeSchema,
     passthroughNodeSchema,
