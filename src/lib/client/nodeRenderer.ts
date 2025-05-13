@@ -149,7 +149,7 @@ export class StandardNodeRenderer implements INodeRenderer {
             });
 
             choiceGroupEl.appendChild(choiceEl);
-            waitwait(this.baseDelay);
+            await waitwait(this.baseDelay / 4);
         }
     }
 
