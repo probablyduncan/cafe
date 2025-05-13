@@ -148,10 +148,8 @@ export class StandardNodeRenderer implements INodeRenderer {
                 // fire choice event
             });
 
-            console.log(choiceGroupEl);
-
             choiceGroupEl.appendChild(choiceEl);
-            waitwait(20);
+            waitwait(this.baseDelay);
         }
     }
 
