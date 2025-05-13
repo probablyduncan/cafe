@@ -171,7 +171,7 @@ export class GameState implements IGameState {
 
     onChoose(choice: Pick<RenderableChoice, "nodeId" | "sceneId" | "clearOnChoose" | "setState">) {
 
-        this._setChoiceMade(choice);
+        this._setChoiceVisited(choice);
         this._setCondition(choice.setState);
 
         if (choice.clearOnChoose) {
@@ -255,7 +255,7 @@ export class GameState implements IGameState {
         return this._choices.get(choice.sceneId)?.has(choice.nodeId) ?? false;
     }
 
-    private _setChoiceMade(choice: Pick<RenderableChoice, "nodeId" | "sceneId">) {
+    private _setChoiceVisited(choice: Pick<RenderableChoice, "nodeId" | "sceneId">) {
         const choicesForScene = this._choices.get(choice.sceneId);
         if (choicesForScene !== undefined) {
             choicesForScene.add(choice.nodeId);
