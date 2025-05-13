@@ -1,13 +1,12 @@
 import { htmlToWords } from "../agnostic/letterSplitter";
 import { waitwait } from "../agnostic/waitwait";
 import type { RenderableChoice, RenderableLinearNode, SceneChild } from "../contentSchemaTypes";
-import type { IGameState } from "./gameState";
 
 export interface INodeRenderer {
 
     renderLinearNode(node: RenderableLinearNode): Promise<void>;
     renderChoiceGroup(choices: RenderableChoice[]): Promise<void>;
-    renderChoiceMade(el: HTMLElement, choice: RenderableChoice): Promise<void>;
+    renderChoiceMade(choice: RenderableChoice): Promise<void>;
 
     backRenderLinearNode(node: RenderableLinearNode): void;
     backRenderChoiceMade(choice: RenderableChoice): void;
@@ -15,10 +14,10 @@ export interface INodeRenderer {
 
 export class StandardNodeRenderer implements INodeRenderer {
 
-    private baseDelay: number = 400;
+    private baseDelay: number = 4//00;
 
     private _contentContainer: Element;
-    constructor(contentContainerSelector: string, private readonly _state: IGameState) {
+    constructor(contentContainerSelector: string) {
 
         const cc = document.querySelector(contentContainerSelector);
         if (cc === null) {
@@ -138,10 +137,10 @@ export class StandardNodeRenderer implements INodeRenderer {
             const choiceEl = document.createElement("button");
             choiceEl.classList.add("choice");
             choiceEl.dataset.choice = JSON.stringify(choices[i]);
-            choiceEl.dataset.choiceKey = choices[i].number ?? (i + 1).toString();
+            choiceEl.dataset.choiceKey = choices[i].number;
             choiceEl.innerHTML = choices[i].html;
 
-            if (this._state.wasChoiceMade(choices[i])) {
+            if (choices[i].visited) {
                 choiceEl.classList.add("visited");
             }
 
@@ -156,7 +155,7 @@ export class StandardNodeRenderer implements INodeRenderer {
         }
     }
 
-    async renderChoiceMade(el: HTMLElement, choice: RenderableChoice): Promise<void> {
+    async renderChoiceMade(choice: RenderableChoice): Promise<void> {
 
         if (choice.clearOnChoose) {
             this._contentContainer.innerHTML = "";
@@ -166,18 +165,29 @@ export class StandardNodeRenderer implements INodeRenderer {
         const madeChioce = document.createElement("p");
         madeChioce.innerHTML = choice.html;
         madeChioce.classList.add("choice");
-        madeChioce.dataset.choiceKey = el.dataset.choiceKey;
+        madeChioce.dataset.choiceKey = choice.number;
 
-        el.parentElement?.remove();
+        this._contentContainer.querySelectorAll(".choice-group").forEach(e => e.remove());
         this._contentContainer.appendChild(madeChioce);
     }
-
+    
     backRenderLinearNode(node: RenderableLinearNode): void {
-        throw new Error("Method not implemented.");
+        // ...
+        if (node.type === "text") {
+            const el = document.createElement("p");
+            el.innerHTML = node.html;
+            el.classList.add(node.type);
+            el.classList.add(node.style);
+            this._contentContainer.appendChild(el);
+        }
+
     }
 
     backRenderChoiceMade(choice: RenderableChoice): void {
-        throw new Error("Method not implemented.");
+        const madeChioce = document.createElement("p");
+        madeChioce.innerHTML = choice.html;
+        madeChioce.classList.add("choice");
+        madeChioce.dataset.choiceKey = choice.number;
+        this._contentContainer.appendChild(madeChioce);
     }
-
 }

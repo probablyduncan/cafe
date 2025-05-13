@@ -30,15 +30,15 @@ const { ...stateOptions } = Astro.props;
                     display: inline-block;
 
                     span& {
-                        animation: letter-enter 0.5s 1;
+                        /* animation: letter-enter 0.5s 1; */
                     }
 
                     em& {
-                        animation: italic-letter-enter 0.5s 1;
+                        /* animation: italic-letter-enter 0.5s 1; */
                     }
 
                     strong& {
-                        animation: bold-letter-enter 0.5s 1;
+                        /* animation: bold-letter-enter 0.5s 1; */
                     }
                 }
             }
@@ -154,23 +154,13 @@ const { ...stateOptions } = Astro.props;
     } from "../lib/client/nodeRenderer";
 
     function initDialogueColumn() {
-
-        const state = new GameState(
-            new LocalStorageSaveStore(window.localStorage),
-        );
-
-        const nodeRenderer: INodeRenderer = new StandardNodeRenderer(
-            "[data-content]",
-            state,
-        );
-
-        const driver = new GameDriver({
-            nodeRenderer,
-            state,
+        new GameDriver({
+            state: new GameState(
+                new LocalStorageSaveStore(window.localStorage),
+            ),
+            renderer: new StandardNodeRenderer("[data-content]"),
             sceneStore: new HTTPSceneStore(),
-        });
-
-        driver.begin();
+        }).begin();
     }
 
     document.addEventListener("DOMContentLoaded", initDialogueColumn);

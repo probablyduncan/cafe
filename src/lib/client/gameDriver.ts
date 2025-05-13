@@ -1,3 +1,4 @@
+import { toNodePosition } from "../agnostic/nodeHelper";
 import type { NodePosition, RenderableChoice, RenderableLinearNode, Scene, SceneChild, SceneNode } from "../contentSchemaTypes";
 import { componentNodes } from "./componentNodes";
 import type { IGameState } from "./gameState";
@@ -8,19 +9,19 @@ import type { ISceneStore } from "./sceneStore";
 type GameDriverDeps = {
     state: IGameState;
     sceneStore: ISceneStore;
-    nodeRenderer: INodeRenderer;
+    renderer: INodeRenderer;
 }
 
 export class GameDriver {
 
     private _state: IGameState;
     private _sceneStore: ISceneStore;
-    private _nodeRenderer: INodeRenderer;
+    private _renderer: INodeRenderer;
 
     constructor(deps: GameDriverDeps) {
         this._state = deps.state;
         this._sceneStore = deps.sceneStore;
-        this._nodeRenderer = deps.nodeRenderer;
+        this._renderer = deps.renderer;
     }
 
     async begin() {
@@ -31,15 +32,28 @@ export class GameDriver {
         const startSceneId = lastClear?.sceneId ?? "morning-start-outside";
         const startScene = await this._sceneStore.get(startSceneId);
 
-        console.log("fast forward start at:", lastClear ?? "beginning");
-        console.log("choice path:", choicePath);
-        console.log("starting scene:", startScene);
-
-        // TODO:
-        // this.fastForward(startScene, choicePath);
+        // console.log("fast forward start at:", lastClear ?? "beginning");
+        // console.log("choice path:", choicePath);
+        // console.log("starting scene:", startScene);
 
         this.initChoiceListener();
-        this.renderAtNode({ nodeId: lastClear?.nodeId ?? startScene.entryNodeId, sceneId: startSceneId });
+        
+        // if lastClear is undefined and choicePath is empty, we just start rendering at start
+        // if lastClear is set but choicePath is empty, we just start rendering at lastClear
+        // if lastClear is undefined but choicePath is set, we fast forward from start to the last item in choicepath and render from there
+        // if lastClear is set and choicePath is set, we fast forward from lastClear to the last item in choicepath and render from there
+
+        // so there are a few things to track
+        // where am I starting
+        // where am I 
+
+        let startPos = {
+            nodeId: lastClear?.nodeId ?? startScene.entryNodeId,
+            sceneId: startSceneId
+        };
+
+        startPos = await this._fastForward(startPos, choicePath);
+        await this.renderAtNode(startPos);
     }
 
     async renderAtNode(node: NodePosition) {
@@ -73,7 +87,10 @@ export class GameDriver {
                             continue;
                         }
                         case "component": {
-                            await componentNodes[result.componentKey](this);
+                            await componentNodes[result.componentKey]({
+                                state: this._state,
+                                isBackRendering: false,
+                            });
                             children = result.children;
                             continue;
                         }
@@ -82,7 +99,7 @@ export class GameDriver {
                             continue;
                         }
                         default: {
-                            await this._nodeRenderer.renderLinearNode(result);
+                            await this._renderer.renderLinearNode(result);
                             children = result.children;
                             continue;
                         }
@@ -90,14 +107,14 @@ export class GameDriver {
                 }
 
                 case "choices": {
-                    await this._nodeRenderer.renderChoiceGroup(result);
-                    break;
+                    await this._renderer.renderChoiceGroup(result);
+                    return;
                 }
 
                 case "none": {
                     const parentSceneExitPos = this._state.onExitScene();
                     if (parentSceneExitPos === undefined) {
-                        break;
+                        return;
                     }
 
                     scene = await this._sceneStore.get(parentSceneExitPos.sceneId);
@@ -125,7 +142,7 @@ export class GameDriver {
                 continue;
             }
 
-            const node: SceneChild & SceneNode & NodePosition = {
+            const node = {
                 ...child,
                 ...scene.nodes[child.nodeId],
                 sceneId: scene.sceneId,
@@ -133,7 +150,10 @@ export class GameDriver {
 
             if (node.type === "choice") {
                 // add all eligable choices to be rendered
-                choices.push(node);
+                choices.push({
+                    ...node,
+                    visited: this._state.wasChoiceMade(node)
+                });
             }
             else if (choices.length === 0) {
                 // first eligable node is not a choice, so we just render that
@@ -145,6 +165,12 @@ export class GameDriver {
         }
 
         if (choices.length > 0) {
+
+            // resolve choice numbers
+            choices.forEach((c, i) => {
+                c.number ??= (i + 1).toString();
+            });
+
             return {
                 type: "choices",
                 result: choices,
@@ -157,13 +183,113 @@ export class GameDriver {
         };
     }
 
-    // private fastForward(scene: Scene, choicePath: NodePosition[]) {
-    //     for (let choice of choicePath) {
+    /**
+     * fast forwards all choices and returns the last choice made, i.e. where to start normal game loop from
+     */
+    private async _fastForward(lastScreenClear: NodePosition, choicePath: NodePosition[]): Promise<NodePosition> {
 
-    //         let startNode = {}
-    //         this.renderAtNode(scene.nodes[choice.nodeId]);
-    //     }
-    // }
+        // if no choices made since screen clear, then we're just rendering from last clear choice
+        if (choicePath.length === 0) {
+            return lastScreenClear;
+        }
+
+        // if choices have been made, we start rendering at the given node (last screen clear)
+        // and fast forward all nodes until we get to the last choice in choice path. Then we return the last choice made
+
+
+        // We should start back rendering after the first one and return the last one
+        const choicesMade = [lastScreenClear, ...choicePath];
+
+        for (let i = 0; i < choicesMade.length - 1; i++) {
+
+            // first start rendering at the first choice (last clear choice)
+            const choiceGroup = await this._fastForwardAtNode(choicesMade[i]);
+            if (choiceGroup === undefined) {
+                throw "Forwarded too fast!!";
+            }
+
+            // then get the resolved renderable choice we need to make
+            const choiceToMake = choiceGroup.find(
+                choice => choice.nodeId === choicesMade[i+1].nodeId && choice.sceneId === choicesMade[i+1].sceneId
+            );
+
+            if (choiceToMake === undefined) {
+                throw "aaah 2";
+            }
+
+            this._renderer.backRenderChoiceMade(choiceToMake);
+        }
+
+        return choicesMade.at(-1)!;
+    }
+
+    private async _fastForwardAtNode(node: NodePosition): Promise<RenderableChoice[] | undefined> {
+        let scene = await this._sceneStore.get(node.sceneId);
+        const startNode: SceneNode = scene.nodes[node.nodeId];
+        let children: SceneChild[] = startNode.type === "choice" ? startNode.children : [{
+            nodeId: node.nodeId,
+            delay: {
+                cycles: 0,
+                style: "newScene",
+            }
+        }];
+
+        while (true) {
+
+            const { type, result } = this.getRenderableChildren(children, scene);
+            switch (type) {
+
+                case "node": {
+                    switch (result.type) {
+                        case "scene": {
+                            this._state.onEnterScene(result);
+                            scene = await this._sceneStore.get(result.sceneKey);
+                            children = [{
+                                nodeId: scene.entryNodeId,
+                                delay: {
+                                    cycles: 0,
+                                    style: "newScene",
+                                }
+                            }];
+                            continue;
+                        }
+                        case "component": {
+                            await componentNodes[result.componentKey]({
+                                state: this._state,
+                                isBackRendering: true,
+                            });
+                            children = result.children;
+                            continue;
+                        }
+                        case "passthrough": {
+                            children = result.children;
+                            continue;
+                        }
+                        default: {
+                            this._renderer.backRenderLinearNode(result);
+                            children = result.children;
+                            continue;
+                        }
+                    }
+                }
+
+                case "choices": {
+                    return result;
+                }
+
+                case "none": {
+                    const parentSceneExitPos = this._state.onExitScene();
+                    if (parentSceneExitPos === undefined) {
+                        return undefined;
+                    }
+
+                    scene = await this._sceneStore.get(parentSceneExitPos.sceneId);
+                    children = scene.nodes[parentSceneExitPos.nodeId].children;
+                    continue;
+                }
+            }
+        }
+    }
 
     private initChoiceListener() {
         document.addEventListener("keydown", e => {
@@ -181,14 +307,14 @@ export class GameDriver {
                 }
                 const choiceData = JSON.parse(choiceJson) as RenderableChoice;
 
-                this.choose(choiceEl, choiceData);
+                this.choose(choiceData);
             }
         });
     }
 
-    private async choose(choiceEl: HTMLElement, choice: RenderableChoice) {
+    private async choose(choice: RenderableChoice) {
         this._state.onChoose(choice);
-        await this._nodeRenderer.renderChoiceMade(choiceEl, choice);
+        await this._renderer.renderChoiceMade(choice);
         this.renderAtNode(choice);
     }
 }

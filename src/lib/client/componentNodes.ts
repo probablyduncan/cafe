@@ -1,3 +1,9 @@
+import type { IGameState } from "./gameState";
+
+/**
+ * Functions of type `(context: ComponentNodeContext) => Promise<void>`
+ * that can be used as linear nodes
+ */
 export const componentNodes = {
     confetti,
     passTime,
@@ -6,9 +12,20 @@ export const componentNodes = {
 export type ComponentKey = keyof typeof componentNodes;
 export const componentKeys = Object.keys(componentNodes) as [ComponentKey];
 
-// BEGIN COMPONENTS of type `(context: ComponentNodeContext) => Promise<void>`
+export type ComponentNodeContext = {
+    state: IGameState;
+    isBackRendering: boolean;
+}
 
-async function confetti(context) {
+//#region functions
+
+async function confetti(context: ComponentNodeContext) {
+
+    if (context.isBackRendering) {
+        console.log("back rendering confetti");
+        return;
+    }
+
     context.state.isConditionMet({
         name: "confetti",
         negated: false,
@@ -19,6 +36,8 @@ async function confetti(context) {
     document.body.style.backgroundColor = "unset";
 }
 
-async function passTime(context) {
+async function passTime() {
     console.log("hey!");
 }
+
+//#endregion

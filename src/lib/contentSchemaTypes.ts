@@ -111,8 +111,16 @@ export type NodePosition = {
     sceneId: string;
 }
 
-export type RenderableLinearNode = Exclude<SceneNode, { type: "choice" }> & SceneChild & NodePosition;
-export type RenderableChoice = Extract<SceneNode, { type: "choice" }> & SceneChild & NodePosition;
+export type RenderableLinearNode = 
+    Exclude<SceneNode, { type: "choice" }> 
+    & SceneChild 
+    & NodePosition;
+
+export type RenderableChoice = 
+    Extract<SceneNode, { type: "choice" }> 
+    & SceneChild 
+    & NodePosition 
+    & { visited: boolean };
 
 export type StateCondition = z.infer<typeof stateCondition>;
 
