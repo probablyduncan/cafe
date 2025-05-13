@@ -94,6 +94,11 @@ export interface IGameState {
     save(): void;
 
     /**
+     * Wipes all save data.
+     */
+    reset(): void;
+
+    /**
      * Returns true if the given choice has already been visited.
      */
     wasChoiceMade(choice: Pick<RenderableChoice, "nodeId" | "sceneId">): boolean;
@@ -249,6 +254,10 @@ export class GameState implements IGameState {
             lastClear: this._lastClearChoice,
             choicePath: this._choicePath,
         };
+    }
+
+    reset() {
+        this._saveStore.remove(SAVE_DATA_KEY);
     }
 
     wasChoiceMade(choice: Pick<RenderableChoice, "nodeId" | "sceneId">): boolean {

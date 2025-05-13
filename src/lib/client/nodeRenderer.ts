@@ -14,7 +14,7 @@ export interface INodeRenderer {
 
 export class StandardNodeRenderer implements INodeRenderer {
 
-    private baseDelay: number = 4//00;
+    private baseDelay: number = 400;
 
     private _contentContainer: Element;
     constructor(contentContainerSelector: string) {

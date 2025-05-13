@@ -6,7 +6,7 @@ import type { IGameState } from "./gameState";
  */
 export const componentNodes = {
     confetti,
-    passTime,
+    reset,
 } as const;
 
 export type ComponentKey = keyof typeof componentNodes;
@@ -36,8 +36,8 @@ async function confetti(context: ComponentNodeContext) {
     document.body.style.backgroundColor = "unset";
 }
 
-async function passTime() {
-    console.log("hey!");
+async function reset(context: ComponentNodeContext) {
+    context.state.reset();
 }
 
 //#endregion
