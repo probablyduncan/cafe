@@ -67,7 +67,7 @@ export function sceneNodeMapToString(map?: Map<string, Set<string>>): string {
         return "";
     }
 
-    return [...map].map(([sceneId, nodeIds]) => sceneId + ":" + [...nodeIds].join(",")).join("|");
+    return [...map].map(([sceneId, nodeIds]) => sceneId + ":" + [...nodeIds].join(",")).join(";");
 }
 
 /**
@@ -79,7 +79,7 @@ export function stringToSceneNodeMap(str?: string): Map<string, Set<string>> {
         return result;
     }
 
-    str.split("|").forEach((sceneNodes) => {
+    str.split(";").forEach((sceneNodes) => {
         const splitIndex = sceneNodes.indexOf(":");
         if (splitIndex === -1) {
             return;

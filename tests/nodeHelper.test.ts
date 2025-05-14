@@ -64,10 +64,10 @@ test(nodePositionsToPath, () => {
 
 test(sceneNodeMapToString, () => {
     expect(sceneNodeMapToString(new Map([["s1", new Set(["c1", "c2"])]]))).toBe("s1:c1,c2");
-    expect(sceneNodeMapToString(new Map([["s1", new Set(["c1", "c2"])], ["s2", new Set(["c4", "c5"])]]))).toBe("s1:c1,c2|s2:c4,c5");
+    expect(sceneNodeMapToString(new Map([["s1", new Set(["c1", "c2"])], ["s2", new Set(["c4", "c5"])]]))).toBe("s1:c1,c2;s2:c4,c5");
 });
 
 test(stringToSceneNodeMap, () => {
     expect(stringToSceneNodeMap("s1:c1,c2")).toEqual(new Map([["s1", new Set(["c1", "c2"])]]));
-    expect(stringToSceneNodeMap("s1:c1,c2|s2:c4,c5")).toEqual(new Map([["s1", new Set(["c1", "c2"])], ["s2", new Set(["c4", "c5"])]]));
+    expect(stringToSceneNodeMap("s1:c1,c2;s2:c4,c5")).toEqual(new Map([["s1", new Set(["c1", "c2"])], ["s2", new Set(["c4", "c5"])]]));
 });

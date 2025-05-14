@@ -352,6 +352,7 @@ option in debug mode to click on a rendered piece of text to go back to that poi
 - [x] implement IRenderer up to what's currently working
 - [x] back rendering / fast forwarding in renderer
 - [ ] basic events implementation for RESET button and MAKE CHOICE only
+- [ ] wire up debug stuff
 - [ ] global state keys ? for date/time
 - [ ] back rendering fade in effect
 - [ ] better text effects
