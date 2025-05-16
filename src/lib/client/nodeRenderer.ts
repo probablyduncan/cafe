@@ -1,6 +1,7 @@
 import { htmlToWords } from "../agnostic/letterSplitter";
 import { waitwait } from "../agnostic/waitwait";
 import type { RenderableChoice, RenderableLinearNode, SceneChild } from "../contentSchemaTypes";
+import { customEvents } from "./events";
 
 export interface INodeRenderer {
 
@@ -36,7 +37,7 @@ export class StandardNodeRenderer implements INodeRenderer {
     }
 
     private async _renderTextNode(node: Extract<RenderableLinearNode, { type: "text" }>) {
-        
+
         const el = document.createElement("p");
         el.classList.add(node.type);
         el.classList.add(node.style);
@@ -145,7 +146,7 @@ export class StandardNodeRenderer implements INodeRenderer {
             }
 
             choiceEl.addEventListener("click", () => {
-                // fire choice event
+                customEvents.fire("choose", { choiceNode: choices[i] });
             });
 
             choiceGroupEl.appendChild(choiceEl);
@@ -168,7 +169,7 @@ export class StandardNodeRenderer implements INodeRenderer {
         this._contentContainer.querySelectorAll(".choice-group").forEach(e => e.remove());
         this._contentContainer.appendChild(madeChioce);
     }
-    
+
     backRenderLinearNode(node: RenderableLinearNode): void {
         // ...
         if (node.type === "text") {

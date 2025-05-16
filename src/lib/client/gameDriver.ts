@@ -1,6 +1,7 @@
 import { toNodePosition } from "../agnostic/nodeHelper";
 import type { NodePosition, RenderableChoice, RenderableLinearNode, Scene, SceneChild, SceneNode } from "../contentSchemaTypes";
 import { componentNodes } from "./componentNodes";
+import { customEvents } from "./events";
 import type { IGameState } from "./gameState";
 import type { INodeRenderer } from "./nodeRenderer";
 import type { ISceneStore } from "./sceneStore";
@@ -26,29 +27,15 @@ export class GameDriver {
 
     async begin() {
 
-        // here we load at the beginning
         const { lastClear, choicePath } = this._state.loadToLastClear();
 
         const startSceneId = lastClear?.sceneId ?? "morning-start-outside";
-        const startScene = await this._sceneStore.get(startSceneId);
-
-        // console.log("fast forward start at:", lastClear ?? "beginning");
-        // console.log("choice path:", choicePath);
-        // console.log("starting scene:", startScene);
-
-        this.initChoiceListener();
+        const defaultEntryNodeId = (await this._sceneStore.get(startSceneId)).entryNodeId;
         
-        // if lastClear is undefined and choicePath is empty, we just start rendering at start
-        // if lastClear is set but choicePath is empty, we just start rendering at lastClear
-        // if lastClear is undefined but choicePath is set, we fast forward from start to the last item in choicepath and render from there
-        // if lastClear is set and choicePath is set, we fast forward from lastClear to the last item in choicepath and render from there
-
-        // so there are a few things to track
-        // where am I starting
-        // where am I 
+        this.initListeners();
 
         let startPos = {
-            nodeId: lastClear?.nodeId ?? startScene.entryNodeId,
+            nodeId: lastClear?.nodeId ?? defaultEntryNodeId,
             sceneId: startSceneId
         };
 
@@ -210,7 +197,7 @@ export class GameDriver {
 
             // then get the resolved renderable choice we need to make
             const choiceToMake = choiceGroup.find(
-                choice => choice.nodeId === choicesMade[i+1].nodeId && choice.sceneId === choicesMade[i+1].sceneId
+                choice => choice.nodeId === choicesMade[i + 1].nodeId && choice.sceneId === choicesMade[i + 1].sceneId
             );
 
             if (choiceToMake === undefined) {
@@ -291,7 +278,9 @@ export class GameDriver {
         }
     }
 
-    private initChoiceListener() {
+    private initListeners() {
+
+        // key listeners
         document.addEventListener("keydown", e => {
 
             const choiceEl = document.querySelector(
@@ -305,11 +294,17 @@ export class GameDriver {
                 if (choiceJson === undefined) {
                     return;
                 }
-                const choiceData = JSON.parse(choiceJson) as RenderableChoice;
 
-                this.choose(choiceData);
+                const choiceData = JSON.parse(choiceJson) as RenderableChoice;
+                customEvents.fire("choose", { choiceNode: choiceData });
             }
         });
+
+        // make choice
+        customEvents.on("choose", async e => await this.choose(e.choiceNode));
+
+        // reset
+        customEvents.on("reset", () => { this._state.reset(); });
     }
 
     private async choose(choice: RenderableChoice) {

@@ -1,3 +1,4 @@
+import { customEvents } from "./events";
 import type { IGameState } from "./gameState";
 
 /**
@@ -36,8 +37,8 @@ async function confetti(context: ComponentNodeContext) {
     document.body.style.backgroundColor = "unset";
 }
 
-async function reset(context: ComponentNodeContext) {
-    context.state.reset();
+async function reset() {
+    customEvents.fire("reset");
 }
 
 //#endregion
