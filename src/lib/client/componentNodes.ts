@@ -1,4 +1,4 @@
-import { customEvents } from "./events";
+import { events } from "./events";
 import type { IGameState } from "./gameState";
 
 /**
@@ -38,7 +38,7 @@ async function confetti(context: ComponentNodeContext) {
 }
 
 async function reset() {
-    customEvents.fire("reset");
+    events.fire("reset");
 }
 
 //#endregion

@@ -1,7 +1,7 @@
 import { htmlToWords } from "../agnostic/letterSplitter";
 import { waitwait } from "../agnostic/waitwait";
 import type { RenderableChoice, RenderableLinearNode, SceneChild } from "../contentSchemaTypes";
-import { customEvents } from "./events";
+import { events } from "./events";
 
 export interface INodeRenderer {
 
@@ -29,11 +29,13 @@ export class StandardNodeRenderer implements INodeRenderer {
     }
 
     async renderLinearNode(node: RenderableLinearNode): Promise<void> {
+        events.fire("linearNodeRenderStart", { node, isBackRendering: false });
         switch (node.type) {
             case "text":
                 await this._renderTextNode(node);
                 break;
         }
+        events.fire("linearNodeRenderComplete", { node, isBackRendering: false, el: this._contentContainer.lastElementChild as HTMLElement });
     }
 
     private async _renderTextNode(node: Extract<RenderableLinearNode, { type: "text" }>) {
@@ -129,6 +131,8 @@ export class StandardNodeRenderer implements INodeRenderer {
 
     async renderChoiceGroup(choices: RenderableChoice[]): Promise<void> {
 
+        events.fire("choiceGroupRenderStart", { choiceGroup: choices });
+
         const choiceGroupEl = document.createElement("p");
         choiceGroupEl.classList.add("choice-group");
         this._contentContainer.appendChild(choiceGroupEl);
@@ -146,15 +150,19 @@ export class StandardNodeRenderer implements INodeRenderer {
             }
 
             choiceEl.addEventListener("click", () => {
-                customEvents.fire("choose", { choiceNode: choices[i] });
+                events.fire("choose", { choiceNode: choices[i] });
             });
 
             choiceGroupEl.appendChild(choiceEl);
             await waitwait(this.baseDelay);
         }
+
+        events.fire("choiceGroupRenderComplete", { choiceGroup: choices, choiceGroupEl });
     }
 
     async renderChoiceMade(choice: RenderableChoice): Promise<void> {
+
+        events.fire("choiceMadeRenderStart", { choiceNode: choice, isBackRendering: false });
 
         if (choice.clearOnChoose) {
             this._contentContainer.innerHTML = "";
@@ -168,25 +176,39 @@ export class StandardNodeRenderer implements INodeRenderer {
 
         this._contentContainer.querySelectorAll(".choice-group").forEach(e => e.remove());
         this._contentContainer.appendChild(madeChioce);
+
+        events.fire("choiceMadeRenderComplete", { choiceNode: choice, isBackRendering: false, choiceMadeEl: madeChioce });
     }
 
+    // --------------------------
+    // Back rendering
+
     backRenderLinearNode(node: RenderableLinearNode): void {
-        // ...
+        
+        events.fire("linearNodeRenderStart", { node, isBackRendering: true });
+
+        let el: HTMLElement;
         if (node.type === "text") {
-            const el = document.createElement("p");
+            el = document.createElement("p");
             el.innerHTML = node.html;
             el.classList.add(node.type);
             el.classList.add(node.style);
             this._contentContainer.appendChild(el);
         }
 
+        events.fire("linearNodeRenderComplete", { node, isBackRendering: true, el: el! });
     }
 
     backRenderChoiceMade(choice: RenderableChoice): void {
-        const madeChioce = document.createElement("p");
-        madeChioce.innerHTML = choice.html;
-        madeChioce.classList.add("choice");
-        madeChioce.dataset.choiceKey = choice.number;
-        this._contentContainer.appendChild(madeChioce);
+
+        events.fire("choiceMadeRenderStart", { choiceNode: choice, isBackRendering: true });
+        
+        const madeChoice = document.createElement("p");
+        madeChoice.innerHTML = choice.html;
+        madeChoice.classList.add("choice");
+        madeChoice.dataset.choiceKey = choice.number;
+        this._contentContainer.appendChild(madeChoice);
+
+        events.fire("choiceMadeRenderComplete", { choiceNode: choice, isBackRendering: true, choiceMadeEl: madeChoice });
     }
 }
