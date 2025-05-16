@@ -24,8 +24,8 @@ const choiceHistory = [
             variables.map(([id, val]) => (
                 <li>
                     <>
-                        <input type="checkbox" checked={val} />
-                        <label onclick="(this).previousElementSibling.checked = !(this).previousElementSibling.checked;">
+                        <label>
+                            <input type="checkbox" checked={val} />
                             {id}
                         </label>
                     </>
@@ -76,13 +76,6 @@ const choiceHistory = [
         list-style: none;
         padding: 0;
         margin: 0;
-    }
-
-    ul.variables {
-        label,
-        input {
-            cursor: pointer;
-        }
     }
 
     ul.choice-history button[data-go-to-choice] {
