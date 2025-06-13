@@ -1,4 +1,6 @@
 ---
+import SpeedToggle from './speed-toggle.astro';
+
 interface Props {
     scrollDirection?: undefined | "reverse";
 }
@@ -24,6 +26,7 @@ const { scrollDirection } = Astro.props;
         <!-- <span>Duncanpetrie.com</span> -->
         <span>Cafe Halcyon</span>
         <span>ACT I</span>
+        <SpeedToggle />
         <a
             title="start over"
             onclick="window.localStorage.removeItem('save-data'); window.location.reload()"

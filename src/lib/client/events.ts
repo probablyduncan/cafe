@@ -24,6 +24,8 @@ type EventMap = {
     fastForwardStart: { lastClearChoicePos: NodePosition },
     fastForwardComplete: { lastChoiceMadePos: NodePosition },
 
+    updateSpeed: { isFast: boolean },
+
     enterScene: { scene: Scene },
     exitScene: { scene: Scene },
 

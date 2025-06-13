@@ -360,3 +360,9 @@ option in debug mode to click on a rendered piece of text to go back to that poi
 - [ ] writing!! that is probably top priority lol and how I will learn what new features I need
 - [x] maybe don't serialize last clear choice in choices map, so it doesn't get stored twice?
 
+
+
+ok so what is actually blocking me
+- debug is difficult to wire up, because of separation of concerns, compartmentalization, abstraction
+- I don't really know what debug options I need
+- I'm putting off implementing actual features because it's a pain to refactor stuff every time

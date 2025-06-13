@@ -15,7 +15,11 @@ export interface INodeRenderer {
 
 export class StandardNodeRenderer implements INodeRenderer {
 
-    private baseDelay: number = 400;
+    private isFast: boolean = false;
+
+    private get delay(): number {
+        return this.isFast ? 10 : 400;
+    }
 
     private _contentContainer: Element;
     constructor(contentContainerSelector: string) {
@@ -26,6 +30,10 @@ export class StandardNodeRenderer implements INodeRenderer {
         }
 
         this._contentContainer = cc;
+
+        events.on("updateSpeed", ({ isFast }) => {
+            this.isFast = isFast;
+        });
     }
 
     async renderLinearNode(node: RenderableLinearNode): Promise<void> {
@@ -68,7 +76,7 @@ export class StandardNodeRenderer implements INodeRenderer {
                 const charEl = document.createElement(char.tag);
                 charEl.innerHTML = char.content;
                 wordEl.appendChild(charEl);
-                await waitwait(this.baseDelay / 8);
+                await waitwait(this.delay / 8);
             }
 
             if (i < words.length - 1) {
@@ -77,22 +85,22 @@ export class StandardNodeRenderer implements INodeRenderer {
                 spaceEl.innerHTML = " ";
                 wordEl.appendChild(spaceEl);
 
-                // await waitwait(this.baseDelay / 8);
+                // await waitwait(this.delay / 8);
             }
 
             switch (words[i].delay) {
                 case "short":
-                    await waitwait(this.baseDelay / 2);
+                    await waitwait(this.delay / 2);
                     break;
                 case "long":
-                    await waitwait(this.baseDelay * 2);
+                    await waitwait(this.delay * 2);
                     break;
                 // case "none":
-                //     await waitwait(this.baseDelay / 4);
+                //     await waitwait(this.delay / 4);
             }
         }
 
-        await waitwait(this.baseDelay);
+        await waitwait(this.delay);
     }
 
     private async _renderDelay(delay: SceneChild["delay"], el: HTMLElement) {
@@ -100,10 +108,10 @@ export class StandardNodeRenderer implements INodeRenderer {
             switch (delay.style) {
                 case "threeDots":
                     await this._renderThreeDotDelay(el);
-                    await waitwait(this.baseDelay);
+                    await waitwait(this.delay);
                     break;
                 case "newScene":
-                    // await waitwait(this.baseDelay);
+                    // await waitwait(this.delay);
                     break;
             }
         }
@@ -118,7 +126,7 @@ export class StandardNodeRenderer implements INodeRenderer {
                 el.innerHTML = "";
             }
             el.appendChild(span);
-            await waitwait(this.baseDelay);
+            await waitwait(this.delay);
         }
         el.innerHTML = "&nbsp;";
     }
@@ -154,7 +162,7 @@ export class StandardNodeRenderer implements INodeRenderer {
             });
 
             choiceGroupEl.appendChild(choiceEl);
-            await waitwait(this.baseDelay);
+            await waitwait(this.delay);
         }
 
         events.fire("choiceGroupRenderComplete", { choiceGroup: choices, choiceGroupEl });
@@ -184,7 +192,7 @@ export class StandardNodeRenderer implements INodeRenderer {
     // Back rendering
 
     backRenderLinearNode(node: RenderableLinearNode): void {
-        
+
         events.fire("linearNodeRenderStart", { node, isBackRendering: true });
 
         let el: HTMLElement;
@@ -202,7 +210,7 @@ export class StandardNodeRenderer implements INodeRenderer {
     backRenderChoiceMade(choice: RenderableChoice): void {
 
         events.fire("choiceMadeRenderStart", { choiceNode: choice, isBackRendering: true });
-        
+
         const madeChoice = document.createElement("p");
         madeChoice.innerHTML = choice.html;
         madeChoice.classList.add("choice");

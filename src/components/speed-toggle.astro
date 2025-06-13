@@ -1,0 +1,40 @@
+---
+
+---
+
+<label>
+    <input data-fast-forward type="checkbox" />
+    Fast Forward <em><code>[Shift]</code></em>
+</label>
+<script>
+    import { events } from "../lib/client/events";
+
+    function initSpeedToggle() {
+        const input = document.querySelector(
+            "input[data-fast-forward]",
+        ) as HTMLInputElement;
+        updateSpeed();
+
+        function updateSpeed() {
+            events.fire("updateSpeed", { isFast: input.checked });
+        }
+
+        input.addEventListener("change", updateSpeed);
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Shift" && !input.checked) {
+                input.checked = true;
+                updateSpeed();
+            }
+        });
+        
+        document.addEventListener("keyup", (e) => {
+            if (e.key === "Shift" && input.checked) {
+                input.checked = false;
+                updateSpeed();
+            }
+        });
+    }
+
+    events.on("setupComplete", initSpeedToggle);
+</script>
