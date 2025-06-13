@@ -1,55 +1,48 @@
 flowchart TD
 
-    %% i[*You walk up to the counter, which is a wide glass case. Aside from an enamel bowl of tomatoes and a few loose tortillas, it's mostly empty.*]
-    %% --> ii[*The woman behind the counter looks you up and down. She's old and her hair is all over the place. Like a hedgehog.*]
-    %% --> iii[What can I get for you? *she asks.*]
-    %% --> iv[*You don't see a menu anywhere.*]
-
-    %% iv --o c1[What do you have?]
-    %% --> c1-i[Oh!] --> c1-ii[*The woman looks behind her. There's a folding screen leaned up against the wall. She pulls it out next to the counter and unfolds it, revealing a thorough list of things that go in sandwiches.*] --> c1-c1[Read the list.] & c1-c2[Ask for ''the first thing'' on the list.]
-
-    %% c1-c1 --> c1-c1-i[You try, but it's all jibberish to you. Oh yeah. You can't read.] --> c1-c1-ii[How could you forget?]
-
-    %% iv --o c2[One cheese sandwhich, please.]
-    
-    %% iv --o c3[Coffee and a cigraette.]
-    
-    %% iv --o c4[*Tell her to surprise you.*]
-    
-    %% iv --o c5[Ask her what her name is.]
-
-
-
-
-    start --> a[The door bangs shut behind you.
+    start --> a[
+        The door bangs shut behind you.
         For a second, you think the glass has broken,
-        but it turns out it just makes that noise every time.]
-        --> b[There are only a few tables, and they're all occupied.]
-        
-        b -->|morning-start-outside:wavedAtOldMan| ba[
-            The old man in the window looks up.
-            He smiles at you.
-        ] --> c
+        but it seems like it just makes that noise every time.
+    ] --> enter-choices
 
-        b -->|morning-start-outside:ignoredOldMan| bb[
-            The old man in the window looks up at you,
-            his eyebrows raised.
-        ] --> c
+    enter-choices --o a1[Look around.] --> b
+    enter-choices --o a2[Approach the counter.] --> fish_convo.mmd
 
-        b --> bb[To your right, beside the window, an old man is reading.] --> c
+    b[There are only a few tables, and they're all occupied.]
+    
+    b --> |morning-start-outside:wavedAtOldMan| ba[
+        The old man in the window looks up.
+        He smiles at you.
+    ] --> c
 
-        c[To your left, a gaggle of children hold court over a long table.]
-        --> d[
-            And in front of you is a wide glass counter,
-            where two women are talking.
-            One of them seems to be the proprietor of the place.
-        ]
-        --o e[Approach the counter.] --> fish_convo.mmd
-        --> f[You look around. Aside from an enamel bowl of tomatoes, and a few loose tortillas, you don't see any food.]
+    b --> |morning-start-outside:ignoredOldMan| bb[
+        The old man in the window looks up at you,
+        his eyebrows raised.
+    ] --> c
+
+    b --> bb[
+        To your right, beside the window, an old man is reading.
+    ] --> c
+
+    c[To your left, a gaggle of children hold court over a long table.]
+    --> d[
+        And in front of you is a wide glass counter,
+        where two women are talking.
+        One of them seems to be the proprietor of the place.
+    ] --> enter-choices
+
+    fish_convo.mmd --> fc[Hmm. What _can_ she get for you?] --> ordering-choices
+
+    ordering-choices --o o1[Look around.] -- looked-around --> look-around[You look around. Aside from an enamel bowl of tomatoes, and a few loose tortillas, you don't see any food.] --> ordering-choices
+    ordering-choices -- ! --o o2[What do you have?] -- asked--> ask-her[''Well, we've got all sorts of things, I suppose. What are you in the mood for?''] --> ordering-choices
+    ordering-choices -- ! --o o3[''One pig liver sandwich, please!''] --> liver[''Wow, you're enthusiastic. I don't think we have any of those.''] --> ordering-choices
+    ordering-choices -- asked --o o4[Ask for the special.] --> special
+    ordering-choices -- looked-around --o o5[Tomato tortilla?] --> tom-tot[You point at the counter and ask for some tomatoes in a tortilla.] --> tom-tot2[She smiles.] --> tom-tot[''Oh, sure. I guess I can do that.'']
+    ordering-choices -- asked --o o6[Coffee and a cigraette.] --> french-breakfast[''Ah, you're one of them,'' she says knowingly.] --> fb2[You're a little early. Most of the poets don't normally arrive until noon. But I think Parnassus is here.''] --o fb3[''Parnassus?''] --> fb4[''Parnassus. One of the poets. He's in the other room.'']
+    ordering-choices -- fish_convo:listened --o o7[Did you save any of those fish?] --> fish[''Oh! Um.''] --> fish2[She's a little taken aback. Maybe she didn't realize you'd heard all that.] --> fish3[''No. I made him put them all back in the sea.''] --> ordering-choices
 
 
-        %% and he slapped the fish, one after the other. And they flopped around, of course. they're chatting and you have to interrupt them or wait?
-
-        %% once you've ordered, you have to choose where to sit.
-        %% and I have to make it really easy to go take your food outside and be alone.
-        %% but difficult/rewarding to sit down with some rando
+    %% once you've ordered, you have to choose where to sit.
+    %% and I have to make it really easy to go take your food outside and be alone.
+    %% but difficult/rewarding to sit down with some rando

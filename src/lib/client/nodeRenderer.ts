@@ -16,9 +16,10 @@ export interface INodeRenderer {
 export class StandardNodeRenderer implements INodeRenderer {
 
     private isFast: boolean = false;
+    private baseDelay: number = 400;
 
     private get delay(): number {
-        return this.isFast ? 10 : 400;
+        return this.isFast ? 10 : this.baseDelay;
     }
 
     private _contentContainer: Element;
@@ -162,7 +163,7 @@ export class StandardNodeRenderer implements INodeRenderer {
             });
 
             choiceGroupEl.appendChild(choiceEl);
-            await waitwait(this.delay);
+            await waitwait(this.baseDelay);
         }
 
         events.fire("choiceGroupRenderComplete", { choiceGroup: choices, choiceGroupEl });

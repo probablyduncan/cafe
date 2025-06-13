@@ -366,3 +366,19 @@ ok so what is actually blocking me
 - debug is difficult to wire up, because of separation of concerns, compartmentalization, abstraction
 - I don't really know what debug options I need
 - I'm putting off implementing actual features because it's a pain to refactor stuff every time
+
+what can I do to solve this?
+- procedural code, messier code lol
+- figure out all the requirements first before optimizing/refactoring/architecting
+
+what are the big requirements now that I've been thinking about it?
+- need to actuall traverse the story normally#
+- configuration options
+    - speed
+    - theme
+    - text size?
+    - motion?
+- debug options
+    - go to node (text box, type in scene:node or something)
+    - ability to update state vars used in current scene (updates state)
+    - save and load states (snapshots/quicksave for easy testing)
