@@ -15,48 +15,39 @@ const choiceHistory = [
 ---
 
 <aside>
-    <span>*Debug Panel*</span>
-    <h2>Current State</h2>
-    <!-- list all state stuff here - what's stored in localstorage -->
-    <h2>State variables</h2>
-    <ul class="variables">
-        {
-            variables.map(([id, val]) => (
-                <li>
-                    <>
-                        <label>
-                            <input type="checkbox" checked={val} />
-                            {id}
-                        </label>
-                    </>
-                </li>
-            ))
-        }
-    </ul>
-    <br />
-    <h2>Choice history</h2>
-    <ul class="choice-history">
-        {
-            choiceHistory.map(([id, text], i) => (
-                <li>
-                    <button data-go-to-choice={id}>
-                        <>
-                            <span>{text}</span>
-                            <span />
-                            <span>↩</span>
-                        </>
-                    </button>
-                </li>
-            ))
-        }
-    </ul>
-    <h2>Actions</h2>
-    <button
-        style="text-decoration: underline dotted; cursor: pointer;"
-        onclick="window.localStorage.removeItem('save-data'); window.location.reload();"
-    >
-        Clear state and restart
-    </button>
+    <h2>*Debug Panel*</h2>
+
+    <details open data-choice-history>
+        <summary>Choice History</summary>
+        <!-- <button data-go-to-choice="ignore">
+            <span>Ignore him</span>
+            <span></span>
+            <span>↩</span>
+        </button> -->
+    </details>
+
+    <details open data-state-vars>
+        <summary>State Variables</summary>
+        <label
+            ><input type="checkbox" checked="True" />old_man_convo:waved</label
+        >
+        <label
+            ><input
+                type="checkbox"
+                checked="False"
+            />old_man_convo:ignored</label
+        >
+    </details>
+
+    <details open>
+        <summary>Actions</summary>
+        <button
+            style="text-decoration: underline dotted; cursor: pointer;"
+            onclick="window.localStorage.removeItem('save-data'); window.location.reload();"
+        >
+            Clear state and restart
+        </button>
+    </details>
 </aside>
 <style>
     aside {
@@ -72,13 +63,27 @@ const choiceHistory = [
         border-left: 2px solid var(--text-color);
     }
 
-    ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
+    details {
+        display: flex;
+        flex-direction: column;
     }
 
-    ul.choice-history button[data-go-to-choice] {
+    details:not(:has(:not(summary))) {
+        display: none;
+    }
+
+    summary {
+        margin: 1em 0 0.5em;
+        font-size: 1.125em;
+        font-weight: bold;
+    }
+
+    label,
+    input {
+        cursor: pointer;
+    }
+
+    details[data-choice-history] button {
         border: unset;
         background: unset;
         font-family: unset;
@@ -119,4 +124,29 @@ const choiceHistory = [
         }
     }
 </style>
-<script></script>
+<script>
+    import { events } from "../lib/client/events";
+    import type { NodePosition, RenderableChoice } from "../lib/contentSchemaTypes";
+
+    function initDebug() {
+        events.on("choose", (e) => addChoiceMade(e.choiceNode));
+    }
+
+    function addChoiceMade(choiceNode: RenderableChoice) {
+        const el = document.querySelector("details[data-choice-history]");
+        if (!el) {
+            return;
+        }
+
+        const button = document.createElement("button");
+        button.addEventListener("click", () => goBackToChoice(choiceNode));
+        button.innerHTML = `<span>${choiceNode.html}</span><span></span><span>↩</span>`;
+        el.appendChild(button);
+    }
+
+    function goBackToChoice(pos: NodePosition) {
+        // events.fire("goto", { pos });
+    }
+
+    events.on("setupComplete", initDebug);
+</script>

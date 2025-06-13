@@ -312,6 +312,9 @@ export class GameDriver {
 
         // reset
         events.on("reset", () => { this._state.reset(); });
+
+        // goto
+        // events.on("goto", ({ pos }) => this.renderFromNode(pos));
     }
 
     private async choose(choice: RenderableChoice) {
