@@ -7,7 +7,7 @@ import { type FlowEdge, type FlowVertex } from "../node_modules/mermaid/dist/dia
 import { marked } from 'marked';
 import { flowchart, getVisitedStateVariable, type Flowchart, type FlowchartEdge, type Scene, sceneSchema, nodeSchema, type SceneNode, childNodeSchema, type StateCondition, type SceneChild } from './lib/contentSchemaTypes';
 import { type FilePath, parsePath } from './lib/server/parsePath';
-import { formatQuotes } from './lib/agnostic/quoteResolver';
+import { formatQuotes } from '@probablyduncan/common/quotes';
 import { resolveChoiceNumber } from './lib/agnostic/choiceNumberResolver';
 import { componentKeys } from './lib/client/componentNodes';
 
