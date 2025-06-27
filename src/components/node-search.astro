@@ -1,0 +1,94 @@
+---
+interface Props {}
+---
+
+<dialog data-node-search>
+    <form method="dialog">
+        <label>
+            <span>Go to:&nbsp;</span>
+            <input type="search" placeholder="scene:node" autofocus />
+        </label>
+    </form>
+</dialog>
+<script>
+    import { events } from "../lib/client/events";
+
+    const OPEN_KEY = ".";
+
+    function initGoto() {
+        const dialog = document.querySelector(
+            "dialog[data-node-search]",
+        ) as HTMLDialogElement;
+
+        if (!dialog) {
+            return;
+        }
+
+        const form = dialog.querySelector("form") as HTMLFormElement;
+        const input = dialog.querySelector(
+            'input[type="search"]',
+        ) as HTMLInputElement;
+
+        form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const value = input.value.trim();
+
+            if (value) {
+                const parts = value.split(":");
+                if (parts.length !== 2) {
+                    input.setCustomValidity(
+                        "Please enter a valid format: `scene:node`.",
+                    );
+                    input.reportValidity();
+                    input.setCustomValidity("");
+                    return;
+                }
+
+                events.fire("goto", {
+                    pos: {
+                        sceneId: parts[0],
+                        nodeId: parts[1],
+                    },
+                });
+            }
+
+            dialog.close();
+            return;
+        });
+
+        document.addEventListener("keydown", (event) => {
+            switch (event.key) {
+                case OPEN_KEY:
+                    if (!dialog.open) {
+                        event.preventDefault();
+                        dialog.showModal();
+                    }
+                    break;
+                case "Escape":
+                    if (dialog.open) {
+                        event.preventDefault();
+                        dialog.close();
+                    }
+                    break;
+            }
+        });
+
+        dialog.addEventListener("close", () => {
+            input.value = "";
+        });
+    }
+
+    events.on("setupComplete", initGoto);
+</script>
+<style>
+    dialog {
+        padding: 1rem;
+        border: 2px solid var(--text-color);
+        background-color: var(--bg-color);
+    }
+
+    dialog::backdrop {
+        background-color: rbga(var(--bg-color), 0.5);
+        backdrop-filter: blur(8px);
+    }
+</style>

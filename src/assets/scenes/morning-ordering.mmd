@@ -38,7 +38,7 @@ flowchart TD
     ordering-choices -- ! --o o2[What do you have?] -- asked--> ask-her[''Well, we've got all sorts of things, I suppose. What are you in the mood for?''] --> ordering-choices
     ordering-choices -- ! --o o3[''One pig liver sandwich, please!''] --> liver[''Wow, you're enthusiastic. I don't think we have any of those.''] --> ordering-choices
     ordering-choices -- asked --o o4[Ask for the special.] --> special
-    ordering-choices -- looked-around --o o5[Tomato tortilla?] --> tom-tot[You point at the counter and ask for some tomatoes in a tortilla.] --> tom-tot2[She smiles.] --> tom-tot[''Oh, sure. I guess I can do that.'']
+    ordering-choices -- looked-around --o o5[Tomato tortilla?] --> tom-tot[You point at the counter and ask for some tomatoes in a tortilla.] --> tom-tot2[She smiles.] --> tom-tot3[''Oh, sure. I guess I can do that.'']
     ordering-choices -- asked --o o6[Coffee and a cigraette.] --> french-breakfast[''Ah, you're one of them,'' she says knowingly.] --> fb2[You're a little early. Most of the poets don't normally arrive until noon. But I think Parnassus is here.''] --o fb3[''Parnassus?''] --> fb4[''Parnassus. One of the poets. He's in the other room.'']
     ordering-choices -- fish_convo:listened --o o7[Did you save any of those fish?] --> fish[''Oh! Um.''] --> fish2[She's a little taken aback. Maybe she didn't realize you'd heard all that.] --> fish3[''No. I made him put them all back in the sea.''] --> ordering-choices
 
