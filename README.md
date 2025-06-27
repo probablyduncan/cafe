@@ -375,10 +375,16 @@ what are the big requirements now that I've been thinking about it?
 - need to actuall traverse the story normally#
 - configuration options
     - speed
+    - play/pause?
     - theme
     - text size?
     - motion?
 - debug options
     - go to node (text box, type in scene:node or something)
+        - how should this work?
+        - can we roll back state or something?
+        - or maybe just go there and don't bother with state
+        - visited choices can be empty
+        - and we'll allow the debugger to choose whatever state vars they want I guess?
     - ability to update state vars used in current scene (updates state)
     - save and load states (snapshots/quicksave for easy testing)

@@ -36,12 +36,63 @@ flowchart TD
 
     ordering-choices --o o1[Look around.] -- looked-around --> look-around[You look around. Aside from an enamel bowl of tomatoes, and a few loose tortillas, you don't see any food.] --> ordering-choices
     ordering-choices -- ! --o o2[What do you have?] -- asked--> ask-her[''Well, we've got all sorts of things, I suppose. What are you in the mood for?''] --> ordering-choices
-    ordering-choices -- ! --o o3[''One pig liver sandwich, please!''] --> liver[''Wow, you're enthusiastic. I don't think we have any of those.''] --> ordering-choices
-    ordering-choices -- asked --o o4[Ask for the special.] --> special
-    ordering-choices -- looked-around --o o5[Tomato tortilla?] --> tom-tot[You point at the counter and ask for some tomatoes in a tortilla.] --> tom-tot2[She smiles.] --> tom-tot3[''Oh, sure. I guess I can do that.'']
-    ordering-choices -- asked --o o6[Coffee and a cigraette.] --> french-breakfast[''Ah, you're one of them,'' she says knowingly.] --> fb2[You're a little early. Most of the poets don't normally arrive until noon. But I think Parnassus is here.''] --o fb3[''Parnassus?''] --> fb4[''Parnassus. One of the poets. He's in the other room.'']
-    ordering-choices -- fish_convo:listened --o o7[Did you save any of those fish?] --> fish[''Oh! Um.''] --> fish2[She's a little taken aback. Maybe she didn't realize you'd heard all that.] --> fish3[''No. I made him put them all back in the sea.''] --> ordering-choices
+    ordering-choices -- asked --o o3[''One pig liver sandwich, please!''] --> liver[''Wow, you're enthusiastic. I don't think we have any of those.''] --> ordering-choices
+    
+    ordering-choices -- looked-around --o o5[Tomato tortilla?] 
+        --> tom-tot[You point at the counter and ask for some tomatoes in a tortilla.] 
+        --> tom-tot2[She smiles.] 
+        --> tom-tot3[''Oh, sure. I guess I can do that.''] 
+        --> tom-tot4[It's a quick thing to prepare. Before long, you're three little ones lighter and one tomato tortilla heavier.] 
+        --> food-aquired
+    
+    ordering-choices -- asked --o c1[''How about some toast?''] 
+        --> c2[''Sure.'' She reaches into her coat pocket. ''I think I've got some bread around here somewhere.''] 
+        c2 ---o cc1[Wait for her.]
+            --> cc11[''Aha! Here it is.'' She pulls out a flat slice of bread and flips it into a dented old toaster.]
+            --> cc12[You pay, the toast springs up, and she slaps it into your palm with your change.]
+            --> food-aquired
+        c2 ---o cc2[''Actually, nevermind.'']
+            --> cc21[''You sure? Okay.'']
+            --> ordering-choices
 
+    ordering-choices -- asked --o o6[Coffee and a cigraette.]
+        --> french-breakfast[''Ah, you're one of them,'' she says knowingly.]
+        --> fb2[You're a little early. Most of the poets don't normally arrive until noon. But I think Parnassus is here.'']
+        --o fb3[''Parnassus?'']
+        --> fb4[''Parnassus. One of the poets. He's in the other room.'']
+        --> fb5[She hands you what you ordered. Lucky you.]
+        --> food-aquired
+    
+    ordering-choices -- fish_convo:listened --o o7[Did you save any of those fish?] 
+        --> fish[''Oh! Um.'']
+        --> fish2[She's a little taken aback. Maybe she didn't realize you'd heard all that.]
+        --> fish3[''No. I made him put them all back in the sea.'']
+        --> ordering-choices
+
+    ordering-choices -- ! --o o4[Ask for the special.] --> special
+
+
+
+    special 
+        ---> sp1[''The special?'']
+        --> sp2[She raises an eyebrow, glances at her friend.]
+        ----> sp3[''One mayonnaise fishoffal, coming right up.]
+        ---> sp4[''You want the 2 month or the 4 month?''] --> sp-choices
+
+        sp-choices --o sp-choices1[''Two, please!''] --> special-trick
+        sp-choices --o sp-choices2[''Four!''] --> special-trick
+        sp-choices -- ! --o sp-choices3[''Months of what?''] --> sp-choices31[''How long it's been fermenting.''] --> sp-choices
+        sp-choices --o sp4.4[''Actually, I want something else.''] --> special-trick
+
+        special-trick 
+        ---> st1[Both women laugh.] 
+        --> st2[''We don't actually have a special. Mayonnaise fishoffal isn't a real thing. I made it up.'']
+        --> st3[Of course. That makes sense.]
+        ----> ordering-choices
+
+
+
+    food-aquired --> morning-find-seat.mmd
 
     %% once you've ordered, you have to choose where to sit.
     %% and I have to make it really easy to go take your food outside and be alone.

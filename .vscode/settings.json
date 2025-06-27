@@ -1,0 +1,8 @@
+{
+    "github.copilot.enable": {
+        "mermaid": false,
+        "mermaid.flowchart": false,
+        "markdown": false,
+        "mdx": false,
+    }
+}

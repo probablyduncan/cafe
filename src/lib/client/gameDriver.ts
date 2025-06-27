@@ -206,7 +206,7 @@ export class GameDriver {
             );
 
             if (choiceToMake === undefined) {
-                throw "aaah 2";
+                throw "aaah";
             }
 
             this._renderer.backRenderChoiceMade(choiceToMake);
