@@ -71,7 +71,7 @@ export class StandardNodeRenderer implements INodeRenderer {
             for (let j = 0; j < words[i].chars.length; j++) {
 
                 // wordEl.innerHTML += words[i].chars[j].content;
-                // await waitwait(GameDriver.BASE_DELAY / 8);
+                // await waitwait(this.delay / 8);
 
                 const char = words[i].chars[j];
                 const charEl = document.createElement(char.tag);
