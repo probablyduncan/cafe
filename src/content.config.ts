@@ -264,7 +264,7 @@ async function flowchartToScene(sceneId: string, chart: Flowchart): Promise<Scen
 
             if (edge.text === "!") {
                 // special case, only allow this node once
-                name = getVisitedStateVariable(edge.end);
+                name = `v:${sceneId}:${edge.end}`;
 
                 child.requiredState = { name, negated: true };
                 endNode.setState = { name, negated: false };
@@ -272,6 +272,10 @@ async function flowchartToScene(sceneId: string, chart: Flowchart): Promise<Scen
             else {
                 const negated = edge.text.startsWith("!");
                 name = negated ? edge.text.substring(1) : edge.text;
+                
+                if (!name.includes(":")) {
+                    name = sceneId + ":" + name;
+                }
 
                 if (startNode.type === "choice") {
                     // need to set this state on choosing the choice

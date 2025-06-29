@@ -4,9 +4,6 @@ import { componentKeys } from "./client/componentNodes";
 // export const timeSlot = z.enum(["morning", "afternoon", "evening", "closed"]);
 // export type TimeSlot = z.infer<typeof timeSlot>;
 
-
-export const getVisitedStateVariable = (nodeId: string) => `v:${nodeId}`;
-
 export const flowchartVertex = z.object({
     id: z.string(),
     text: z.string().optional(),
