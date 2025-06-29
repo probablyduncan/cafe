@@ -70,6 +70,11 @@ export interface IGameState {
     onChoose(choice: Pick<RenderableChoice, "nodeId" | "sceneId" | "clearOnChoose" | "setState">): void;
 
     /**
+     * Updates choices made and sets choice condition. Used when fast forwarding.
+     */
+    onBackChoose(choice: Pick<RenderableChoice, "nodeId" | "sceneId" | "setState">) : void;
+
+    /**
      * Loads state as of last screen clear,
      * and returns choice history starting from last screen clear,
      * to be fast forwarded to current pos.
@@ -189,6 +194,11 @@ export class GameState implements IGameState {
         if (this._options.autosave) {
             this.save();
         }
+    }
+
+    onBackChoose(choice: Pick<RenderableChoice, "nodeId" | "sceneId" | "setState">) {
+        this._setChoiceVisited(choice);
+        this._setCondition(choice.setState);
     }
 
     private _addChoiceToPath(choice: NodePosition) {

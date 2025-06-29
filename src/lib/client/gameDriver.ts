@@ -208,8 +208,9 @@ export class GameDriver {
             if (choiceToMake === undefined) {
                 throw "aaah";
             }
-
+            
             this._renderer.backRenderChoiceMade(choiceToMake);
+            this._state.onBackChoose(choiceToMake);
         }
 
         const lastChoiceMadePos = choicesMade.at(-1)!;
