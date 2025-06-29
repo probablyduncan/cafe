@@ -1,4 +1,4 @@
-import type { NodePosition, RenderableChoice, RenderableLinearNode, Scene, SceneChild, SceneNode } from "../contentSchemaTypes";
+import type { RenderableChoice, RenderableLinearNode, Scene, SceneChild, SceneNode } from "../contentSchemaTypes";
 import { componentNodes } from "./componentNodes";
 import { events } from "./events";
 import type { IGameState } from "./gameState";

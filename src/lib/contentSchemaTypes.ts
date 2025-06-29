@@ -103,11 +103,6 @@ export const nodeSchema = z.discriminatedUnion("type", [
 export type SceneNode = z.infer<typeof nodeSchema>;
 export type SceneChild = z.infer<typeof childNodeSchema>;
 
-export type NodePosition = {
-    nodeId: string;
-    sceneId: string;
-}
-
 export type RenderableLinearNode = 
     Exclude<SceneNode, { type: "choice" }> 
     & SceneChild 

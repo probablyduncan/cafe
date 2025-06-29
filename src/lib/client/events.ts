@@ -1,6 +1,6 @@
 // BA (hons) Events Management
 
-import type { NodePosition, RenderableChoice, RenderableLinearNode, Scene } from "../contentSchemaTypes";
+import type { RenderableChoice, RenderableLinearNode, Scene } from "../contentSchemaTypes";
 
 /**
  * Each key of this map is a different kind of custom event

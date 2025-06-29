@@ -1,5 +1,5 @@
 import { getNodeKey, nodePositionsToPath, parseNodeKey, pathToNodePositions, sceneNodeMapToString, stringToSceneNodeMap, toNodePosition } from "../agnostic/nodeHelper";
-import { SAVE_DATA_KEY, type NodePosition, type RenderableChoice, type StateCondition } from "../contentSchemaTypes";
+import { SAVE_DATA_KEY, type RenderableChoice, type StateCondition } from "../contentSchemaTypes";
 import type { ISaveStore } from "./saveStore";
 
 /**

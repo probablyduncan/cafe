@@ -1,5 +1,3 @@
-import type { NodePosition } from "../contentSchemaTypes";
-
 /**
  * Given an object like `{ sceneId, nodeId }`.
  * returns a node key like: `"sceneId:nodeId"`,

@@ -5,7 +5,7 @@ import fs from "fs";
 import mermaid from 'mermaid';
 import { type FlowEdge, type FlowVertex } from "../node_modules/mermaid/dist/diagrams/flowchart/types.d"
 import { marked } from 'marked';
-import { flowchart, getVisitedStateVariable, type Flowchart, type FlowchartEdge, type Scene, sceneSchema, nodeSchema, type SceneNode, childNodeSchema, type StateCondition, type SceneChild } from './lib/contentSchemaTypes';
+import { flowchart, type Flowchart, type FlowchartEdge, type Scene, sceneSchema, nodeSchema, type SceneNode, childNodeSchema, type StateCondition, type SceneChild } from './lib/contentSchemaTypes';
 import { type FilePath, parsePath } from './lib/server/parsePath';
 import { formatQuotes } from '@probablyduncan/common/quotes';
 import { resolveChoiceNumber } from './lib/agnostic/choiceNumberResolver';
@@ -272,7 +272,7 @@ async function flowchartToScene(sceneId: string, chart: Flowchart): Promise<Scen
             else {
                 const negated = edge.text.startsWith("!");
                 name = negated ? edge.text.substring(1) : edge.text;
-                
+
                 if (!name.includes(":")) {
                     name = sceneId + ":" + name;
                 }

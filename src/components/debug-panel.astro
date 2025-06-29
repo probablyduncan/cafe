@@ -129,7 +129,7 @@ const choiceHistory = [
 </style>
 <script>
     import { events } from "../lib/client/events";
-    import type { NodePosition, RenderableChoice } from "../lib/contentSchemaTypes";
+    import type { RenderableChoice } from "../lib/contentSchemaTypes";
 
     function initDebug() {
         events.on("choose", (e) => addChoiceMade(e.choiceNode));
