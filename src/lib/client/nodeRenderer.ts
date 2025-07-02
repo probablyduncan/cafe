@@ -1,4 +1,4 @@
-import { htmlToWords } from "../agnostic/letterSplitter";
+import { htmlToTokens } from "../agnostic/letterSplitter";
 import { waitwait } from "../agnostic/waitwait";
 import type { RenderableChoice, RenderableLinearNode, SceneChild } from "../contentSchemaTypes";
 import { events } from "./events";
@@ -54,54 +54,55 @@ export class StandardNodeRenderer implements INodeRenderer {
         el.classList.add(node.style);
         el.innerHTML = "&nbsp;";
         this._contentContainer.appendChild(el);
-
+        
         await this._renderDelay(node.delay, el);
+        
+        const tokens = htmlToTokens(node.html);
+        let started = false;
+        let currentEl: HTMLElement = el;
+        for (let i = 0; i < tokens.length; i++) {
 
-        const words = htmlToWords(node.html);
-        for (let i = 0; i < words.length; i++) {
-            const wordEl = document.createElement("span");
+            const token = tokens[i];
 
-            if (i === 0) {
-                el.replaceChildren(wordEl)
-            }
-            else {
-                el.appendChild(wordEl);
-            }
-
-            for (let j = 0; j < words[i].chars.length; j++) {
-
-                // wordEl.innerHTML += words[i].chars[j].content;
-                // await waitwait(this.delay / 8);
-
-                const char = words[i].chars[j];
-                const charEl = document.createElement(char.tag);
-                charEl.innerHTML = char.content;
-                wordEl.appendChild(charEl);
-                await waitwait(this.delay / 8);
-            }
-
-            if (i < words.length - 1) {
-
-                const spaceEl = document.createElement("span");
-                spaceEl.innerHTML = " ";
-                wordEl.appendChild(spaceEl);
-
-                // await waitwait(this.delay / 8);
-            }
-
-            switch (words[i].delay) {
-                case "short":
-                    await waitwait(this.delay / 2);
+            switch (token.type) {
+                case "char": {
+                    if (!started) {
+                        currentEl.innerHTML = token.content;
+                        started = true;
+                    }
+                    else {
+                        currentEl.innerHTML += token.content;
+                    }
+                    await waitwait(this.delay / 16);
                     break;
-                case "long":
-                    await waitwait(this.delay * 2);
+                }
+                case "tag": {
+                    if (token.side === "start") {
+                        const newEl = document.createElement(token.tag);
+                        currentEl.appendChild(newEl);
+                        currentEl = newEl;
+                    }
+                    else {
+                        currentEl = currentEl.parentElement!;
+                    }
                     break;
-                // case "none":
-                //     await waitwait(this.delay / 4);
+                }
+                case "pause": {
+                    switch (token.length) {
+                        case "br":
+                        case "stop":
+                            await waitwait(this.delay * 2);
+                            break;
+                        case "beat":
+                            await waitwait(this.delay / 2);
+                            break;
+                    }
+                    break;
+                }
             }
         }
 
-        await waitwait(this.delay);
+        await waitwait(this.delay * 2);
     }
 
     private async _renderDelay(delay: SceneChild["delay"], el: HTMLElement) {

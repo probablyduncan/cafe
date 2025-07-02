@@ -1,137 +1,4 @@
-export type Token = {
-    content: string;
-    tag: string;
-}
-
-export function tokensToHtmlElements(
-    tokens: Token[][],
-    createWrapperElement: () => HTMLElement,
-    createBreathElement: () => HTMLElement,
-    createCharElement: (token: Token) => HTMLElement,
-): HTMLElement {
-    const wrapperEl = createWrapperElement();
-    for (let i = 0; i < tokens.length; i++) {
-        const breathEl = createBreathElement();
-        for (let j = 0; j < tokens[i].length; j++) {
-            const char = createCharElement(tokens[i][j]);
-            breathEl.appendChild(char);
-        }
-        wrapperEl.appendChild(breathEl);
-    }
-    return wrapperEl;
-}
-
-/**
- * wraps each character in a tag (span, by default)
- * 
- * supports one level of nesting, so in "<em>Wow</em>, dude"
- * the chars in Wow are wrapped in individual <em> tags and the other chars are wrapped in individual <span> tags
- */
-export function splitHtml(html: string): string {
-    const tokens = htmlToTokens(html);
-    const result = tokensToHtmlString(tokens);
-    return result;
-}
-
-
-export function htmlToTokens(html: string): Token[][] {
-
-    const DEFAULT_TAG = "span";
-    let currentTag = DEFAULT_TAG;
-
-    return html.split("\n").map(breath => {
-        breath = breath.trim();
-        const chars: Token[] = [];
-        for (let i = 0; i < breath.length; i++) {
-
-            const char = breath[i];
-
-            // if tag, set current and skip to next char
-            if (char === "<") {
-
-                const endIndex = breath.indexOf(">", i);
-                const spaceIndex = breath.indexOf(" ", i);
-
-                if (
-                    endIndex > -1
-                    && (
-                        endIndex < spaceIndex
-                        || spaceIndex === -1
-                    )
-                ) {
-
-                    currentTag = breath[i + 1] === "/"
-                        ? DEFAULT_TAG
-                        : breath.substring(i + 1, endIndex);
-
-                    i = endIndex;
-                    continue;
-                }
-            }
-
-            // keep special char together, like "&mdash;"
-            if (char === "&") {
-
-                const endIndex = breath.indexOf(";", i);
-                const spaceIndex = breath.indexOf(" ", i);
-
-                if (
-                    endIndex > -1
-                    && (
-                        endIndex < spaceIndex
-                        || spaceIndex === -1
-                    )
-                ) {
-
-                    chars.push({
-                        content: breath.substring(i, endIndex + 1),
-                        tag: currentTag,
-                    });
-
-                    i = endIndex;
-                    continue;
-                }
-            }
-
-            chars.push({
-                content: char,
-                tag: currentTag,
-            });
-
-        }
-
-        return chars;
-    });
-}
-
-
-export function tokensToHtmlString(tokens: Token[][]): string {
-    let result: string = "";
-    for (let i = 0; i < tokens.length; i++) {
-        result += "<span>";
-        for (let j = 0; j < tokens[i].length; j++) {
-            const token = tokens[i][j];
-            result += `<${token.tag}>`;
-            result += token.content;
-            result += `</${token.tag}>`;
-        }
-
-        // if not last, add space after
-        if (i < tokens.length - 1) {
-            result += "<span> </span>";
-        }
-
-        result += "</span>";
-    }
-
-    return result;
-}
-
-
-// this should be split into breaths, then words, then letter
-// 
-
-// return Token[][][]
+//#region v1
 
 export type Char = {
     tag: string;
@@ -257,4 +124,138 @@ export function htmlToWords(html: string) {
     }
 
     return words;
+}
+
+//#endregion
+//#region v2
+
+export type TokenBreathLength = "beat" | "stop" | "br";
+const PAUSE_PASSTHROUGH_CHARS = ["”", "’", " "];
+const PAUSE_STOP_CHARS = [".", "?", "!", ";", ":", "&mdash;"];
+const PAUSE_BEAT_CHARS = [","];
+const ALL_BREATH_CHARS = PAUSE_PASSTHROUGH_CHARS.concat(PAUSE_STOP_CHARS, PAUSE_BEAT_CHARS);
+
+export type Token = {
+    type: "char";
+    content: string;
+} | {
+    type: "tag";
+    side: "start" | "end";
+    tag: string;
+} | {
+    type: "pause";
+    length: TokenBreathLength;
+}
+
+export function htmlToTokens(html: string | undefined): Token[] {
+
+    if (html === undefined || html === "") {
+        return [];
+    }
+
+    let nextPause: TokenBreathLength | "none" = "none";
+
+    const tokens: Token[] = [];
+    for (let i = 0; i < html.length; i++) {
+        const char = html[i];
+        let token: Token = {
+            type: "char",
+            content: char,
+        }
+
+        switch (char) {
+            case "&": {
+                const closeIndex = html.indexOf(";", i);
+                if (closeIndex === -1) {
+                    break;
+                }
+
+                token.content = html.substring(i, closeIndex + 1);
+                i = closeIndex;
+            }
+            case "<": {
+
+                const closeIndex = html.indexOf(">", i);
+                if (closeIndex === -1) {
+                    break;
+                }
+
+                const side = html[i + 1] === "/" ? "end" : "start";
+                if (side === "end") {
+                    i++;
+                }
+
+                token = {
+                    type: "tag",
+                    tag: html.substring(i + 1, closeIndex),
+                    side: side,
+                }
+
+                i = closeIndex;
+                break;
+            }
+            case "\n": {
+                token.content = " ";
+                nextPause = "br";
+
+                if (tokens.length > 0) {
+                    const prev = tokens[tokens.length - 1];
+                    if (prev.type === "char") {
+
+                    }
+                }
+
+                // disregard spaces after \n
+                while (i + 1 < html.length && html[i + 1] === " ") {
+                    i++;
+                }
+                break;
+            }
+            default: {
+
+            }
+        }
+
+
+        if (token.type === "char") {
+
+            // add a breath before the next token if:
+            // 1. we have a pending breath
+            // 2. the next token is not a breath char
+            if (nextPause !== "none" && !ALL_BREATH_CHARS.includes(token.content)) {
+                tokens.push({
+                    type: "pause",
+                    length: nextPause,
+                });
+                nextPause = "none";
+            }
+
+            // otherwise, we can set the next breath if we need to
+            else if (nextPause !== "br") {
+                if (PAUSE_STOP_CHARS.includes(token.content)) {
+                    nextPause = "stop";
+                }
+                else if (nextPause === "none" && PAUSE_BEAT_CHARS.includes(token.content)) {
+                    nextPause = "beat";
+                }
+            }
+        }
+
+        tokens.push(token);
+    }
+
+    return tokens;
+}
+
+export function tokensToString(tokens: Token[]): string {
+    return tokens.map(t => {
+        switch (t.type) {
+            case "char":
+                return `|${t.content}`;
+            case "tag":
+                return `|<${t.side === "end" ? "/" : ""}${t.tag}>`;
+            case "pause":
+                return `|breath:${t.length}`;
+        }
+    }).join("");
 }
