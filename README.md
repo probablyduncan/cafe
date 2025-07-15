@@ -372,13 +372,13 @@ what can I do to solve this?
 - figure out all the requirements first before optimizing/refactoring/architecting
 
 what are the big requirements now that I've been thinking about it?
-- need to actuall traverse the story normally#
+- need to actually traverse the story normally
 - configuration options
-    - speed
-    - play/pause?
-    - theme
-    - text size?
-    - motion?
+    - speed (can I do this with css? I don't think so)
+    - reduce motion? animate text vs don't animate text (css? not sure, probably need js, same as render speed)
+    - play/pause? (js)
+    - theme (css only)
+    - text size? (css only)
 - debug options
     - go to node (text box, type in scene:node or something)
         - how should this work?
@@ -386,5 +386,7 @@ what are the big requirements now that I've been thinking about it?
         - or maybe just go there and don't bother with state
         - visited choices can be empty
         - and we'll allow the debugger to choose whatever state vars they want I guess?
+    - so debug mode doesn't save, you just go to whatever state you want yourself
+    - this means you have to be able to modify all aspects of the state
     - ability to update state vars used in current scene (updates state)
     - save and load states (snapshots/quicksave for easy testing)
