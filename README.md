@@ -375,6 +375,7 @@ what are the big requirements now that I've been thinking about it?
 - need to actually traverse the story normally
 - configuration options
     - speed (can I do this with css? I don't think so)
+    - allow for animated autoplay (current impl), animated text but it stops after every node, and no animation as well
     - reduce motion? animate text vs don't animate text (css? not sure, probably need js, same as render speed)
     - play/pause? (js)
     - theme (css only)
@@ -390,3 +391,14 @@ what are the big requirements now that I've been thinking about it?
     - this means you have to be able to modify all aspects of the state
     - ability to update state vars used in current scene (updates state)
     - save and load states (snapshots/quicksave for easy testing)
+
+config: {
+    // autoplay can't be true if animate is false
+    autoplay: boolean
+    // animate can't be false if autoplay is true
+    animate: boolean
+    // so really the three options are:
+    readingStyle: "immediate" | "animate" | "autoplay"
+
+    speed: ??
+}

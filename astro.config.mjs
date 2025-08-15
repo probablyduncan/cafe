@@ -2,8 +2,10 @@
 import { defineConfig } from "astro/config";
 import mdx from "@astrojs/mdx";
 
+import solidJs from "@astrojs/solid-js";
+
 // https://astro.build/config
 export default defineConfig({
-    integrations: [mdx()],
+    integrations: [mdx(), solidJs()],
     site: "https://duncans.cafe",
 });

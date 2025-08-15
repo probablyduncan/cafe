@@ -1,14 +1,16 @@
 {
-    "extends": "astro/tsconfigs/base",
-    "include": [
-        ".astro/types.d.ts",
-        "**/*"
-    ],
-    "exclude": [
-        "dist"
-    ],
-    "compilerOptions": {
-        "strictNullChecks": true,
-        "allowJs": true
-    }
+  "extends": "astro/tsconfigs/base",
+  "include": [
+    ".astro/types.d.ts",
+    "**/*"
+  ],
+  "exclude": [
+    "dist"
+  ],
+  "compilerOptions": {
+    "strictNullChecks": true,
+    "allowJs": true,
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js"
+  }
 }

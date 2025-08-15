@@ -1,22 +1,8 @@
 ---
-import DebugPanel from "../components/debug-panel.astro";
-import DialoguePanel from "../components/dialogue-panel.astro";
 import Layout from "../components/layout.astro";
-import MainColumn from "../components/main-column.astro";
+import { DebugRoot } from "../components/SolidRoot";
 ---
 
 <Layout>
-    <div>
-        <MainColumn scrollDirection="reverse">
-            <DialoguePanel autosave={false} />
-        </MainColumn>
-        <DebugPanel />
-    </div>
+    <DebugRoot client:only />
 </Layout>
-<style>
-    div {
-        display: grid;
-        grid-template-columns: auto 1fr;
-        overflow: hidden;
-    }
-</style>

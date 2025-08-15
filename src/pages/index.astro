@@ -1,11 +1,10 @@
 ---
-import DialoguePanel from "../components/dialogue-panel.astro";
+// import DialoguePanel from "../components/dialogue-panel.astro";
+// import MainColumn from "../components/main-column.astro";
 import Layout from "../components/layout.astro";
-import MainColumn from "../components/main-column.astro";
+import { Root } from "../components/SolidRoot";
 ---
 
 <Layout>
-    <MainColumn scrollDirection="reverse">
-        <DialoguePanel autosave={true} />
-    </MainColumn>
+    <Root client:only />
 </Layout>

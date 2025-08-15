@@ -98,20 +98,28 @@ export const nodeSchema = z.discriminatedUnion("type", [
     imageNodeSchema,
     nestedSceneNodeSchema,
     componentNodeSchema,
+    nodeBaseSchema.extend({
+        type: z.literal("madeChoice"),
+        nodeId: z.string(),
+        html: z.string().default(""),
+        number: z.string().optional(),
+        style: z.enum(["default"]).default("default"),
+        children: z.array(childNodeSchema).default([]),
+    })
 ]);
 
 export type SceneNode = z.infer<typeof nodeSchema>;
 export type SceneChild = z.infer<typeof childNodeSchema>;
 
-export type RenderableLinearNode = 
-    Exclude<SceneNode, { type: "choice" }> 
-    & SceneChild 
+export type RenderableLinearNode =
+    Exclude<SceneNode, { type: "choice" }>
+    & SceneChild
     & NodePosition;
 
-export type RenderableChoice = 
-    Extract<SceneNode, { type: "choice" }> 
-    & SceneChild 
-    & NodePosition 
+export type RenderableChoice =
+    Extract<SceneNode, { type: "choice" }>
+    & SceneChild
+    & NodePosition
     & { visited: boolean };
 
 export type StateCondition = z.infer<typeof stateCondition>;
